@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Tinos:wght@400;700&display=swap"
+    />
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <style>
+      body {
+        font-family: 'Tinos', Georgia, serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-white justify-between group/design-root overflow-x-hidden">
+      <div>
+        <div class="flex w-full grow bg-white @container p-4">
+          <div class="w-full gap-1 overflow-hidden bg-white @[480px]:gap-2 aspect-[3/2] rounded-lg flex">
+            <div
+              class="w-full bg-center bg-no-repeat bg-cover aspect-auto rounded-none flex-1"
+              style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC4hoWbASsAs4jL2FR6g-XiCKz_NLJIdYvdrKEQaIJSDmSjNPPdc6xyNFw5ShXbJ-NLCmgbxxlhD6xZVuEI_zK87mFEY1IP6AR_yL0lpc1w_UqqWnpKxKEFv1k-E4vB8gf8iccB5dSI3fdV56hbD29gNHgwjmhDjbIAn7I3NFgNiy5_uky8uQ2X_-dxLb0ZctCF3aV4jmvWpm6RAlDPKM15TIYrOiIanVohU-JZKjPXqpcBtk8gDZiYjWYk1MAnxYPqgEYvnu4CMgNU");'
+            ></div>
+          </div>
+        </div>
+
+        <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+          <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#111518] text-base font-medium leading-normal pb-2">Username</p>
+            <input
+              placeholder="Enter your username"
+              class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111518] focus:outline-0 focus:ring-0 border border-[#dbe1e6] bg-white focus:border-[#dbe1e6] h-14 placeholder:text-[#60798a] p-[15px] text-base font-normal leading-normal"
+              value=""
+            />
+          </label>
+        </div>
+
+        <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+          <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#111518] text-base font-medium leading-normal pb-2">Password</p>
+            <input
+              placeholder="Enter your password"
+              class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111518] focus:outline-0 focus:ring-0 border border-[#dbe1e6] bg-white focus:border-[#dbe1e6] h-14 placeholder:text-[#60798a] p-[15px] text-base font-normal leading-normal"
+              value=""
+            />
+          </label>
+        </div>
+
+        <p class="text-[#60798a] text-sm font-normal leading-normal pb-3 pt-1 px-4 underline">Forgot Password</p>
+
+        <div class="flex px-4 py-3">
+          <button
+            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#249df3] text-white text-base font-bold leading-normal tracking-[0.015em]"
+          >
+            <span class="truncate">LOGIN</span>
+          </button>
+        </div>
+
+        <div class="flex px-4 py-3">
+          <button
+            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#f0f3f5] text-[#111518] text-base font-bold leading-normal tracking-[0.015em]"
+          >
+            <span class="truncate">OPEN AN ACCOUNT</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-[#60798a] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">Support</p>
+        <p class="text-[#60798a] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center">25.7.3</p>
+        <div class="h-5 bg-white"></div>
+      </div>
+    </div>
+  </body>
+</html>

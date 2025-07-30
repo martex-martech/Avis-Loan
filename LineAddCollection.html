@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Line</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f9fafb;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+
+    .header-actions {
+      display: flex;
+      gap: 16px;
+    }
+
+    .header-action {
+      color: white;
+      font-size: 18px;
+      position: relative;
+      padding: 4px;
+    }
+
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 9999px;
+      font-weight: bold;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 80px 20px 100px;
+      margin-top: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      background-color: white;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+      appearance: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234f46e5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+      color: var(--primary);
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .toggle-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: var(--primary);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
+
+    .qr-upload {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .qr-upload:hover {
+      border-color: var(--primary-light);
+      background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .qr-upload-text {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .qr-upload-icon {
+      color: var(--primary);
+      font-size: 20px;
+    }
+
+    .btn {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      max-width: 500px;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 16px;
+      border: none;
+      width: calc(100% - 40px);
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+      text-align: center;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      background-color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 70px 15px 100px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <a href="Collection.html" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Add Line</div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="form-group">
+      <label class="form-label" for="lineName">Line Name</label>
+      <input type="text" class="form-input" id="lineName" placeholder="Enter line name">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="lineType">Line Type</label>
+      <select class="form-input form-select" id="lineType">
+        <option value="" disabled selected>Select Type</option>
+        <option value="standard">Standard</option>
+        <option value="premium">Premium</option>
+        <option value="express">Express</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="interest">Interest Per Hundred</label>
+      <input type="text" class="form-input" id="interest" placeholder="Enter interest rate">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="billAmount">Bill Amount Per Hundred</label>
+      <input type="text" class="form-input" id="billAmount" placeholder="Enter bill amount">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="installments">Number of Installments</label>
+      <input type="text" class="form-input" id="installments" placeholder="Enter number of installments">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="badLoanDays">Bad Loan Days</label>
+      <input type="text" class="form-input" id="badLoanDays" placeholder="Enter days">
+    </div>
+
+    <div class="toggle-container">
+      <span class="toggle-label">Close Loan Manually</span>
+      <label class="switch">
+        <input type="checkbox" id="manualClose">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-container">
+      <span class="toggle-label">Enable Penalty</span>
+      <label class="switch">
+        <input type="checkbox" id="enablePenalty">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">UPI QR Code</label>
+      <div class="qr-upload">
+        <span class="qr-upload-text">Upload QR Code</span>
+        <i class="fas fa-chevron-down qr-upload-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Button -->
+  <button class="btn" id="saveLineBtn">
+    <i class="fas fa-save" style="margin-right: 8px;"></i> SAVE LINE
+  </button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('lineName').focus();
+
+      const saveBtn = document.getElementById('saveLineBtn');
+      saveBtn.addEventListener('click', function (e) {
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple-effect');
+
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = `${size}px`;
+        ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+
+        this.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+  </script>
+</body>
+
+</html>
