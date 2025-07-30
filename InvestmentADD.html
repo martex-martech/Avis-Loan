@@ -2,99 +2,225 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Add Investment</title>
-  <!-- Google Fonts: Tinos -->
-  <link href="https://fonts.googleapis.com/css2?family=Tinos&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts - Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f9fafb;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --card-bg: #ffffff;
     }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow-x: hidden;
-      font-family: 'Tinos', serif;
-      background-color: #fff;
-      color: #333;
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Top Navigation Bar */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 16px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      position: sticky;
+    .header {
+      position: fixed;
       top: 0;
-      z-index: 10;
-    }
-
-    .top-bar .left,
-    .top-bar .right {
+      left: 0;
+      right: 0;
+      z-index: 50;
       display: flex;
+      justify-content: space-between;
       align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .top-bar .left i,
-    .top-bar .right i {
+    .header-title {
       font-size: 20px;
-      cursor: pointer;
-    }
-
-    .top-bar .title {
-      font-size: 18px;
       font-weight: 600;
-      margin-left: 10px;
+      letter-spacing: 0.5px;
     }
 
-    .container {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-    }
-
-    select,
-    input[type="text"],
-    input[type="date"],
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      font-family: 'Tinos', serif;
-    }
-
-    .row {
+    .header-actions {
       display: flex;
-      gap: 8px;
-      align-items: center;
+      gap: 16px;
     }
 
-    .row select {
-      flex: 1;
+    .header-action {
+      color: white;
+      font-size: 18px;
+      position: relative;
+      padding: 4px;
     }
 
-    .row button {
-      padding: 8px 10px;
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 9999px;
+      font-weight: bold;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .main-content {
+      padding: 24px 16px;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
       font-size: 16px;
-      border: none;
-      background-color: #f0f0f0;
-      border-radius: 6px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
       cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-color: #eef2ff;
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    .btn-icon:hover {
+      background-color: #e0e7ff;
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: white;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      padding: 12px 0;
+      z-index: 40;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 12px;
+      padding: 4px 12px;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-group-item {
+      flex: 1;
     }
 
     .checkbox-container {
@@ -105,165 +231,160 @@
 
     .checkbox-container input {
       margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
     }
 
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .save-btn {
-      display: block;
-      width: 100%;
-      background-color: #87c7eb;
-      color: white;
-      font-weight: bold;
-      border: none;
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 25px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .save-btn:hover {
-      background-color: #5ab3e1;
-    }
-    .bottom-nav {
- 
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: white; /* or your preferred color */
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* optional shadow */
-  z-index: 100;
-}
-
-    @media (max-width: 480px) {
-      .top-bar .title {
-        font-size: 16px;
-      }
+    .checkbox-container label {
+      margin: 0;
+      font-weight: 400;
+      color: var(--text);
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Top Bar with Back Arrow and Close Icon -->
-  <div class="top-bar">
-    <div class="left">
-      <a href="Expense.html" onclick="goBack()">←</a>
-      <span class="title">Add Investment</span>
+  <!-- Header -->
+  <header class="header">
+    <a href="Investment.html" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Add Investment</div>
+    <div class="header-actions">
+      <a href="Investment.html" class="header-action" title="Close">
+        <i class="fas fa-times"></i>
+      </a>
     </div>
-    <div class="right">
-      <a href="Expense.html" onclick="closeForm()">✕</a>
-    </div>
-  </div>
+  </header>
 
-  <!-- Form Body -->
-  <div class="container">
-
-    <label for="line">Line</label>
-    <select id="line">
-      <option>Select Line</option>
-      <option>Line A</option>
-      <option>Line B</option>
-    </select>
-
-    <label for="investment-type">Investment Type Name</label>
-    <div class="row">
-      <select id="investment-type">
-        <option>Select Type</option>
-        <option>Fixed Deposit</option>
-        <option>Mutual Fund</option>
-      </select>
-      <button title="Search">🔍</button>
-      <button title="Add New">➕</button>
-    </div>
-
-    <label for="amount">Invested Amount</label>
-    <input type="text" id="amount" placeholder="Enter amount" />
-
-    <div class="checkbox-container">
-      <input type="checkbox" id="online" />
-      <label for="online">Online Payment</label>
-    </div>
-    
-    <label for="online-amount">Online Amount</label>
-    <input type="text" id="online-amount" placeholder="Enter amount" />
-
-    <label for="date">Investment Date</label>
-    <input type="date" id="date" value="2025-07-27" />
-
-    <label for="comments">Comments</label>
-    <textarea id="comments" placeholder="Enter any remarks..."></textarea>
-
-    <button class="save-btn">SAVE</button>
-  </div>
-
-  <!-- JS for back/close -->
-  <script>
-    function goBack() {
-      alert("Back clicked"); // Replace with real navigation
-    }
-    function closeForm() {
-      alert("Close clicked"); // Replace with real close logic
-    }
-  </script>
-<div class="bottom-nav">
-        <div class="flex gap-2 border-t border-[#f0f3f4] bg-white px-4 pb-3 pt-2">
-          <a class="just flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-[#111518]" href="Collection.html">
-            <div class="text-[#111518] flex h-8 items-center justify-center" data-icon="Money" data-size="24px" data-weight="fill">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path
-                  d="M168,128a40,40,0,1,1-40-40A40,40,0,0,1,168,128Zm80-64V192a8,8,0,0,1-8,8H16a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H240A8,8,0,0,1,248,64Zm-16,46.35A56.78,56.78,0,0,1,193.65,72H62.35A56.78,56.78,0,0,1,24,110.35v35.3A56.78,56.78,0,0,1,62.35,184h131.3A56.78,56.78,0,0,1,232,145.65Z"
-                ></path>
-              </svg>
-            </div>
-            <p class="text-[#111518] text-xs font-medium leading-normal tracking-[0.015em]">Collection</p>
-          </a>
-          <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#617989]" href="Expense.html">
-            <div class="text-[#617989] flex h-8 items-center justify-center" data-icon="CurrencyDollar" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path
-                  d="M152,120H136V56h8a32,32,0,0,1,32,32,8,8,0,0,0,16,0,48.05,48.05,0,0,0-48-48h-8V24a8,8,0,0,0-16,0V40h-8a48,48,0,0,0,0,96h8v64H104a32,32,0,0,1-32-32,8,8,0,0,0-16,0,48.05,48.05,0,0,0,48,48h16v16a8,8,0,0,0,16,0V216h16a48,48,0,0,0,0-96Zm-40,0a32,32,0,0,1,0-64h8v64Zm40,80H136V136h16a32,32,0,0,1,0,64Z"
-                ></path>
-              </svg>
-            </div>
-            <p class="text-[#617989] text-xs font-medium leading-normal tracking-[0.015em]">Expense</p>
-          </a>
-          <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#617989]" href="Customer.html">
-            <div class="text-[#617989] flex h-8 items-center justify-center" data-icon="Users" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path
-                  d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"
-                ></path>
-              </svg>
-            </div>
-            <p class="text-[#617989] text-xs font-medium leading-normal tracking-[0.015em]">Customer</p>
-          </a>
-          <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#617989]" href="Reports.html">
-            <div class="text-[#617989] flex h-8 items-center justify-center" data-icon="PresentationChart" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path
-                  d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176ZM104,120v24a8,8,0,0,1-16,0V120a8,8,0,0,1,16,0Zm32-16v40a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm32-16v56a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Z"
-                ></path>
-              </svg>
-            </div>
-            <p class="text-[#617989] text-xs font-medium leading-normal tracking-[0.015em]">Reports</p>
-          </a>
-          <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#617989]" href="Settings.html">
-            <div class="text-[#617989] flex h-8 items-center justify-center" data-icon="Gear" data-size="24px" data-weight="regular">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                <path
-                  d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"
-                ></path>
-              </svg>
-            </div>
-            <p class="text-[#617989] text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
-          </a>
-        </div>
-        <div class="h-5 bg-white"></div>
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="card">
+      <div class="card-title">Investment Details</div>
+      
+      <!-- Line Selection -->
+      <div class="form-group">
+        <label class="form-label">Select Line</label>
+        <select class="form-input form-select">
+          <option value="" disabled selected>Choose line</option>
+          <option value="main">Main Line</option>
+          <option value="north">North Line</option>
+          <option value="south">South Line</option>
+        </select>
       </div>
+
+      <!-- Investment Type -->
+      <div class="form-group">
+        <label class="form-label">Investment Type</label>
+        <div class="input-group">
+          <div class="input-group-item">
+            <select class="form-input form-select">
+              <option value="" disabled selected>Choose type</option>
+              <option value="fd">Fixed Deposit</option>
+              <option value="mutual">Mutual Fund</option>
+              <option value="stocks">Stocks</option>
+            </select>
+          </div>
+          <button class="btn btn-icon" title="Add New Type">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="form-group">
+        <label class="form-label">Invested Amount (₹)</label>
+        <input type="number" class="form-input" placeholder="Enter amount">
+      </div>
+
+      <!-- Online Payment -->
+      <div class="checkbox-container">
+        <input type="checkbox" id="online-payment">
+        <label for="online-payment">Online Payment</label>
+      </div>
+
+      <!-- Online Amount -->
+      <div class="form-group" id="online-amount-group" style="display: none;">
+        <label class="form-label">Online Amount (₹)</label>
+        <input type="number" class="form-input" placeholder="Enter online amount">
+      </div>
+
+      <!-- Date -->
+      <div class="form-group">
+        <label class="form-label">Investment Date</label>
+        <input type="date" class="form-input" id="investment-date">
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" rows="3" placeholder="Add any additional notes"></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <button class="btn btn-primary w-full">
+        <i class="fas fa-save" style="margin-right: 8px;"></i> SAVE INVESTMENT
+      </button>
     </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="nav">
+    <div class="nav-items">
+      <a href="Collection.html" class="nav-item">
+        <i class="fas fa-coins"></i>
+        <span>Collection</span>
+      </a>
+      <a href="Expense.html" class="nav-item">
+        <i class="fas fa-receipt"></i>
+        <span>Expense</span>
+      </a>
+      <a href="Investment.html" class="nav-item active">
+        <i class="fas fa-chart-line"></i>
+        <span>Investment</span>
+      </a>
+      <a href="Reports.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Reports</span>
+      </a>
+      <a href="Settings.html" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    // Set today's date as default
+    document.addEventListener('DOMContentLoaded', function () {
+      const today = new Date();
+      const formattedDate = today.toISOString().substr(0, 10);
+      document.getElementById('investment-date').value = formattedDate;
+
+      // Toggle online amount field
+      const onlineCheckbox = document.querySelector('#online-payment');
+      const onlineAmountGroup = document.querySelector('#online-amount-group');
+      
+      onlineCheckbox.addEventListener('change', function() {
+        if(this.checked) {
+          onlineAmountGroup.style.display = 'block';
+        } else {
+          onlineAmountGroup.style.display = 'none';
+        }
+      });
+
+      // Add active state to clicked buttons
+      document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          this.classList.add('active');
+          setTimeout(() => {
+            this.classList.remove('active');
+          }, 150);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
