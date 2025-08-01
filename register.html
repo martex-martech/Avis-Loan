@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Register</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts - Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f9fafb;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .register-container {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 40px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      height: 80px;
+      width: auto;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+      margin-bottom: 16px;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background-color: #f3f4f6;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .version {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-light);
+    }
+
+    .password-container {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="register-container">
+    <div class="logo-container">
+      <img
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4hoWbASsAs4jL2FR6g-XiCKz_NLJIdYvdrKEQaIJSDmSjNPPdc6xyNFw5ShXbJ-NLCmgbxxlhD6xZVuEI_zK87mFEY1IP6AR_yL0lpc1w_UqqWnpKxKEFv1k-E4vB8gf8iccB5dSI3fdV56hbD29gNHgwjmhDjbIAn7I3NFgNiy5_uky8uQ2X_-dxLb0ZctCF3aV4jmvWpm6RAlDPKM15TIYrOiIanVohU-JZKjPXqpcBtk8gDZiYjWYk1MAnxYPqgEYvnu4CMgNU"
+        alt="Logo" class="logo">
+      <h1 class="text-2xl font-semibold text-gray-800 mt-4">Create an Account</h1>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input type="text" class="form-input" placeholder="Enter your full name">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="text" class="form-input" placeholder="Choose a username">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-input" placeholder="Enter your email">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mobile Number</label>
+      <input type="tel" class="form-input" placeholder="Enter your mobile number">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="password-container">
+        <input type="password" id="password" class="form-input" placeholder="Create a password">
+        <i class="password-toggle fas fa-eye" onclick="togglePassword('password')"></i>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Confirm Password</label>
+      <div class="password-container">
+        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password">
+        <i class="password-toggle fas fa-eye" onclick="togglePassword('confirmPassword')"></i>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="registerUser()">
+      CREATE ACCOUNT
+    </button>
+
+    <div class="text-center mt-4 text-sm text-gray-600">
+      Already have an account? <a href="index.html" class="text-indigo-600 hover:text-indigo-800">Sign in</a>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const icon = input.nextElementSibling;
+      
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    }
+
+    function registerUser() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (password !== confirmPassword) {
+        alert("Passwords don't match!");
+        return;
+      }
+      
+      // Here you would typically send the data to your backend
+      alert("Registration successful! Redirecting to login...");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+
+</html>
