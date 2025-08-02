@@ -190,12 +190,15 @@
 
   <!-- Header -->
   <header class="header">
-    <a href="Customer.html" class="header-action">
+    <!-- <a href="Customer.html" class="header-action">
       <i class="fas fa-chevron-left"></i>
-    </a>
+    </a> -->
     <div class="header-title">Customer</div>
     <div class="header-actions">
-      <a href="Customer.html" class="header-action" title="Close">
+      <a href="AddCustomer.html" class="header-action" title="Add Customer">
+        <i class="fas fa-plus"></i>
+      </a>
+      <a href="Customer.html" class="header-action" title="Customers">
         <i class="fas fa-users"></i>
       </a>
     </div>
@@ -223,7 +226,7 @@
       </select>
     </div>
 
-    <button class="btn btn-primary w-full">
+    <button class="btn btn-primary w-full" onclick="window.location.href = 'customerlist.html'">
       SUBMIT
     </button>
   </main>
