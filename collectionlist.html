@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Vasool Collection</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts - Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f9fafb;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 16px;
+    }
+
+    .header-action {
+      color: white;
+      font-size: 18px;
+      position: relative;
+      padding: 4px;
+    }
+
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 9999px;
+      font-weight: bold;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .main-content {
+      padding: 16px;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .customer-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .customer-info {
+      flex: 1;
+      margin-left: 12px;
+    }
+
+    .customer-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .customer-details {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .customer-details span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .payment-amount {
+      font-weight: 600;
+      color: var(--primary);
+      margin: 4px 0;
+    }
+
+    .payment-status {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-paid {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-overdue {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-light);
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: white;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      padding: 12px 0;
+      z-index: 40;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 12px;
+      padding: 4px 12px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active i {
+      transform: scale(1.1);
+    }
+
+    .search-bar {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-bar i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      z-index: 10;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      background-color: white;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+      outline: none;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .filter-tabs::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      white-space: nowrap;
+      background-color: #f3f4f6;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .filter-tab:hover {
+      transform: translateY(-1px);
+    }
+
+    .filter-tab.active {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .collection-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .customer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #e0e7ff;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .summary-bar {
+      display: flex;
+      justify-content: space-between;
+      background-color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .summary-item {
+      text-align: center;
+    }
+
+    .summary-value {
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .hidden {
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      border: none;
+      transform: scale(0.9);
+      pointer-events: none;
+    }
+
+    /* Animation classes */
+    .fade-in {
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-up {
+      animation: slideUp 0.3s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Button animations */
+    .collect-btn {
+      transition: all 0.2s ease;
+    }
+
+    .collect-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .collect-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <a href="Collection.html" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Vasool Collection</div>
+    <div class="header-actions">
+      <a href="" class="header-action" title="Filter">
+        <i class="fas fa-filter"></i>
+      </a>
+      <a href="" class="header-action" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <span class="badge">3</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Search and Filter -->
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="Search customers...">
+    </div>
+
+    <div class="filter-tabs">
+      <div class="filter-tab active" data-filter="all">All</div>
+      <div class="filter-tab" data-filter="pending">Pending</div>
+      <div class="filter-tab" data-filter="paid">Paid</div>
+      <div class="filter-tab" data-filter="overdue">Overdue</div>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="summary-bar slide-up">
+      <div class="summary-item">
+        <div class="summary-value" style="color: var(--success);">₹3,250</div>
+        <div class="summary-label">Collected</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value" style="color: var(--danger);">₹5,500</div>
+        <div class="summary-label">Pending</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value">8/15</div>
+        <div class="summary-label">Visited</div>
+      </div>
+    </div>
+
+    <!-- Customer List -->
+    <div class="section-title">
+      Today's Collections
+      <span id="customer-count" style="font-size: 14px; color: var(--text-light); font-weight: normal;">15 customers</span>
+    </div>
+
+    <div id="customer-list">
+      <!-- Customer 1 - Paid -->
+      <div class="customer-row fade-in" data-status="paid" data-name="rajesh kumar" data-phone="9876543210" data-area="downtown">
+        <div class="customer-avatar">RK</div>
+        <div class="customer-info">
+          <div class="customer-name">Rajesh Kumar</div>
+          <div class="customer-details">
+            <span><i class="fas fa-phone-alt"></i> 9876543210</span>
+            <span><i class="fas fa-map-marker-alt"></i> Downtown</span>
+          </div>
+          <div class="payment-amount">₹1,250.00</div>
+          <span class="payment-status status-paid">
+            <i class="fas fa-check-circle"></i> Paid
+          </span>
+        </div>
+        <div class="collection-actions">
+          <button class="btn btn-outline btn-sm">
+            <i class="fas fa-receipt"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer 2 - Pending -->
+      <div class="customer-row fade-in" data-status="pending" data-name="priya sharma" data-phone="8765432109" data-area="uptown">
+        <div class="customer-avatar">PS</div>
+        <div class="customer-info">
+          <div class="customer-name">Priya Sharma</div>
+          <div class="customer-details">
+            <span><i class="fas fa-phone-alt"></i> 8765432109</span>
+            <span><i class="fas fa-map-marker-alt"></i> Uptown</span>
+          </div>
+          <div class="payment-amount">₹2,500.00</div>
+          <span class="payment-status status-pending">
+            <i class="fas fa-clock"></i> Due Today
+          </span>
+        </div>
+        <div class="collection-actions">
+          <button class="btn btn-success btn-sm collect-btn">
+            Collect
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer 3 - Overdue -->
+      <div class="customer-row fade-in" data-status="overdue" data-name="vikram patel" data-phone="7654321098" data-area="suburbs">
+        <div class="customer-avatar">VP</div>
+        <div class="customer-info">
+          <div class="customer-name">Vikram Patel</div>
+          <div class="customer-details">
+            <span><i class="fas fa-phone-alt"></i> 7654321098</span>
+            <span><i class="fas fa-map-marker-alt"></i> Suburbs</span>
+          </div>
+          <div class="payment-amount">₹3,750.00</div>
+          <span class="payment-status status-overdue">
+            <i class="fas fa-exclamation-circle"></i> Overdue (2 days)
+          </span>
+        </div>
+        <div class="collection-actions">
+          <button class="btn btn-danger btn-sm collect-btn">
+            Collect
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer 4 - Paid -->
+      <div class="customer-row fade-in" data-status="paid" data-name="anjali gupta" data-phone="6543210987" data-area="downtown">
+        <div class="customer-avatar">AG</div>
+        <div class="customer-info">
+          <div class="customer-name">Anjali Gupta</div>
+          <div class="customer-details">
+            <span><i class="fas fa-phone-alt"></i> 6543210987</span>
+            <span><i class="fas fa-map-marker-alt"></i> Downtown</span>
+          </div>
+          <div class="payment-amount">₹1,800.00</div>
+          <span class="payment-status status-paid">
+            <i class="fas fa-check-circle"></i> Paid
+          </span>
+        </div>
+        <div class="collection-actions">
+          <button class="btn btn-outline btn-sm">
+            <i class="fas fa-receipt"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Customer 5 - Pending -->
+      <div class="customer-row fade-in" data-status="pending" data-name="sanjay mehta" data-phone="9876501234" data-area="uptown">
+        <div class="customer-avatar">SM</div>
+        <div class="customer-info">
+          <div class="customer-name">Sanjay Mehta</div>
+          <div class="customer-details">
+            <span><i class="fas fa-phone-alt"></i> 9876501234</span>
+            <span><i class="fas fa-map-marker-alt"></i> Uptown</span>
+          </div>
+          <div class="payment-amount">₹1,200.00</div>
+          <span class="payment-status status-pending">
+            <i class="fas fa-clock"></i> Due Today
+          </span>
+        </div>
+        <div class="collection-actions">
+          <button class="btn btn-success btn-sm collect-btn">
+            Collect
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="nav">
+    <div class="nav-items">
+      <a href="Collection.html" class="nav-item active">
+        <i class="fas fa-coins"></i>
+        <span>Collection</span>
+      </a>
+      <a href="Expense.html" class="nav-item">
+        <i class="fas fa-receipt"></i>
+        <span>Expense</span>
+      </a>
+      <a href="Customer.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="Reports.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Reports</span>
+      </a>
+      <a href="Settings.html" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Customer data
+      const customers = Array.from(document.querySelectorAll('.customer-row'));
+      const searchInput = document.getElementById('search-input');
+      const customerCount = document.getElementById('customer-count');
+      
+      // Filter tab functionality
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          const filter = this.dataset.filter;
+          filterCustomers(filter, searchInput.value.toLowerCase());
+        });
+      });
+      
+      // Search functionality
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const activeFilter = document.querySelector('.filter-tab.active').dataset.filter;
+        filterCustomers(activeFilter, searchTerm);
+      });
+      
+      // Filter and search function
+      function filterCustomers(filter, searchTerm = '') {
+        let visibleCount = 0;
+        
+        customers.forEach(customer => {
+          const status = customer.dataset.status;
+          const name = customer.dataset.name;
+          const phone = customer.dataset.phone;
+          const area = customer.dataset.area;
+          
+          const matchesFilter = filter === 'all' || status === filter;
+          const matchesSearch = searchTerm === '' || 
+                               name.includes(searchTerm) || 
+                               phone.includes(searchTerm) || 
+                               area.includes(searchTerm);
+          
+          if (matchesFilter && matchesSearch) {
+            customer.classList.remove('hidden');
+            // Add animation class when showing
+            customer.classList.add('fade-in');
+            visibleCount++;
+          } else {
+            customer.classList.add('hidden');
+            customer.classList.remove('fade-in');
+          }
+        });
+        
+        // Update customer count
+        customerCount.textContent = `${visibleCount} customer${visibleCount !== 1 ? 's' : ''}`;
+      }
+      
+      // Collect payment button functionality
+      document.querySelectorAll('.collect-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const row = this.closest('.customer-row');
+          const status = row.querySelector('.payment-status');
+          const amount = row.querySelector('.payment-amount');
+          
+          // Add animation to the row
+          row.classList.add('fade-in');
+          
+          // Mark as paid
+          row.dataset.status = 'paid';
+          status.innerHTML = '<i class="fas fa-check-circle"></i> Paid';
+          status.classList.remove('status-pending', 'status-overdue');
+          status.classList.add('status-paid');
+          
+          // Change button to receipt
+          this.innerHTML = '<i class="fas fa-receipt"></i>';
+          this.classList.remove('btn-success', 'btn-danger');
+          this.classList.add('btn-outline');
+          
+          // Update summary (in a real app, this would be calculated)
+          const collectedValue = document.querySelector('.summary-value:first-child');
+          const currentCollected = parseInt(collectedValue.textContent.replace('₹','').replace(',',''));
+          const paymentAmount = parseInt(amount.textContent.replace('₹','').replace(',',''));
+          collectedValue.textContent = '₹' + (currentCollected + paymentAmount).toLocaleString('en-IN');
+          
+          // Add animation to the summary update
+          collectedValue.classList.add('slide-up');
+          setTimeout(() => collectedValue.classList.remove('slide-up'), 300);
+          
+          // Update visited count
+          const visitedCount = document.querySelector('.summary-value:last-child');
+          const currentVisited = parseInt(visitedCount.textContent.split('/')[0]);
+          visitedCount.textContent = (currentVisited + 1) + '/15';
+          
+          // Update pending amount
+          const pendingValue = document.querySelector('.summary-value:nth-child(2)');
+          const currentPending = parseInt(pendingValue.textContent.replace('₹','').replace(',',''));
+          pendingValue.textContent = '₹' + (currentPending - paymentAmount).toLocaleString('en-IN');
+          
+          // If we're filtering by pending, hide this customer now
+          const activeFilter = document.querySelector('.filter-tab.active').dataset.filter;
+          if (activeFilter === 'pending' || activeFilter === 'overdue') {
+            filterCustomers(activeFilter, searchInput.value.toLowerCase());
+          }
+        });
+      });
+      
+      // Bottom navigation animation
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          if (!this.classList.contains('active')) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
