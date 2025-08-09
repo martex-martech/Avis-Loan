@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Language Settings</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts - Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f9fafb;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .main-content {
+      padding: 24px 16px;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .language-option {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background-color: white;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .language-option.active {
+      border: 1px solid var(--primary);
+    }
+
+    .language-flag {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .language-name {
+      flex-grow: 1;
+      font-weight: 500;
+    }
+
+    .language-check {
+      color: var(--primary);
+      font-size: 16px;
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: white;
+      padding: 12px 0;
+      z-index: 40;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 12px;
+      padding: 4px 12px;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <a href="Settings.html" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Language</div>
+    <div class="header-actions"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="language-option active">
+      <div class="language-flag">EN</div>
+      <div class="language-name">English</div>
+      <i class="fas fa-check language-check"></i>
+    </div>
+  </main>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Language selection functionality can be added here when more languages are available
+    });
+  </script>
+</body>
+</html>
