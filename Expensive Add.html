@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Investment</title>
+  <title>Add Expense</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -56,49 +56,10 @@
       letter-spacing: 0.5px;
     }
 
-    .header-actions {
-      display: flex;
-      gap: 16px;
-    }
-
-    .header-action {
-      color: white;
-      font-size: 18px;
-      position: relative;
-      padding: 4px;
-      transition: transform 0.2s;
-    }
-
-    .header-action:active {
-      transform: scale(0.9);
-    }
-
-    .badge {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      background-color: #ef4444;
-      color: white;
-      font-size: 10px;
-      padding: 2px 5px;
-      border-radius: 9999px;
-      font-weight: bold;
-      min-width: 18px;
-      text-align: center;
-    }
-
     .main-content {
       padding: 24px 16px;
       max-width: 600px;
       margin: 0 auto;
-    }
-
-    .form-card {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
     }
 
     .form-group {
@@ -113,7 +74,7 @@
       color: var(--text-light);
     }
 
-    .form-input {
+    .form-input, .form-select {
       width: 100%;
       padding: 12px 16px;
       border: 1px solid var(--border);
@@ -123,7 +84,7 @@
       background-color: white;
     }
 
-    .form-input:focus {
+    .form-input:focus, .form-select:focus {
       outline: none;
       border-color: var(--primary-light);
       box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
@@ -135,49 +96,6 @@
       background-repeat: no-repeat;
       background-position: right 16px center;
       background-size: 16px;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 12px;
-    }
-
-    .input-group-item {
-      flex: 1;
-    }
-
-    .action-btn {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #eef2ff;
-      color: var(--primary);
-      border-radius: 8px;
-      font-size: 16px;
-      transition: all 0.2s;
-    }
-
-    .action-btn:active {
-      transform: scale(0.95);
-    }
-
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .checkbox-container input {
-      margin-right: 10px;
-      width: 18px;
-      height: 18px;
-    }
-
-    .checkbox-container label {
-      margin: 0;
-      font-size: 14px;
     }
 
     .btn {
@@ -198,7 +116,6 @@
       box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
       text-align: center;
       cursor: pointer;
-      overflow: hidden;
     }
 
     .btn:active {
@@ -215,66 +132,42 @@
       <i class="fas fa-chevron-left"></i>
     </a>
     <div class="header-title">Add Expense</div>
-    <div class="header-actions">
-    </div>
+    <div class="header-actions"></div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="form-group">
-      <label class="form-label">Line</label>
-      <select class="form-input form-select" id="line">
-        <option value="" disabled selected>Select Line</option>
-        <option value="line1">Line A</option>
-        <option value="line2">Line B</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Investment Type Name</label>
-      <div class="input-group">
-        <div class="input-group-item">
-          <select class="form-input form-select" id="investment-type">
-            <option value="" disabled selected>Select Type</option>
-            <option value="fd">Fixed Deposit</option>
-            <option value="mf">Mutual Fund</option>
-          </select>
-        </div>
-        <button class="action-btn" title="Search">
-          <i class="fas fa-search"></i>
-        </button>
-        <button class="action-btn" title="Add New">
-          <i class="fas fa-plus"></i>
-        </button>
+      <div class="form-group">
+        <label class="form-label">Line</label>
+        <select class="form-select" id="line">
+          <option value="all">All Lines</option>
+          <option value="line1">Line 1</option>
+          <option value="line2">Line 2</option>
+        </select>
       </div>
+
+    <div class="form-group">
+      <label class="form-label">Expense Name</label>
+      <input type="text" class="form-input" id="expense-name" placeholder="Enter expense name" />
     </div>
 
     <div class="form-group">
-      <label class="form-label">Invested Amount</label>
-      <input type="text" class="form-input" id="amount" placeholder="Enter amount" />
-    </div>
-
-    <div class="checkbox-container">
-      <input type="checkbox" id="online" />
-      <label for="online">Online Payment</label>
+      <label class="form-label">Amount</label>
+      <input type="number" class="form-input" id="amount" placeholder="Enter amount" />
     </div>
 
     <div class="form-group">
-      <label class="form-label">Online Amount</label>
-      <input type="text" class="form-input" id="online-amount" placeholder="Enter amount" />
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Investment Date</label>
+      <label class="form-label">Expense Date</label>
       <input type="date" class="form-input" id="date" />
     </div>
 
     <div class="form-group">
       <label class="form-label">Comments</label>
-      <textarea class="form-input" id="comments" placeholder="Enter any remarks..."></textarea>
+      <textarea class="form-input" id="comments" rows="3" placeholder="Enter any remarks..."></textarea>
     </div>
-    <button class="btn" id="saveLineBtn">
-      <i class="fas fa-save" style="margin-right: 8px;"></i> SAVE INVESTMENT
+
+    <button class="btn" id="saveBtn">
+      <i class="fas fa-save" style="margin-right: 8px;"></i> SAVE EXPENSE
     </button>
   </main>
 
@@ -284,20 +177,6 @@
       const today = new Date();
       const formattedDate = today.toISOString().substr(0, 10);
       document.getElementById('date').value = formattedDate;
-
-      // Toggle online amount field based on checkbox
-      const onlineCheckbox = document.getElementById('online');
-      const onlineAmountField = document.getElementById('online-amount');
-
-      onlineCheckbox.addEventListener('change', function () {
-        onlineAmountField.disabled = !this.checked;
-        if (!this.checked) {
-          onlineAmountField.value = '';
-        }
-      });
-
-      // Initialize disabled state
-      onlineAmountField.disabled = !onlineCheckbox.checked;
     });
   </script>
 </body>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>License Payment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #4f46e5;
+      color: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      z-index: 100;
+    }
+    .header-title {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      margin: auto;
+      pointer-events: none;
+    }
+    .qr-code {
+      background: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+    }
+    .payment-button {
+      background-color: #4f46e5;
+      transition: all 0.3s ease;
+    }
+    .payment-button:hover {
+      background-color: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with back button -->
+  <header class="header">
+    <a href="javascript:history.back()" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <h1 class="text-xl font-semibold header-title">License</h1>
+    <!-- Empty div to balance the back button -->
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="px-4 py-6 max-w-md mx-auto">
+    <!-- User Info -->
+    <div class="mb-8">
+      <h2 class="text-lg font-medium text-gray-700 mb-1">Username</h2>
+      <p class="text-xl font-semibold text-gray-900">John</p>
+    </div>
+
+    <!-- Payment Details -->
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div>
+        <h3 class="text-sm text-gray-500">Annual Amount</h3>
+        <p class="text-lg font-bold text-indigo-600">$99.00</p>
+      </div>
+      <div>
+        <h3 class="text-sm text-gray-500">Valid Until</h3>
+        <p class="text-lg font-bold text-green-600">May 14, 2024</p>
+      </div>
+    </div>
+
+    <!-- Payment QR Code -->
+    <div class="qr-code rounded-lg p-6 mb-6 flex flex-col items-center justify-center">
+      <div class="bg-white p-3 rounded mb-3">
+        <i class="fas fa-qrcode text-6xl text-gray-400"></i>
+      </div>
+      <p class="text-sm text-gray-500 mb-3">Scan QR code to complete payment</p>
+    </div>
+  </main>
+</body>
+</html>

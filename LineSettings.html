@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Line Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #4f46e5;
+      color: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      z-index: 100;
+    }
+    .header-title {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      margin: auto;
+      pointer-events: none;
+    }
+    .line-list {
+      margin-top: 8px;
+    }
+    .line-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background-color: white;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .line-item:last-child {
+      border-bottom: none;
+    }
+    .delete-btn {
+      color: #ef4444;
+      background: none;
+      border: none;
+      padding: 8px;
+      margin-left: 8px;
+    }
+    .delete-btn:active {
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="javascript:history.back()" class="mr-4 text-white z-10">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <h1 class="text-xl font-semibold header-title">Line Settings</h1>
+    <a href="LineAddCollection.html" class="ml-auto text-white z-10">
+      <i class="fas fa-plus"></i>
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="px-4">
+    <!-- Lines List -->
+    <div class="line-list" id="lineList">
+      <!-- Line items will be added here dynamically -->
+    </div>
+  </main>
+
+  <script>
+    // Sample line data
+    let lines = [
+      "Main Production Line",
+      "Secondary Assembly",
+      "Packaging Line",
+      "Quality Check"
+    ];
+
+    const lineList = document.getElementById('lineList');
+
+    // Render lines with delete buttons
+    function renderLines() {
+      lineList.innerHTML = '';
+      lines.forEach((line, index) => {
+        const lineItem = document.createElement('div');
+        lineItem.className = 'line-item';
+        lineItem.innerHTML = `
+          <span>${line}</span>
+          <button class="delete-btn" data-index="${index}">
+            <i class="fas fa-trash"></i>
+          </button>
+        `;
+        lineList.appendChild(lineItem);
+      });
+
+      // Add click listeners for delete buttons
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', handleDelete);
+      });
+    }
+
+    // Handle delete
+    function handleDelete(e) {
+      const index = parseInt(e.currentTarget.dataset.index);
+      if (confirm(`Delete "${lines[index]}"?`)) {
+        lines.splice(index, 1);
+        renderLines();
+      }
+    }
+
+    // Initial render
+    renderLines();
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Areas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: #f9fafb;
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #4f46e5;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      z-index: 50;
+    }
+    .header-title {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      margin: 0 auto;
+      font-weight: 500;
+    }
+    .area-list {
+      margin: 0;
+      padding: 0.5rem 1rem;
+    }
+    .area-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .area-item:last-child {
+      border-bottom: none;
+    }
+    .delete-btn {
+      color: #ef4444;
+      background: none;
+      border: none;
+      padding: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="javascript:history.back()" class="mr-4 text-white z-10">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <h1 class="text-lg header-title">Areas</h1>
+    <a href="LineAddCollection.html" class="ml-auto text-white z-10">
+      <i class="fas fa-plus"></i>
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="area-list" id="areaList">
+      <!-- Areas will be added here -->
+    </div>
+  </main>
+
+  <script>
+    let areas = [
+      "Production Floor",
+      "Warehouse",
+      "Office Space",
+      "Loading Dock"
+    ];
+
+    const areaList = document.getElementById('areaList');
+
+    // Render areas
+    function renderAreas() {
+      areaList.innerHTML = areas.map((area, index) => `
+        <div class="area-item">
+          <span>${area}</span>
+          <button class="delete-btn" data-index="${index}">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `).join('');
+
+      // Add click listeners for delete buttons
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', handleDelete);
+      });
+    }
+
+    // Handle delete
+    function handleDelete(e) {
+      const index = e.currentTarget.dataset.index;
+      if (confirm(`Delete "${areas[index]}"?`)) {
+        areas.splice(index, 1);
+        renderAreas();
+      }
+    }
+
+    // Initial render
+    renderAreas();
+  </script>
+</body>
+</html>
