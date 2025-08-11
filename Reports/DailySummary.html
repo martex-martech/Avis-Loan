@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Line Summary</title>
+  <title>Plan Screen</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -146,7 +147,7 @@
       background-color: white;
       padding: 12px 0;
       z-index: 40;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     }
 
     .nav-items {
@@ -172,36 +173,10 @@
       color: var(--primary);
     }
 
-    .line-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
     .back-arrow {
       color: white;
       font-size: 20px;
       margin-right: 12px;
-    }
-
-    .page-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 0;
-    }
-    
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: var(--text-light);
-    }
-    
-    .checkbox-label input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary);
     }
   </style>
 </head>
@@ -212,7 +187,7 @@
     <a href="Reports.html" class="header-action back-arrow">
       <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Line Summary</div>
+    <div class="header-title">Daily Summary</div>
     <div class="header-actions">
     </div>
   </header>
@@ -220,44 +195,22 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="form-group">
-      <label class="form-label">Line Type</label>
+      <label class="form-label">Line</label>
       <select class="form-input form-select">
-        <option value="" disabled selected>Select Line Type</option>
-        <option value="main">Main Line</option>
-        <option value="secondary">Secondary Line</option>
+        <option value="" disabled selected>Select Line</option>
+        <option value="north">North Line</option>
+        <option value="south">South Line</option>
+        <option value="east">East Line</option>
+        <option value="west">West Line</option>
       </select>
     </div>
 
     <div class="form-group">
-      <label class="form-label">Line</label>
-      <div class="line-row">
-        <select class="form-input form-select" style="flex: 1;">
-          <option value="" disabled selected>Select Line</option>
-          <option value="north">North Line</option>
-          <option value="south">South Line</option>
-          <option value="east">East Line</option>
-          <option value="west">West Line</option>
-        </select>
-        <label class="checkbox-label">
-          <input type="checkbox" checked />
-          All
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">From Date</label>
+      <label class="form-label">Date</label>
       <input type="date" class="form-input" value="2025-07-28">
     </div>
 
-    <div class="form-group">
-      <label class="form-label">To Date</label>
-      <input type="date" class="form-input" value="2025-07-28">
-    </div>
-
-    <button class="btn btn-primary">
-      SUBMIT
-    </button>
+    <a href="DailySummaryReport.html" class="btn btn-primary">SUBMIT</a>
   </main>
 
   <!-- Bottom Navigation -->

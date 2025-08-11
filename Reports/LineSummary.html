@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Plan Screen</title>
+  <title>Line Summary</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -198,22 +198,13 @@
     <a href="Reports.html" class="header-action back-arrow">
       <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Daily Summary</div>
+    <div class="header-title">Line Summary</div>
     <div class="header-actions">
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="form-group">
-      <label class="form-label">Line Type</label>
-      <select class="form-input form-select">
-        <option value="" disabled selected>Select Line Type</option>
-        <option value="main">Main Line</option>
-        <option value="secondary">Secondary Line</option>
-      </select>
-    </div>
-
     <div class="form-group">
       <label class="form-label">Line</label>
       <select class="form-input form-select">
@@ -226,13 +217,16 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">Date</label>
+      <label class="form-label">From Date</label>
       <input type="date" class="form-input" value="2025-07-28">
     </div>
 
-    <button class="btn btn-primary">
-      SUBMIT
-    </button>
+    <div class="form-group">
+      <label class="form-label">To Date</label>
+      <input type="date" class="form-input" value="2025-07-28">
+    </div>
+
+    <a href="LineSummaryReport.html" class="btn btn-primary">SUBMIT</a>
   </main>
 
   <!-- Bottom Navigation -->

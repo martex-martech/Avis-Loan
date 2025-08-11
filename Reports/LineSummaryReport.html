@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Summary Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --text: #111827;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+            color: var(--text);
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: var(--primary);
+            color: white;
+        }
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        .main-content {
+            padding: 20px;
+            margin-top: 60px;
+            margin-bottom: 80px;
+        }
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .line-list {
+            margin-top: 20px;
+        }
+        .line-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .highlight {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="LineSummary.html" class="header-action">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <div class="header-title">Line Summary Report</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="report-row">
+            <span>Date</span>
+            <span>05/08/2025 - 11/08/2025</span>
+        </div>
+        
+        <div class="report-row">
+            <span>Expense</span>
+            <span>₹0</span>
+        </div>
+        
+        <div class="line-list">
+            <div class="line-item">
+                <span>Line 1</span>
+                <span>₹1,500</span>
+            </div>
+            <div class="line-item">
+                <span>Line 2</span>
+                <span>₹2,300</span>
+            </div>
+            <div class="line-item">
+                <span>Line 3</span>
+                <span>₹1,800</span>
+            </div>
+            <div class="line-item highlight">
+                <span>Total Collected</span>
+                <span>₹5,600</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav">
+        <a href="Collection.html" class="nav-item">
+            <i class="fas fa-coins"></i>
+            <span>Collection</span>
+        </a>
+        <a href="Expense.html" class="nav-item">
+            <i class="fas fa-receipt"></i>
+            <span>Expense</span>
+        </a>
+        <a href="Customer.html" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Customers</span>
+        </a>
+        <a href="Reports.html" class="nav-item active">
+            <i class="fas fa-chart-pie"></i>
+            <span>Reports</span>
+        </a>
+        <a href="Settings.html" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+</body>
+</html>

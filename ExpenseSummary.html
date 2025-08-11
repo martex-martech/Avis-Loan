@@ -104,30 +104,6 @@
       background-size: 16px;
     }
 
-    .line-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      margin-top: 8px;
-    }
-
-    .checkbox-input {
-      width: 18px;
-      height: 18px;
-      margin-right: 8px;
-      accent-color: var(--primary);
-    }
-
-    .checkbox-label {
-      font-size: 14px;
-      color: var(--text-light);
-    }
-
     .btn {
       display: inline-flex;
       align-items: center;
@@ -205,29 +181,14 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="form-group">
-      <label class="form-label">Line Type</label>
-      <select class="form-input form-select">
-        <option value="" disabled selected>Select Line Type</option>
-        <option value="main">Main Line</option>
-        <option value="secondary">Secondary Line</option>
-      </select>
-    </div>
-
-    <div class="form-group">
       <label class="form-label">Line</label>
-      <div class="line-row">
-        <select class="form-input form-select">
-          <option value="" disabled selected>Select Line</option>
-          <option value="north">North Line</option>
-          <option value="south">South Line</option>
-          <option value="east">East Line</option>
-          <option value="west">West Line</option>
-        </select>
-        <div class="checkbox-container">
-          <input type="checkbox" id="selectAll" class="checkbox-input" checked>
-          <label for="selectAll" class="checkbox-label">All</label>
-        </div>
-      </div>
+      <select class="form-input form-select">
+        <option value="" disabled selected>Select Line</option>
+        <option value="north">North Line</option>
+        <option value="south">South Line</option>
+        <option value="east">East Line</option>
+        <option value="west">West Line</option>
+      </select>
     </div>
 
     <div class="form-group">

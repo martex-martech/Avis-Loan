@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Daily Summary</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --text: #111827;
+            --text-light: #6b7280;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+            color: var(--text);
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Add this to center content horizontally */
+            padding: 16px 20px;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-action {
+            position: absolute;
+            /* Position the back button absolutely */
+            left: 20px;
+            /* Position it on the left */
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 60px;
+            margin-bottom: 80px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            font-family: monospace;
+            font-size: 16px;
+        }
+
+        .total-row {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 12px;
+            margin-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="DailySummary.html" class="header-action">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <div class="header-title">Daily Summary Report</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="summary-label">Date</span>
+                <span class="summary-value">11/08/2025</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Line</span>
+                <span class="summary-value">Daily</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Collected</span>
+                <span class="summary-value">₹15,000</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Expense</span>
+                <span class="summary-value">₹11,400</span>
+            </div>
+            <div class="total-row">
+                <span class="summary-label">Total Balance</span>
+                <span class="summary-value">₹3,600</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav">
+        <a href="Collection.html" class="nav-item">
+            <i class="fas fa-coins"></i>
+            <span>Collection</span>
+        </a>
+        <a href="Expense.html" class="nav-item">
+            <i class="fas fa-receipt"></i>
+            <span>Expense</span>
+        </a>
+        <a href="Customer.html" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Customers</span>
+        </a>
+        <a href="Reports.html" class="nav-item active">
+            <i class="fas fa-chart-pie"></i>
+            <span>Reports</span>
+        </a>
+        <a href="Settings.html" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+</body>
+
+</html>
