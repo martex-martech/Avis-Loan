@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Line Summary Report</title>
+    <title>Date Range Report</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -39,30 +39,32 @@
         .header-title {
             font-size: 20px;
             font-weight: 600;
+            text-align: center;
+            flex: 1;
         }
         .main-content {
             padding: 20px;
             margin-top: 60px;
             margin-bottom: 80px;
         }
-        .report-row {
+        .date-range {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .date-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 12px;
             font-size: 15px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
         }
-        .line-list {
-            margin-top: 20px;
-        }
-        .line-item {
+        .total-row {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .highlight {
+            border-top: 1px solid var(--border);
             font-weight: 600;
             color: var(--primary);
         }
@@ -94,41 +96,27 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header with centered title -->
     <header class="header">
-        <a href="LineSummary.html" class="header-action">
+        <a href="ExpenseSummary.html" class="header-action">
             <i class="fas fa-chevron-left"></i>
         </a>
-        <div class="header-title">Line Summary Report</div>
+        <div class="header-title">Expense Summary Report</div>
     </header>
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="report-row">
-            <span>Date</span>
-            <span>05/08/2025 - 11/08/2025</span>
-        </div>
-        
-        <div class="report-row">
-            <span>Expense</span>
-            <span>₹0</span>
-        </div>
-        
-        <div class="line-list">
-            <div class="line-item">
-                <span>Line 1</span>
-                <span>₹1,500</span>
+        <div class="date-range">
+            <div class="date-row">
+                <span>From Date</span>
+                <span>05/08/2025</span>
             </div>
-            <div class="line-item">
-                <span>Line 2</span>
-                <span>₹2,300</span>
+            <div class="date-row">
+                <span>To Date</span>
+                <span>11/08/2025</span>
             </div>
-            <div class="line-item">
-                <span>Line 3</span>
-                <span>₹1,800</span>
-            </div>
-            <div class="line-item highlight">
-                <span>Total Collected</span>
+            <div class="total-row">
+                <span>Total Amount</span>
                 <span>₹5,600</span>
             </div>
         </div>

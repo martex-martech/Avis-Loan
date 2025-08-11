@@ -38,7 +38,7 @@
       right: 0;
       z-index: 50;
       display: flex;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       padding: 16px 20px;
       background-color: var(--primary);
@@ -50,13 +50,17 @@
       font-size: 20px;
       font-weight: 600;
       letter-spacing: 0.5px;
-      margin-left: 12px;
+      text-align: center;
+      flex: 1;
+      margin: 0 40px; /* Match back button width */
     }
 
     .header-action {
       color: white;
       font-size: 18px;
       padding: 4px;
+      position: absolute;
+      left: 20px;
     }
 
     .main-content {
@@ -201,9 +205,7 @@
       <input type="date" class="form-input" value="2025-07-28">
     </div>
 
-    <button class="btn btn-primary">
-      SUBMIT
-    </button>
+    <a href="ExpenseSummaryReport.html" class="btn btn-primary">SUBMIT</a>
   </main>
 
   <!-- Bottom Navigation -->
