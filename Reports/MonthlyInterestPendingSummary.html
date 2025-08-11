@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Bad Loan Summary</title>
+  <title>Monthly Interest Pending Summary</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -109,51 +109,10 @@
       background-size: 16px;
     }
 
-    .checkbox-row {
+    .line-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      color: var(--text-light);
-    }
-
-    .checkbox-label input {
-      margin-right: 8px;
-      width: 16px;
-      height: 16px;
-    }
-
-    .radio-group {
-      margin-top: 15px;
-    }
-
-    .radio-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .radio-item:last-child {
-      border-bottom: none;
-    }
-
-    .radio-item input[type="radio"] {
-      width: 16px;
-      height: 16px;
-      margin-right: 10px;
-      accent-color: var(--primary);
-    }
-
-    .radio-item label {
-      font-size: 14px;
-      color: var(--text);
+      gap: 10px;
     }
 
     .btn {
@@ -161,7 +120,6 @@
       align-items: center;
       justify-content: center;
       padding: 12px 24px;
-      margin-top: 20px;
       border-radius: 8px;
       font-weight: 500;
       font-size: 15px;
@@ -228,75 +186,29 @@
     <a href="Reports.html" class="header-action">
       <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Bad Loan Summary</div>
+    <div class="header-title">Interest Pending Summary</div>
     <div></div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
     <div class="form-group">
-      <label class="form-label">Line Type</label>
-      <select class="form-input form-select">
-        <option value="" disabled selected>Select Line Type</option>
-        <option value="Type A">Type A</option>
-        <option value="Type B">Type B</option>
-      </select>
-    </div>
-
-    <div class="form-group">
       <label class="form-label">Line</label>
       <select class="form-input form-select">
         <option value="" disabled selected>Select Line</option>
-        <option value="Line 1">Line 1</option>
-        <option value="Line 2">Line 2</option>
+        <option value="north">North Line</option>
+        <option value="south">South Line</option>
+        <option value="east">East Line</option>
+        <option value="west">West Line</option>
       </select>
-      <div class="checkbox-row">
-        <label class="checkbox-label">
-          <input type="checkbox" id="allLines" />
-          All
-        </label>
-      </div>
     </div>
 
     <div class="form-group">
-      <label class="form-label">Bad Loan Days</label>
-      <div class="radio-group">
-        <div class="radio-item">
-          <input type="radio" name="loanDays" id="above100" />
-          <label for="above100">Above 100 Days</label>
-        </div>
-        <div class="radio-item">
-          <input type="radio" name="loanDays" id="above150" />
-          <label for="above150">Above 150 Days</label>
-        </div>
-        <div class="radio-item">
-          <input type="radio" name="loanDays" id="between150to200" />
-          <label for="between150to200">Between 150 to 200 Days</label>
-        </div>
-        <div class="radio-item">
-          <input type="radio" name="loanDays" id="above200" />
-          <label for="above200">Above 200 Days</label>
-        </div>
-        <div class="radio-item">
-          <input type="radio" name="loanDays" id="custom" />
-          <label for="custom">Custom</label>
-        </div>
-      </div>
+      <label class="form-label">Date</label>
+      <input type="date" class="form-input" value="2025-07-28">
     </div>
 
-    <div class="form-group">
-      <label class="form-label">From Date</label>
-      <input type="date" class="form-input" />
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">To Date</label>
-      <input type="date" class="form-input" />
-    </div>
-
-    <button class="btn btn-primary">
-      SUBMIT
-    </button>
+    <a href="MonthlyInterestReport.html" class="btn btn-primary">SUBMIT</a>
   </main>
 
   <!-- Bottom Navigation -->

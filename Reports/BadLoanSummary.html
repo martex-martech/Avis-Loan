@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Loan Analysis</title>
+  <title>Bad Loan Summary</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,8 +32,6 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      padding-top: 60px; /* Space for fixed header */
-      padding-bottom: 80px; /* Space for fixed nav */
     }
 
     .header {
@@ -49,7 +47,6 @@
       background-color: var(--primary);
       color: white;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      height: 60px;
     }
 
     .header-title {
@@ -67,6 +64,8 @@
 
     .main-content {
       padding: 24px 16px;
+      margin-top: 60px;
+      margin-bottom: 80px;
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
@@ -110,26 +109,6 @@
       background-size: 16px;
     }
 
-    .line-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      color: var(--text-light);
-    }
-
-    .checkbox-label input {
-      margin-right: 8px;
-      width: 16px;
-      height: 16px;
-      accent-color: var(--primary);
-    }
-
     .btn {
       display: inline-flex;
       align-items: center;
@@ -169,7 +148,6 @@
       padding: 12px 0;
       z-index: 40;
       box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-      height: 80px;
     }
 
     .nav-items {
@@ -203,50 +181,32 @@
     <a href="Reports.html" class="header-action">
       <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Loan Analysis</div>
+    <div class="header-title">Bad Loan Summary</div>
     <div></div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
     <div class="form-group">
-      <label class="form-label">Line Type</label>
+      <label class="form-label">Line</label>
       <select class="form-input form-select">
-        <option value="" disabled selected>Select Line Type</option>
-        <option value="main">Main Line</option>
-        <option value="secondary">Secondary Line</option>
+        <option value="" disabled selected>Select Line</option>
+        <option value="Line 1">Line 1</option>
+        <option value="Line 2">Line 2</option>
       </select>
     </div>
 
     <div class="form-group">
-      <label class="form-label">Line</label>
-      <div class="line-row">
-        <select class="form-input form-select">
-          <option value="" disabled selected>Select Line</option>
-          <option value="north">North Line</option>
-          <option value="south">South Line</option>
-          <option value="east">East Line</option>
-          <option value="west">West Line</option>
-        </select>
-        <label class="checkbox-label">
-          <input type="checkbox" checked /> All
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
       <label class="form-label">From Date</label>
-      <input type="date" class="form-input" value="2025-07-28" />
+      <input type="date" class="form-input" />
     </div>
 
     <div class="form-group">
       <label class="form-label">To Date</label>
-      <input type="date" class="form-input" value="2025-07-28" />
+      <input type="date" class="form-input" />
     </div>
 
-    <button class="btn btn-primary">
-      SUBMIT
-    </button>
+    <a href="BadLoanReport.html" class="btn btn-primary">SUBMIT</a>
   </main>
 
   <!-- Bottom Navigation -->

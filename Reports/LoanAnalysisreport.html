@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Analysis Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f9fafb;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #dc2626;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text);
+      padding-top: 60px;
+      padding-bottom: 80px;
+    }
+    
+    .header {
+      background-color: var(--primary);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .metric-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .nav {
+      background-color: white;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 text-white h-16">
+    <a href="Reports.html" class="text-white text-lg p-1">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="text-xl font-semibold tracking-wide ml-3">Loan Analysis</div>
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-6 max-w-3xl">
+    <!-- Date Filter -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-500 mb-1">From Date</label>
+          <input type="date" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100" value="2023-08-01">
+        </div>
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-500 mb-1">To Date</label>
+          <input type="date" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-100" value="2023-08-31">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="metric-card p-4">
+        <div class="text-gray-500 text-sm">Total Loans</div>
+        <div class="text-2xl font-bold mt-1">₹12,45,000</div>
+        <div class="text-green-600 text-sm mt-1 flex items-center">
+          <i class="fas fa-arrow-up mr-1"></i> 8.5% from last month
+        </div>
+      </div>
+      
+      <div class="metric-card p-4">
+        <div class="text-gray-500 text-sm">Active Loans</div>
+        <div class="text-2xl font-bold mt-1">84</div>
+        <div class="text-green-600 text-sm mt-1 flex items-center">
+          <i class="fas fa-arrow-up mr-1"></i> 12% from last month
+        </div>
+      </div>
+      
+      <div class="metric-card p-4">
+        <div class="text-gray-500 text-sm">Overdue Loans</div>
+        <div class="text-2xl font-bold mt-1">15</div>
+        <div class="text-red-600 text-sm mt-1 flex items-center">
+          <i class="fas fa-arrow-down mr-1"></i> 3% from last month
+        </div>
+      </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="grid grid-cols-1 gap-6 mb-6">
+      <div class="metric-card p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-medium">Loan Distribution</h3>
+          <select class="text-sm p-2 border rounded">
+            <option>This Month</option>
+            <option>Last Month</option>
+            <option>Last Quarter</option>
+          </select>
+        </div>
+        <canvas id="loanDistributionChart" height="250"></canvas>
+      </div>
+      
+      <div class="metric-card p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-medium">Repayment Status</h3>
+          <select class="text-sm p-2 border rounded">
+            <option>This Month</option>
+            <option>Last Month</option>
+            <option>Last Quarter</option>
+          </select>
+        </div>
+        <canvas id="repaymentChart" height="250"></canvas>
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="metric-card p-4">
+      <h3 class="font-medium mb-4">Recent Loan Activity</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="text-left text-sm text-gray-500 border-b">
+              <th class="pb-2">Customer</th>
+              <th class="pb-2">Amount</th>
+              <th class="pb-2">Date</th>
+              <th class="pb-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="py-3">Rahul Sharma</td>
+              <td class="py-3">₹50,000</td>
+              <td class="py-3">28 Aug 2023</td>
+              <td class="py-3"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span></td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3">Priya Patel</td>
+              <td class="py-3">₹35,000</td>
+              <td class="py-3">27 Aug 2023</td>
+              <td class="py-3"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span></td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3">Vikram Singh</td>
+              <td class="py-3">₹75,000</td>
+              <td class="py-3">25 Aug 2023</td>
+              <td class="py-3"><span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Overdue</span></td>
+            </tr>
+            <tr>
+              <td class="py-3">Anjali Gupta</td>
+              <td class="py-3">₹42,000</td>
+              <td class="py-3">22 Aug 2023</td>
+              <td class="py-3"><span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="nav fixed bottom-0 left-0 right-0 z-40 h-20">
+    <div class="flex justify-around h-full items-center">
+      <a href="Collection.html" class="nav-item flex flex-col items-center text-gray-500">
+        <i class="fas fa-coins text-xl"></i>
+        <span class="text-xs mt-1">Collection</span>
+      </a>
+      <a href="Expense.html" class="nav-item flex flex-col items-center text-gray-500">
+        <i class="fas fa-receipt text-xl"></i>
+        <span class="text-xs mt-1">Expense</span>
+      </a>
+      <a href="Customer.html" class="nav-item flex flex-col items-center text-gray-500">
+        <i class="fas fa-users text-xl"></i>
+        <span class="text-xs mt-1">Customers</span>
+      </a>
+      <a href="Reports.html" class="nav-item active flex flex-col items-center text-indigo-600">
+        <i class="fas fa-chart-pie text-xl"></i>
+        <span class="text-xs mt-1">Reports</span>
+      </a>
+      <a href="Settings.html" class="nav-item flex flex-col items-center text-gray-500">
+        <i class="fas fa-cog text-xl"></i>
+        <span class="text-xs mt-1">Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    // Loan Distribution Chart
+    const loanCtx = document.getElementById('loanDistributionChart').getContext('2d');
+    new Chart(loanCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Personal', 'Business', 'Education', 'Agriculture', 'Others'],
+        datasets: [{
+          data: [35, 25, 20, 15, 5],
+          backgroundColor: [
+            '#4f46e5',
+            '#6366f1',
+            '#818cf8',
+            '#a5b4fc',
+            '#c7d2fe'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // Repayment Status Chart
+    const repayCtx = document.getElementById('repaymentChart').getContext('2d');
+    new Chart(repayCtx, {
+      type: 'bar',
+      data: {
+        labels: ['On Time', 'Late (<30d)', 'Late (>30d)', 'Defaulted'],
+        datasets: [{
+          data: [65, 15, 12, 8],
+          backgroundColor: [
+            '#10b981',
+            '#f59e0b',
+            '#f97316',
+            '#dc2626'
+          ],
+          borderRadius: 4
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              display: false
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+
+    // Button active state
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.classList.add('transform', 'scale-95');
+          setTimeout(() => {
+            this.classList.remove('transform', 'scale-95');
+          }, 150);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

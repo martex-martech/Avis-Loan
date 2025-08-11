@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Missing Customer Summary</title>
+  <title>About to Close Loan Summary</title>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -115,30 +116,11 @@
       gap: 10px;
     }
 
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      margin-top: 8px;
-    }
-
-    .checkbox-input {
-      width: 18px;
-      height: 18px;
-      margin-right: 8px;
-      accent-color: var(--primary);
-    }
-
-    .checkbox-label {
-      font-size: 14px;
-      color: var(--text-light);
-    }
-
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 12px 24px;
-      margin-top: 20px;
       border-radius: 8px;
       font-weight: 500;
       font-size: 15px;
@@ -171,7 +153,7 @@
       background-color: white;
       padding: 12px 0;
       z-index: 40;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     }
 
     .nav-items {
@@ -205,7 +187,7 @@
     <a href="Reports.html" class="header-action">
       <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Missing Customer Summary</div>
+    <div class="header-title">Close Loan Summary</div>
     <div></div>
   </header>
 
@@ -230,31 +212,15 @@
           <option value="east">East Line</option>
           <option value="west">West Line</option>
         </select>
-        <div class="checkbox-container">
-          <input type="checkbox" id="selectAll" class="checkbox-input" checked>
-          <label for="selectAll" class="checkbox-label">All</label>
-        </div>
       </div>
     </div>
 
     <div class="form-group">
-      <label class="form-label">From Date</label>
-      <input type="date" class="form-input" value="2025-07-28">
+      <label class="form-label">Date</label>
+      <input type="date" class="form-input">
     </div>
 
-    <div class="form-group">
-      <label class="form-label">To Date</label>
-      <input type="date" class="form-input" value="2025-07-28">
-    </div>
-
-    <div class="checkbox-container">
-      <input type="checkbox" id="searchByDate" class="checkbox-input" checked>
-      <label for="searchByDate" class="checkbox-label">Search By Date</label>
-    </div>
-
-    <button class="btn btn-primary">
-      SUBMIT
-    </button>
+    <a href="closeSummaryReport.html" class="btn btn-primary">SUBMIT</a>
   </main>
 
   <!-- Bottom Navigation -->
@@ -297,4 +263,5 @@
     });
   </script>
 </body>
+
 </html>
