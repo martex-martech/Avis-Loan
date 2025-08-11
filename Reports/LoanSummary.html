@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Loan Records</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts - Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #f9fafb;
+      --text: #111827;
+      --text-light: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .header-action {
+      color: white;
+      font-size: 18px;
+      padding: 4px;
+      position: absolute;
+      left: 20px;
+    }
+
+    .header-filter {
+      color: white;
+      font-size: 18px;
+      padding: 4px;
+      position: absolute;
+      right: 20px;
+    }
+
+    .main-content {
+      padding: 16px;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .sort-options {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .sort-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .sort-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .filter-panel {
+      display: none;
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .filter-panel.show {
+      display: block;
+    }
+
+    .filter-group {
+      margin-bottom: 16px;
+    }
+
+    .filter-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .filter-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .loan-list {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .loan-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .loan-item:last-child {
+      border-bottom: none;
+    }
+
+    .loan-details {
+      flex: 1;
+    }
+
+    .loan-customer {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .loan-date {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .loan-amount {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: white;
+      padding: 12px 0;
+      z-index: 40;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 12px;
+      padding: 4px 12px;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="Reports.html" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Loan Records</div>
+    <button class="header-filter" id="filterToggle">
+      <i class="fas fa-filter"></i>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Filter Panel -->
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-group">
+        <label class="filter-label">Customer Name</label>
+        <input type="text" class="filter-input" id="filterCustomer" placeholder="Search by name">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Date Range</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="date" class="filter-input" id="filterFromDate" style="flex: 1;">
+          <input type="date" class="filter-input" id="filterToDate" style="flex: 1;">
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Amount Range</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="number" class="filter-input" id="filterMinAmount" placeholder="Min" style="flex: 1;">
+          <input type="number" class="filter-input" id="filterMaxAmount" placeholder="Max" style="flex: 1;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn" id="resetFilter" style="flex: 1; background: #e5e7eb; color: var(--text);">
+          RESET FILTERS
+        </button>
+      </div>
+    </div>
+
+    <!-- Sort Options -->
+    <div class="sort-options">
+      <div class="sort-buttons">
+        <button class="sort-btn active" id="sortDateDesc">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Newest First</span>
+        </button>
+        <button class="sort-btn" id="sortDateAsc">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Oldest First</span>
+        </button>
+      </div>
+      <button class="filter-btn" id="mobileFilterToggle">
+        <i class="fas fa-filter"></i>
+        <span>Filter</span>
+      </button>
+    </div>
+
+    <!-- Loan List -->
+    <div class="loan-list" id="loanList">
+      <!-- Results will be dynamically inserted here -->
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="nav">
+    <div class="nav-items">
+      <a href="Collection.html" class="nav-item">
+        <i class="fas fa-coins"></i>
+        <span>Collection</span>
+      </a>
+      <a href="Expense.html" class="nav-item">
+        <i class="fas fa-receipt"></i>
+        <span>Expense</span>
+      </a>
+      <a href="Customer.html" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="Reports.html" class="nav-item active">
+        <i class="fas fa-chart-pie"></i>
+        <span>Reports</span>
+      </a>
+      <a href="Settings.html" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // DOM Elements
+      const filterToggle = document.getElementById('filterToggle');
+      const mobileFilterToggle = document.getElementById('mobileFilterToggle');
+      const filterPanel = document.getElementById('filterPanel');
+      const resetFilter = document.getElementById('resetFilter');
+      const sortDateDesc = document.getElementById('sortDateDesc');
+      const sortDateAsc = document.getElementById('sortDateAsc');
+      const loanList = document.getElementById('loanList');
+      
+      // Filter inputs
+      const filterCustomer = document.getElementById('filterCustomer');
+      const filterFromDate = document.getElementById('filterFromDate');
+      const filterToDate = document.getElementById('filterToDate');
+      const filterMinAmount = document.getElementById('filterMinAmount');
+      const filterMaxAmount = document.getElementById('filterMaxAmount');
+
+      // Sample data - in a real app you would fetch this from your backend
+      let loans = [
+        { customer: "Rajesh Kumar", date: "15/08/2025", amount: 12500, rawDate: new Date(2025, 7, 15) },
+        { customer: "Priya Patel", date: "12/08/2025", amount: 8000, rawDate: new Date(2025, 7, 12) },
+        { customer: "Amit Sharma", date: "10/08/2025", amount: 15000, rawDate: new Date(2025, 7, 10) },
+        { customer: "Sunita Gupta", date: "05/08/2025", amount: 10000, rawDate: new Date(2025, 7, 5) },
+        { customer: "Vikram Singh", date: "01/08/2025", amount: 20000, rawDate: new Date(2025, 7, 1) },
+        { customer: "Neha Verma", date: "28/07/2025", amount: 7500, rawDate: new Date(2025, 6, 28) },
+        { customer: "Rahul Mehta", date: "25/07/2025", amount: 18000, rawDate: new Date(2025, 6, 25) },
+        { customer: "Anjali Desai", date: "20/07/2025", amount: 9000, rawDate: new Date(2025, 6, 20) }
+      ];
+
+      // Current sort and filter state
+      let currentSort = 'desc';
+      let currentFilters = {
+        customer: '',
+        fromDate: null,
+        toDate: null,
+        minAmount: null,
+        maxAmount: null
+      };
+
+      // Set default dates in filter
+      const today = new Date();
+      const monthAgo = new Date();
+      monthAgo.setDate(today.getDate() - 30);
+      
+      filterFromDate.valueAsDate = monthAgo;
+      filterToDate.valueAsDate = today;
+
+      // Initialize
+      updateFilters();
+      renderLoans();
+
+      // Toggle filter panel
+      function toggleFilterPanel() {
+        filterPanel.classList.toggle('show');
+        mobileFilterToggle.classList.toggle('active', filterPanel.classList.contains('show'));
+      }
+
+      filterToggle.addEventListener('click', toggleFilterPanel);
+      mobileFilterToggle.addEventListener('click', toggleFilterPanel);
+
+      // Format currency
+      function formatCurrency(amount) {
+        return '₹' + amount.toLocaleString('en-IN');
+      }
+
+      // Format date to DD/MM/YYYY
+      function formatDate(date) {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+
+      // Update filters from input values
+      function updateFilters() {
+        currentFilters = {
+          customer: filterCustomer.value.toLowerCase(),
+          fromDate: filterFromDate.value ? new Date(filterFromDate.value) : null,
+          toDate: filterToDate.value ? new Date(filterToDate.value) : null,
+          minAmount: filterMinAmount.value ? Number(filterMinAmount.value) : null,
+          maxAmount: filterMaxAmount.value ? Number(filterMaxAmount.value) : null
+        };
+      }
+
+      // Apply filters to loan data
+      function applyFilters() {
+        return loans.filter(loan => {
+          // Filter by customer name
+          if (currentFilters.customer && 
+              !loan.customer.toLowerCase().includes(currentFilters.customer)) {
+            return false;
+          }
+          
+          // Filter by date range
+          if (currentFilters.fromDate && loan.rawDate < currentFilters.fromDate) {
+            return false;
+          }
+          if (currentFilters.toDate && loan.rawDate > currentFilters.toDate) {
+            return false;
+          }
+          
+          // Filter by amount range
+          if (currentFilters.minAmount !== null && loan.amount < currentFilters.minAmount) {
+            return false;
+          }
+          if (currentFilters.maxAmount !== null && loan.amount > currentFilters.maxAmount) {
+            return false;
+          }
+          
+          return true;
+        });
+      }
+
+      // Sort loans
+      function sortLoans(filteredLoans) {
+        return [...filteredLoans].sort((a, b) => {
+          return currentSort === 'desc' ? 
+            b.rawDate - a.rawDate : 
+            a.rawDate - b.rawDate;
+        });
+      }
+
+      // Render loans
+      function renderLoans() {
+        updateFilters();
+        let filteredLoans = applyFilters();
+        const sortedLoans = sortLoans(filteredLoans);
+        
+        loanList.innerHTML = '';
+        
+        if (sortedLoans.length === 0) {
+          loanList.innerHTML = '<div class="no-results">No loans match your filters</div>';
+          return;
+        }
+        
+        sortedLoans.forEach(loan => {
+          const loanItem = document.createElement('div');
+          loanItem.className = 'loan-item';
+          loanItem.innerHTML = `
+            <div class="loan-details">
+              <div class="loan-customer">${loan.customer}</div>
+              <div class="loan-date">Issued: ${loan.date}</div>
+            </div>
+            <div class="loan-amount">${formatCurrency(loan.amount)}</div>
+          `;
+          loanList.appendChild(loanItem);
+        });
+      }
+
+      // Reset filters
+      function resetFilters() {
+        filterCustomer.value = '';
+        filterFromDate.valueAsDate = monthAgo;
+        filterToDate.valueAsDate = today;
+        filterMinAmount.value = '';
+        filterMaxAmount.value = '';
+        renderLoans();
+      }
+
+      // Sort by date (descending - newest first)
+      function sortByDateDesc() {
+        currentSort = 'desc';
+        sortDateDesc.classList.add('active');
+        sortDateAsc.classList.remove('active');
+        renderLoans();
+      }
+
+      // Sort by date (ascending - oldest first)
+      function sortByDateAsc() {
+        currentSort = 'asc';
+        sortDateAsc.classList.add('active');
+        sortDateDesc.classList.remove('active');
+        renderLoans();
+      }
+
+      // Event listeners for dynamic filtering
+      filterCustomer.addEventListener('input', renderLoans);
+      filterFromDate.addEventListener('change', renderLoans);
+      filterToDate.addEventListener('change', renderLoans);
+      filterMinAmount.addEventListener('input', renderLoans);
+      filterMaxAmount.addEventListener('input', renderLoans);
+
+      // Other event listeners
+      resetFilter.addEventListener('click', resetFilters);
+      sortDateDesc.addEventListener('click', sortByDateDesc);
+      sortDateAsc.addEventListener('click', sortByDateAsc);
+    });
+  </script>
+</body>
+</html>
