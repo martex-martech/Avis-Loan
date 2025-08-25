@@ -27,45 +27,15 @@ SECRET_KEY = 'django-insecure-1880%b^nhacul!j(tt*dl!87nm&a2tgn!_@iwc!%6j-(wkzlrw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# settings.py
-
-import os
-
-# --------------------------
-# Hosts and CSRF
-# --------------------------
-
-# Allowed hosts for your Django app
-ALLOWED_HOSTS = [
-    'avis-loan.onrender.com',  # your deployed domain
-    '127.0.0.1',               # local development
-    'localhost',
-]
+ALLOWED_HOSTS = ["*"]
 
 # CSRF trusted origins
-CSRF_TRUSTED_ORIGINS = [
-    'https://avis-loan.onrender.com',  # include scheme!
-]
-
-# --------------------------
-# Optional: Development tweaks
-# --------------------------
-# Only use this for local testing. Do NOT enable in production.
-# from django.conf import settings
-# if settings.DEBUG:
-#     CSRF_TRUSTED_ORIGINS.append('http://127.0.0.1:8000')
-#     ALLOWED_HOSTS.append('127.0.0.1')
-
-# --------------------------
-# Other settings
-# --------------------------
-# Make sure you have secure cookies enabled in production
+CSRF_TRUSTED_ORIGINS = ["*"]
 CSRF_COOKIE_SECURE = True      # only over HTTPS
 SESSION_COOKIE_SECURE = True   # only over HTTPS
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_SSL_REDIRECT = True     # force HTTPS
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -236,4 +206,5 @@ LOGIN_REDIRECT_URL = '/'       # Where to redirect after login
 LOGOUT_REDIRECT_URL = '/accounts/login/'  # Where to redirect after logout
 
 CORS_ALLOW_ALL_ORIGINS = True
+
 
