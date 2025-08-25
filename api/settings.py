@@ -30,7 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 # CSRF trusted origins
-CSRF_TRUSTED_ORIGINS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://avis-loan.onrender.com', ]
 CSRF_COOKIE_SECURE = True      # only over HTTPS
 SESSION_COOKIE_SECURE = True   # only over HTTPS
 SECURE_BROWSER_XSS_FILTER = True
@@ -206,5 +206,6 @@ LOGIN_REDIRECT_URL = '/'       # Where to redirect after login
 LOGOUT_REDIRECT_URL = '/accounts/login/'  # Where to redirect after logout
 
 CORS_ALLOW_ALL_ORIGINS = True
+
 
 
