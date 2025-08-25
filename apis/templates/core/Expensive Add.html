@@ -1,0 +1,255 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 100px 20px 100px;
+    /* leaves space for header and button */
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-light);
+  }
+
+  .form-input,
+  .form-select,
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: white;
+    transition: all 0.2s ease;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .error-message {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 4px;
+    display: none;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+  }
+
+  .btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0 auto;
+    max-width: 500px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 16px;
+    border: none;
+    width: calc(100% - 40px);
+    background-color: var(--primary);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn:active {
+    transform: translateX(-50%) scale(0.98);
+  }
+
+  .message-container {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100% - 2rem);
+    max-width: 500px;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message-container.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .message-container.success {
+    background-color: var(--success);
+  }
+
+  .message-container.error {
+    background-color: var(--error);
+  }
+
+  .message-container i {
+    margin-right: 8px;
+    font-size: 1rem;
+  }
+</style>
+
+<header class="header">
+  <a href="{% url 'settings' %}" class="header-action"><i class="fas fa-chevron-left"></i></a>
+  <div class="header-title">Add Expense</div>
+</header>
+
+<div id="successMessage" class="message-container success"></div>
+<div id="errorMessage" class="message-container error"></div>
+
+<main class="main-content">
+  <form id="expenseForm" method="POST" action="{% url 'add_expense' %}">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Line</label>
+      <select class="form-select" id="line" name="line" required>
+        <option value="" selected disabled>Select Line</option>
+        {% for line in lines %}
+        <option value="{{ line.id }}">{{ line.line_name }}</option>
+        {% endfor %}
+      </select>
+      <div class="error-message" id="line-error">Please select a line.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Expense Name</label>
+      <input type="text" class="form-input" id="expense-name" name="name" placeholder="Enter expense name" required />
+      <div class="error-message" id="name-error">Please enter expense name.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Amount</label>
+      <input type="number" class="form-input" id="amount" name="amount" placeholder="Enter amount" step="0.01" min="0"
+        required />
+      <div class="error-message" id="amount-error">Please enter a valid amount.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Expense Date</label>
+      <input type="date" class="form-input" id="date" name="date" required />
+      <div class="error-message" id="date-error">Please select a date.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Comments</label>
+      <textarea class="form-input" id="comments" name="comments" rows="3" placeholder="Enter any remarks..."></textarea>
+      <div class="error-message" id="comments-error">Please enter comments.</div>
+    </div>
+
+    <button class="btn" type="submit">
+      <i class="fas fa-save" style="margin-right: 8px;"></i> SAVE EXPENSE
+    </button>
+  </form>
+
+  <script>
+    function showMessage(type, message) {
+      const msgElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+      const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+      msgElement.classList.add('show');
+      setTimeout(() => msgElement.classList.remove('show'), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const lineSelect = document.getElementById('line');
+      const nameInput = document.getElementById('expense-name');
+      const amountInput = document.getElementById('amount');
+      const dateInput = document.getElementById('date');
+      const commentsInput = document.getElementById('comments');
+      const form = document.getElementById('expenseForm');
+
+      dateInput.value = new Date().toISOString().substr(0, 10);
+
+      [lineSelect, nameInput, amountInput, dateInput, commentsInput].forEach(field => {
+        field.addEventListener('input', () => document.getElementById(`${field.id}-error`).style.display = 'none');
+        field.addEventListener('change', () => document.getElementById(`${field.id}-error`).style.display = 'none');
+      });
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        let valid = true;
+
+        if (!lineSelect.value) { document.getElementById('line-error').style.display = 'block'; valid = false; }
+        if (!nameInput.value.trim()) { document.getElementById('name-error').style.display = 'block'; valid = false; }
+        if (!amountInput.value || parseFloat(amountInput.value) <= 0) { document.getElementById('amount-error').style.display = 'block'; valid = false; }
+        if (!dateInput.value) { document.getElementById('date-error').style.display = 'block'; valid = false; }
+        if (!commentsInput.value.trim()) { document.getElementById('comments-error').style.display = 'block'; valid = false; }
+        if (!valid) return;
+
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const formData = new FormData(this);
+
+        try {
+          const response = await fetch(this.action, { method: 'POST', body: formData, headers: { 'X-CSRFToken': csrftoken } });
+          const data = await response.json();
+          if (response.ok) {
+            showMessage('success', data.message || 'Expense added successfully!');
+            form.reset();
+            dateInput.value = new Date().toISOString().substr(0, 10);
+          } else {
+            showMessage('error', data.error || 'Failed to add expense.');
+          }
+        } catch (err) {
+          showMessage('error', 'Network error. Please try again.');
+        }
+      });
+    });
+  </script>
+
+</main>
+{% endblock %}

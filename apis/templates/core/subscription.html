@@ -1,0 +1,900 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+    /* Sidebar Styles */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: white;
+        color: var(--dark);
+        padding: 24px 0;
+        height: 100vh;
+        position: fixed;
+        border-right: 1px solid var(--light-gray);
+        z-index: 1000;
+    }
+
+    .sidebar-header {
+        padding: 0 24px 24px;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .sidebar-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .sidebar-header h3 i {
+        font-size: 1.5rem;
+    }
+
+    .sidebar-menu {
+        padding: 24px 0;
+    }
+
+    .menu-title {
+        padding: 0 24px 12px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--gray);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+
+    .menu-items {
+        list-style: none;
+    }
+
+    .menu-item {
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        margin: 4px 0;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        color: var(--gray);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+        background-color: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .menu-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary);
+        position: relative;
+    }
+
+    .menu-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background-color: var(--primary);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .menu-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .menu-item a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .menu-item a:hover {
+        text-decoration: none;
+        color: var(--primary);
+    }
+
+
+    /* Main Content Styles */
+    .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        padding: 32px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
+
+    .page-title h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .page-title p {
+        font-size: 0.875rem;
+        color: var(--gray);
+        margin-top: 4px;
+    }
+
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .user-role {
+        font-size: 0.75rem;
+        color: var(--gray);
+    }
+
+    /* Subscription Container */
+    .subscription-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+    }
+
+    .table-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .filter-dropdown {
+        padding: 10px 16px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        background-color: white;
+        font-size: 0.875rem;
+        color: var(--dark);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .filter-dropdown:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--light-gray);
+    }
+
+    .subscription-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .subscription-table th {
+        background-color: var(--light);
+        padding: 16px 24px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--dark);
+        border-bottom: 1px solid var(--light-gray);
+        white-space: nowrap;
+    }
+
+    .subscription-table td {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--light-gray);
+        vertical-align: middle;
+        color: var(--dark);
+    }
+
+    .subscription-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .subscription-table tr:hover {
+        background-color: var(--primary-light);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-expired {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .status-pending {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+    }
+
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        border: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .extend-btn {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .extend-btn:hover {
+        background-color: var(--secondary);
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        border-radius: var(--border-radius);
+        width: 480px;
+        max-width: 90%;
+        padding: 24px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray);
+        transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+        color: var(--dark);
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--dark);
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-control:disabled {
+        background-color: #f3f4f6;
+        color: #6b7280;
+        cursor: not-allowed;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        border-radius: var(--border-radius);
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary);
+    }
+
+    .btn-secondary {
+        background-color: var(--light);
+        color: var(--dark);
+        border: 1px solid var(--light-gray);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--light-gray);
+    }
+
+    /* Message Styles */
+    .message-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 3000;
+        padding: 15px 25px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-100px);
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .message-container.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .message-success {
+        background-color: var(--success);
+    }
+
+    .message-error {
+        background-color: var(--danger);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(67, 97, 238, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--primary);
+        animation: spin 1s ease-in-out infinite;
+        display: none;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        :root {
+            --sidebar-width: 240px;
+        }
+
+        .main-content {
+            padding: 24px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 72px;
+            overflow: hidden;
+        }
+
+        .sidebar-header h3 span,
+        .menu-item span,
+        .user-info {
+            display: none;
+        }
+
+        .sidebar-header h3,
+        .menu-item {
+            justify-content: center;
+        }
+
+        .main-content {
+            margin-left: 72px;
+            padding: 20px;
+        }
+
+        .table-actions {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-box {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .user-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-hand-holding-usd"></i> LoanApp</h3>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-title">Main</div>
+            <ul class="menu-items">
+                <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item"><i class="fas fa-chart-line"></i>
+                        Dashboard</a>
+                </li>
+                <li><a href="{% url 'payments' %}" class="menu-item active"><i
+                            class="fas fa-money-bill-wave"></i><span>Subscriptions</span></a></li>
+            </ul>
+            <div class="menu-title">Management</div>
+            <ul class="menu-items">
+                <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-users-cog"></i> User
+                        Management</a>
+                </li>
+                <li><a href="{% url 'loan-management-page' %}" class="menu-item"><i class="fas fa-file-contract"></i>
+                        Loan Management</a></li>
+                <li><a href="{% url 'payments_page' %}" class="menu-item"><i class="fas fa-credit-card"></i>
+                        Payments</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="messageContainer" class="message-container"></div>
+
+        <div class="header">
+            <div class="page-title">
+                <h1>Subscription Management</h1>
+                <p>Manage and extend agent subscriptions</p>
+            </div>
+            <div class="user-actions">
+                <div class="user-profile">
+                    <div class="user-avatar">SA</div>
+                    <div class="user-info">
+                        <span class="user-name">Super Admin</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subscription-container">
+            <div class="table-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search agents..." id="searchInput">
+                </div>
+                <select class="filter-dropdown" id="statusFilter">
+                    <option value="all">All Subscriptions</option>
+                    <option value="active">Active Only</option>
+                    <option value="expired">Expired Only</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table class="subscription-table">
+                    <thead>
+                        <tr>
+                            <th>Agent ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Current Expiry</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subscriptionTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="spinner" id="tableSpinner"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="extendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Extend Subscription</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="extendForm">
+                <div class="form-group">
+                    <label>Agent ID</label>
+                    <input type="text" id="agentId" class="form-control" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label>Agent Name</label>
+                    <input type="text" id="agentName" class="form-control" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label>Current Expiry Date</label>
+                    <input type="text" id="currentExpiry" class="form-control" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label for="newExpiry">New Expiry Date</label>
+                    <input type="date" id="newExpiry" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <span id="submitText">Confirm Extension</span>
+                        <div class="spinner" id="submitSpinner"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_USERS = "http://127.0.0.1:8000/api/users/";
+        let usersData = [];
+
+        // Load subscriptions on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSubscriptions();
+
+            // Set up event listeners
+            document.getElementById('searchInput').addEventListener('input', filterTable);
+            document.getElementById('statusFilter').addEventListener('change', filterTable);
+            document.getElementById("extendForm").addEventListener("submit", handleFormSubmit);
+
+            // Close modal when clicking outside
+            window.addEventListener("click", function (e) {
+                if (e.target === document.getElementById("extendModal")) {
+                    closeModal();
+                }
+            });
+        });
+
+        // Load subscriptions function
+        function loadSubscriptions() {
+            const spinner = document.getElementById('tableSpinner');
+            const tbody = document.getElementById("subscriptionTableBody");
+
+            spinner.style.display = 'block';
+            tbody.innerHTML = '';
+
+            fetch(API_USERS)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    usersData = data;
+                    renderTable(data);
+                    spinner.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error loading subscriptions:', error);
+                    showMessage('Error loading subscriptions. Please try again.', 'error');
+                    spinner.style.display = 'none';
+                });
+        }
+
+        // Render table with data
+        function renderTable(data) {
+            const tbody = document.getElementById("subscriptionTableBody");
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 24px;">
+              No agents found.
+            </td>
+          </tr>`;
+                return;
+            }
+
+            data.forEach(user => {
+                if (user.role === "agent") {
+                    const expiry = user.expiry_date || "N/A";
+                    const status = getStatus(expiry);
+                    const row = `
+            <tr>
+              <td>AG-${user.id}</td>
+              <td>${user.full_name}</td>
+              <td>${user.mobile_number || "-"}</td>
+              <td>${user.email || "-"}</td>
+              <td>${expiry}</td>
+              <td><span class="status-badge ${status.class}">${status.label}</span></td>
+              <td><button class="action-btn extend-btn" onclick="openExtendModal('AG-${user.id}','${user.full_name}','${expiry}')">Extend</button></td>
+            </tr>`;
+                    tbody.insertAdjacentHTML("beforeend", row);
+                }
+            });
+        }
+
+        // Filter table based on search and status
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            const filteredData = usersData.filter(user => {
+                if (user.role !== "agent") return false;
+
+                // Search filter
+                const matchesSearch =
+                    `ag-${user.id}`.includes(searchTerm) ||
+                    user.full_name.toLowerCase().includes(searchTerm) ||
+                    (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+                    (user.mobile_number && user.mobile_number.includes(searchTerm));
+
+                if (!matchesSearch) return false;
+
+                // Status filter
+                if (statusFilter === 'all') return true;
+
+                const expiry = user.expiry_date || "N/A";
+                const status = getStatus(expiry);
+
+                return status.label.toLowerCase() === statusFilter;
+            });
+
+            renderTable(filteredData);
+        }
+
+        // Status logic
+        function getStatus(expiry) {
+            if (!expiry || expiry === "N/A") return {
+                label: "Pending",
+                class: "status-pending"
+            };
+
+            const today = new Date();
+            const expiryDate = new Date(expiry);
+
+            if (expiryDate < today) return {
+                label: "Expired",
+                class: "status-expired"
+            };
+            return {
+                label: "Active",
+                class: "status-active"
+            };
+        }
+
+        // Modal functions
+        function openExtendModal(agentId, agentName, currentExpiry) {
+            document.getElementById('agentId').value = agentId;
+            document.getElementById('agentName').value = agentName;
+            document.getElementById('currentExpiry').value = currentExpiry;
+
+            // Set min date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('newExpiry').min = tomorrow.toISOString().split('T')[0];
+
+            // Set default date to 1 year from today
+            const oneYearFromNow = new Date();
+            oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+            document.getElementById('newExpiry').value = oneYearFromNow.toISOString().split('T')[0];
+
+            // If current expiry is a valid date and is in the future, use it instead
+            if (currentExpiry && currentExpiry !== "N/A") {
+                const currentExpiryDate = new Date(currentExpiry);
+                const today = new Date();
+
+                // Only use current expiry if it's in the future
+                if (currentExpiryDate > today) {
+                    document.getElementById('newExpiry').value = currentExpiry;
+                }
+            }
+
+            document.getElementById('extendModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('extendModal').style.display = 'none';
+            document.getElementById('extendForm').reset();
+        }
+
+        // Handle form submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const agentId = document.getElementById('agentId').value.replace("AG-", "");
+            const newExpiry = document.getElementById('newExpiry').value;
+
+            // Show loading state
+            const submitText = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
+
+            submitText.style.display = 'none';
+            submitSpinner.style.display = 'block';
+
+            // Make PATCH request
+            fetch(`${API_USERS}${agentId}/`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken') // For Django CSRF protection
+                },
+                body: JSON.stringify({
+                    expiry_date: newExpiry
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(updatedUser => {
+                    showMessage(`Subscription extended to ${newExpiry}!`, 'success');
+                    closeModal();
+                    loadSubscriptions(); // Refresh the table
+                })
+                .catch(error => {
+                    console.error('Error updating subscription:', error);
+                    showMessage('Error updating subscription. Please try again.', 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    submitText.style.display = 'block';
+                    submitSpinner.style.display = 'none';
+                });
+        }
+
+        // Function to get CSRF token (needed for Django)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Message System Function
+        function showMessage(message, type) {
+            const msgContainer = document.getElementById("messageContainer");
+            msgContainer.textContent = message;
+            msgContainer.className = 'message-container';
+            if (type === 'success') {
+                msgContainer.classList.add('message-success');
+            } else {
+                msgContainer.classList.add('message-error');
+            }
+            msgContainer.classList.add('show');
+            setTimeout(() => {
+                msgContainer.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+{% endblock %}

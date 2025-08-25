@@ -1,0 +1,377 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 16px;
+  }
+
+  .header-action {
+    color: white;
+    font-size: 18px;
+    position: relative;
+    padding: 4px;
+  }
+
+  .badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 9999px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+  }
+
+.main-content {
+  padding: 24px 16px;
+  margin-top: 60px;
+  margin-bottom: 80px;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;      
+  margin-right: 0;
+}
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-light);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s;
+    background-color: white;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 12px 0;
+    z-index: 40;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    height: 80px;
+  }
+
+  .nav-items {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  .nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+
+  /* Message Styles */
+  .message-container {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100% - 2rem);
+    max-width: 500px;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message-container.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .message-container.success {
+    background-color: var(--success);
+  }
+
+  .message-container.error {
+    background-color: var(--error);
+  }
+
+  .message-container i {
+    margin-right: 8px;
+    font-size: 1rem;
+  }
+</style>
+
+<header class="header">
+  <a href="{% url 'settings' %}" class="header-action">
+  </a>
+  <div class="header-title">Add Customer</div>
+  <div class="header-actions">
+    <i class="fas fa-users"></i>
+    </a>
+  </div>
+</header>
+
+<div id="successMessage" class="message-container success"></div>
+<div id="errorMessage" class="message-container error"></div>
+
+<main class="main-content">
+  <form id="customerForm" method="post" action="{% url 'add_customer' %}">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label">Customer Name</label>
+      <input type="text" name="name" id="customer-name" class="form-input" placeholder="Enter customer name" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Customer Code</label>
+      <input type="text" name="code" id="customer-code" class="form-input" placeholder="Enter customer code" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mobile Number</label>
+      <input type="tel" name="mobile_number" id="mobile-number" class="form-input" placeholder="Enter mobile number"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Select Line</label>
+      <select name="line" class="form-input form-select" required>
+        <option value="" disabled selected>Choose line</option>
+        {% for l in lines %}
+        <option value="{{ l.id }}">{{ l.line_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Select Area</label>
+      <select name="area" class="form-input form-select" required>
+        <option value="" disabled selected>Choose area</option>
+        {% for a in areas %}
+        <option value="{{ a.id }}">{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select name="status" id="status-select" class="form-input form-select" required>
+        <option value="" disabled selected>Select status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="pending">Pending</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Maximum Loan Amount</label>
+      <input type="number" name="max_loan_amount" id="max-loan-amount" class="form-input"
+        placeholder="Enter maximum loan amount" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <textarea name="address" id="address-input" class="form-input" rows="3" placeholder="Enter customer address"
+        required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-full">
+      SAVE CUSTOMER
+    </button>
+  </form>
+</main>
+
+<nav class="nav">
+  <div class="nav-items">
+    <a href="{% url 'collection' %}" class="nav-item">
+      <i class="fas fa-coins"></i>
+      <span>Collection</span>
+    </a>
+    <a href="{% url 'expense_list' %}" class="nav-item">
+      <i class="fas fa-receipt"></i>
+      <span>Expense</span>
+    </a>
+    <a href="{% url 'add_customer' %}" class="nav-item active">
+      <i class="fas fa-users"></i>
+      <span>Customers</span>
+    </a>
+    <a href="{% url 'settings' %}" class="nav-item">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+  // Helper function to show messages
+  function showMessage(type, message) {
+    const msgElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+    const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+    msgElement.classList.add('show');
+    setTimeout(() => {
+      msgElement.classList.remove('show');
+    }, 3000);
+  }
+
+  // Get CSRF token from cookie
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const customerForm = document.getElementById('customerForm');
+
+    // Add form submission listener
+    customerForm.addEventListener('submit', async function (e) {
+      e.preventDefault(); // Prevent default form submission
+
+      const formData = new FormData(this);
+      const url = this.action;
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showMessage('success', data.message || 'Customer added successfully!');
+          customerForm.reset(); // Clear the form after successful submission
+        } else {
+          showMessage('error', data.error || 'An error occurred. Please try again.');
+        }
+      } catch (error) {
+        console.error('Submission error:', error);
+        showMessage('error', 'Network error. Please try again.');
+      }
+    });
+
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        this.classList.add('active');
+        setTimeout(() => {
+          this.classList.remove('active');
+        }, 150);
+      });
+    });
+  });
+</script>
+{% endblock %}

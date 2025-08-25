@@ -1,0 +1,272 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+  <style>
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .header-actions a {
+      color: white;
+      font-size: 18px;
+      padding: 4px;
+      transition: transform 0.2s;
+    }
+
+    .header-actions a:active {
+      transform: scale(0.95);
+    }
+
+    .main-content {
+      padding: 20px 16px;
+      width: 100%;
+      margin: 0 auto;
+      margin-top: 80px;
+      margin-bottom: 100px;
+    }
+
+    /* 🔹 Simplified flat style */
+    .filter-box,
+    .result-box,
+    .expense-card,
+    .expense-empty {
+      background: none;
+      border: none;
+      box-shadow: none;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      padding: 12px 0;
+      margin: 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text-light);
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+    }
+
+    .btn-container {
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .expense-empty {
+      text-align: center;
+      color: var(--text-light);
+      padding: 20px 0;
+    }
+
+    .expense-card p {
+      margin: 4px 0;
+    }
+
+    /* Bottom nav unchanged */
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: white;
+      padding: 12px 0;
+      z-index: 40;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      height: 80px;
+    }
+
+    .nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 12px;
+      padding: 4px 12px;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+  </style>
+
+  <header class="header">
+    <div class="header-title">Expense Tracker</div>
+    <div class="header-actions">
+      <a href="{% url 'add_expense' %}" title="Add Expense">
+        <i class="fas fa-plus"></i>
+      </a>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Filters -->
+    <div class="filter-box">
+      <div class="form-group">
+        <label class="form-label">From Date</label>
+        <input type="date" class="form-input" id="from-date" value="{{ from_date }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">To Date</label>
+        <input type="date" class="form-input" id="to-date" value="{{ to_date }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Line</label>
+        <select class="form-select" id="line">
+          <option value="all" {% if line == 'all' %}selected{% endif %}>All Lines</option>
+          {% for l in lines %}
+          <option value="{{ l.id }}" {% if line|stringformat:"s" == l.id|stringformat:"s" %}selected{% endif %}>{{ l.line_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group btn-container">
+        <div class="btn" id="calculate-btn">Calculate</div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="result-box" id="result-box">
+      <p>Period: {{ period_display }}</p>
+      <p>Total Expenses: <span style="color:green;">₹{{ total|floatformat:2 }}</span></p>
+    </div>
+
+    <!-- Expense List -->
+    <div id="expense-container">
+      {% for expense in expenses %}
+      <div class="expense-card">
+        <p><strong>Date:</strong> {{ expense.date }}</p>
+        <p><strong>Line Name:</strong> {{ expense.line.line_name }}</p>
+        <p><strong>Expense Name:</strong> {{ expense.name }}</p>
+        <p><strong>Amount:</strong> ₹{{ expense.amount|floatformat:2 }}</p>
+      </div>
+      {% empty %}
+      <div class="expense-empty">No expenses found for the selected period</div>
+      {% endfor %}
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="nav">
+    <div class="nav-items">
+      <a href="{% url 'collection' %}" class="nav-item">
+        <i class="fas fa-coins"></i>
+        <span>Collection</span>
+      </a>
+      <a href="{% url 'expense_list' %}" class="nav-item active">
+        <i class="fas fa-receipt"></i>
+        <span>Expense</span>
+      </a>
+      <a href="{% url 'add_customer' %}" class="nav-item">
+        <i class="fas fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="{% url 'settings' %}" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const fromDateInput = document.getElementById('from-date');
+      const toDateInput = document.getElementById('to-date');
+      const lineSelect = document.getElementById('line');
+      const expenseContainer = document.getElementById('expense-container');
+      const resultBox = document.getElementById('result-box');
+      const calculateBtn = document.getElementById('calculate-btn');
+
+      async function fetchExpenses() {
+        const fromDate = fromDateInput.value;
+        const toDate = toDateInput.value;
+        const line = lineSelect.value;
+
+        const url = `/expense_list/?from_date=${fromDate}&to_date=${toDate}&line=${line}`;
+        try {
+          const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+          const html = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          const newExpenses = doc.querySelectorAll('#expense-container > *');
+          expenseContainer.innerHTML = '';
+          newExpenses.forEach(el => expenseContainer.appendChild(el));
+
+          const newResult = doc.querySelector('#result-box').innerHTML;
+          resultBox.innerHTML = newResult;
+        } catch (err) {
+          console.error('Error fetching expenses:', err);
+        }
+      }
+
+      calculateBtn.addEventListener('click', fetchExpenses);
+    });
+  </script>
+
+{% endblock %}

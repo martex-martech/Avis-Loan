@@ -1,0 +1,192 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+  .header {
+    background-color: var(--primary);
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 12px 0;
+    z-index: 40;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    height: 80px;
+  }
+
+  .nav-items {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  .nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+
+
+  /* 🔹 Form elements: always full width & compact */
+  .form-input,
+  .form-select,
+  button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .form-section {
+    margin-bottom: 16px;
+  }
+</style>
+
+<!-- Header -->
+<header class="header fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-5 py-4 text-white shadow-lg">
+  <div class="text-lg font-semibold tracking-wide">Collection</div>
+  <div class="flex gap-5 items-center">
+    <a href="{% url 'calculator' %}" title="Calculator" class="text-xl hover:opacity-80 transition">
+      <i class="fas fa-calculator"></i>
+    </a>
+  </div>
+</header>
+
+
+<!-- Main Content -->
+<main class="pt-20 pb-24 px-4 w-full">
+
+  <!-- Date Picker -->
+  <div class="form-section">
+    <label class="block text-sm font-medium text-gray-600 mb-1">Collection Date</label>
+    <input type="date" id="collection-date" value="{{ today }}"
+      class="form-input border border-gray-300 focus:ring focus:ring-indigo-100">
+  </div>
+
+  <!-- Line Selection -->
+  <div class="form-section">
+    <label class="block text-sm font-medium text-gray-600 mb-1">Select Line</label>
+    <div class="flex gap-2">
+      <select id="line-select" class="form-select border border-gray-300 focus:ring focus:ring-indigo-100 flex-1">
+        <option value="" disabled selected>Select line</option>
+        {% for line in user_lines %}
+        <option value="{{ line.id }}">
+          {{ line.line_name }}{% if line.line_type and line.line_type.line_type_name %} ({{
+          line.line_type.line_type_name }}){% endif %}
+        </option>
+        {% empty %}
+        <option disabled>No lines found</option>
+        {% endfor %}
+      </select>
+      <a href="{% url 'line_add_collection' %}"
+        class="w-12 h-12 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100">
+        <i class="fas fa-plus"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Area Selection -->
+  <div class="form-section">
+    <label class="block text-sm font-medium text-gray-600 mb-1">Select Area</label>
+    <select id="area-select" class="form-select border border-gray-300 focus:ring focus:ring-indigo-100">
+      <option value="" disabled selected>Select area</option>
+      {% for area in user_areas %}
+      <option value="{{ area.id }}">{{ area.name }}</option>
+      {% empty %}
+      <option disabled>No areas found</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Submit Button -->
+  <button id="submit-btn"
+    class="w-full py-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition">
+    Submit
+  </button>
+
+
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="nav">
+  <div class="nav-items">
+    <a href="{% url 'collection' %}" class="nav-item active">
+      <i class="fas fa-coins"></i>
+      <span>Collection</span>
+    </a>
+    <a href="{% url 'expense_list' %}" class="nav-item">
+      <i class="fas fa-receipt"></i>
+      <span>Expense</span>
+    </a>
+    <a href="{% url 'add_customer' %}" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Customers</span>
+    </a>
+    <a href="{% url 'settings' %}" class="nav-item">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+  const submitBtn = document.getElementById('submit-btn');
+  const lineSelect = document.getElementById('line-select');
+  const areaSelect = document.getElementById('area-select');
+  const collectionDate = document.getElementById('collection-date');
+
+  submitBtn.addEventListener('click', () => {
+    const payload = {
+      date: collectionDate.value,
+      line: lineSelect.value,
+      area: areaSelect.value
+    };
+
+    fetch("{% url 'collection' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message) {
+          alert(data.message);
+        } else if (data.error) {
+          alert("Error: " + data.error);
+        }
+        console.log(data);
+      })
+      .catch(err => console.error("Error:", err));
+  });
+</script>
+
+{% endblock %}

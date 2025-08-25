@@ -1,0 +1,291 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #4f46e5;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    z-index: 50;
+  }
+
+  .header-title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    margin: 0 auto;
+    font-weight: 500;
+  }
+
+  .area-list {
+    margin: 0;
+    padding: 0.5rem 1rem;
+    margin-top: 50px;
+    font-weight: 600;
+    color: #111827;
+    flex: 1;
+  }
+
+  .area-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .area-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Message styles */
+  .message-container {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100% - 2rem);
+    max-width: 500px;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message-container.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .message-container.success {
+    background-color: #10b981;
+  }
+
+  .message-container.error {
+    background-color: #ef4444;
+  }
+
+  .delete-btn {
+    color: #ef4444;
+    background: none;
+    border: none;
+    padding: 8px;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .delete-btn:hover {
+    opacity: 0.7;
+  }
+
+  .delete-btn:active {
+    opacity: 0.5;
+  }
+
+  /* Custom Pop-up for Delete Confirmation */
+  .delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+  }
+
+  .delete-modal {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 350px;
+    width: 90%;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .delete-modal p {
+    margin-bottom: 24px;
+    font-size: 16px;
+    color: #4b5563;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  #cancelDelete {
+    background-color: #e5e7eb;
+    color: #4b5563;
+  }
+
+  #confirmDelete {
+    background-color: #ef4444;
+    color: white;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
+
+<header class="header">
+  <a href="{% url 'settings' %}" class="mr-4 text-white z-10">
+    <i class="fas fa-chevron-left"></i>
+  </a>
+  <h1 class="text-lg header-title">Areas</h1>
+  <a href="{% url 'add_area' %}" class="ml-auto text-white z-10">
+    <i class="fas fa-plus"></i>
+  </a>
+</header>
+
+<div id="successMessage" class="message-container success"></div>
+<div id="errorMessage" class="message-container error"></div>
+
+<div id="deleteModalOverlay" class="delete-modal-overlay">
+  <div class="delete-modal">
+    <h3 class="text-lg font-semibold mb-4">Confirm Deletion</h3>
+    <p>Are you sure you want to delete <span id="areaNameToDelete" class="font-bold"></span>?</p>
+    <div class="modal-actions">
+      <button id="cancelDelete">Cancel</button>
+      <button id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<main class="main-content">
+  <div class="area-list">
+    {% for area in areas %}
+    {% if area.created_by == user %}
+    <div class="area-item">
+      <span class="area-name">{{ area.name }}</span>
+      <div class="area-actions">
+        <form action="{% url 'delete_area' area.id %}" method="POST" class="inline-form delete-form"
+          data-name="{{ area.name }}">
+          {% csrf_token %}
+          <button type="submit" class="delete-btn">
+            <i class="fas fa-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+    {% empty %}
+    <div class="area-item">
+      <span class="area-name">No areas found</span>
+    </div>
+    {% endfor %}
+  </div>
+</main>
+
+
+<script>
+  const successMessage = document.getElementById('successMessage');
+  const errorMessage = document.getElementById('errorMessage');
+  const deleteModalOverlay = document.getElementById('deleteModalOverlay');
+  const areaNameToDelete = document.getElementById('areaNameToDelete');
+  const confirmDeleteBtn = document.getElementById('confirmDelete');
+  const cancelDeleteBtn = document.getElementById('cancelDelete');
+
+  function showMessage(type, message) {
+    const msgElement = type === 'success' ? successMessage : errorMessage;
+    msgElement.textContent = message;
+    msgElement.classList.add('show');
+    setTimeout(() => { msgElement.classList.remove('show'); }, 3000);
+  }
+
+  function showDeleteConfirmation(areaName) {
+    return new Promise((resolve) => {
+      areaNameToDelete.textContent = `"${areaName}"`;
+      deleteModalOverlay.style.display = 'flex';
+
+      const handleConfirm = () => {
+        deleteModalOverlay.style.display = 'none';
+        confirmDeleteBtn.removeEventListener('click', handleConfirm);
+        cancelDeleteBtn.removeEventListener('click', handleCancel);
+        resolve(true);
+      };
+      const handleCancel = () => {
+        deleteModalOverlay.style.display = 'none';
+        confirmDeleteBtn.removeEventListener('click', handleConfirm);
+        cancelDeleteBtn.removeEventListener('click', handleCancel);
+        resolve(false);
+      };
+      confirmDeleteBtn.addEventListener('click', handleConfirm);
+      cancelDeleteBtn.addEventListener('click', handleCancel);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.delete-form').forEach(form => {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const areaName = this.dataset.name;
+        const confirmed = await showDeleteConfirmation(areaName);
+        if (confirmed) {
+          const formData = new FormData(this);
+          const url = this.action;
+          fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+          })
+            .then(response => {
+              if (response.ok) {
+                const areaItem = this.closest('.area-item');
+                if (areaItem) areaItem.remove();
+                showMessage('success', 'Area deleted successfully!');
+              } else {
+                showMessage('error', 'Failed to delete area.');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              showMessage('error', 'Network error. Could not delete area.');
+            });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

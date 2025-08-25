@@ -1,0 +1,275 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    height: 60px;
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-left: 12px;
+  }
+
+  .header-action {
+    color: white;
+    font-size: 18px;
+    padding: 4px;
+  }
+
+  .main-content {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 60px;  /* To push content below the 60px header */
+    padding-bottom: 80px; /* To prevent content from being hidden by the 80px nav */
+  }
+
+  .settings-list {
+    list-style: none;
+  }
+
+  .settings-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .settings-item:last-child {
+    border-bottom: none;
+  }
+
+  .settings-item:hover {
+    background-color: var(--secondary);
+  }
+
+  .settings-icon {
+    font-size: 20px;
+    width: 24px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+  }
+
+  .settings-label {
+    flex-grow: 1;
+    font-weight: 500;
+  }
+
+  .settings-arrow {
+    color: var(--text-light);
+    font-size: 16px;
+  }
+
+  .sign-out {
+    color: var(--danger);
+  }
+
+  .sign-out .settings-icon,
+  .sign-out .settings-label {
+    color: var(--danger);
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 12px 0;
+    z-index: 40;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    height: 80px;
+  }
+
+  .nav-items {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  .nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+</style>
+
+<!-- Header -->
+<header class="header">
+  <a href="Reports.html" class="header-action">
+    <!-- <i class="fas fa-chevron-left"></i> -->
+  </a>
+  <div class="header-title">Settings</div>
+  <div></div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <ul class="settings-list">
+    <a href="{% url 'support' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="far fa-question-circle"></i></span>
+        <span class="settings-label">Support</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <a href="{% url 'license' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-key"></i></span>
+        <span class="settings-label">License</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <a href="LineSettings.html" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-dollar-sign"></i></span>
+        <span class="settings-label">Line</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <!-- <a href="ImportLine.html" style="text-decoration: none; color: inherit;">
+        <li class="settings-item">
+          <span class="settings-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+          <span class="settings-label">Import Line</span>
+          <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      </a>
+      
+      <a href="ExportLine.html" style="text-decoration: none; color: inherit;">
+        <li class="settings-item">
+          <span class="settings-icon"><i class="fas fa-cloud-download-alt"></i></span>
+          <span class="settings-label">Export Line</span>
+          <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      </a> -->
+
+    <a href="{% url 'area_settings' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-map-marker-alt"></i></span>
+        <span class="settings-label">Area</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <a href="{% url 'add_expense' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-credit-card"></i></span>
+        <span class="settings-label">Expense Type</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <!-- <a href="SiteSettings.html" style="text-decoration: none; color: inherit;">
+        <li class="settings-item">
+          <span class="settings-icon"><i class="fas fa-building"></i></span>
+          <span class="settings-label">Site</span>
+          <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      </a> -->
+
+    <a href="{% url 'mysettings' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-user-cog"></i></span>
+        <span class="settings-label">My Settings</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <a href="{% url 'languagae' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-language"></i></span>
+        <span class="settings-label">Language Settings</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <!-- <a href="FingerprintSettings.html" style="text-decoration: none; color: inherit;">
+        <li class="settings-item">
+          <span class="settings-icon"><i class="fas fa-fingerprint"></i></span>
+          <span class="settings-label">Enable Fingerprint</span>
+          <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+        </li>
+      </a> -->
+
+    <a href="{% url 'change_password' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item">
+        <span class="settings-icon"><i class="fas fa-lock"></i></span>
+        <span class="settings-label">Change Password</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+
+    <a href="{% url 'login' %}" style="text-decoration: none; color: inherit;">
+      <li class="settings-item sign-out">
+        <span class="settings-icon"><i class="fas fa-sign-out-alt"></i></span>
+        <span class="settings-label">Sign out</span>
+        <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+      </li>
+    </a>
+  </ul>
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="nav">
+  <div class="nav-items">
+    <a href="{% url 'collection' %}" class="nav-item">
+      <i class="fas fa-coins"></i>
+      <span>Collection</span>
+    </a>
+    <a href="{% url 'expense_list' %}" class="nav-item">
+      <i class="fas fa-receipt"></i>
+      <span>Expense</span>
+    </a>
+    <a href="{% url 'add_customer' %}" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Customers</span>
+    </a>
+    <!-- <a href="Reports.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Reports</span>
+      </a> -->
+    <a href="{% url 'settings' %}" class="nav-item active">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+</nav>
+{% endblock %}

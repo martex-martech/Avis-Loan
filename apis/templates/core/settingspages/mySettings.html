@@ -1,0 +1,278 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+  <style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-action {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+  }
+
+  .header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* MAIN CONTENT */
+  .main-content {
+    flex: 1;
+    padding: 100px 20px 40px; /* clears header and footer */
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-light);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: white;
+    transition: all 0.2s ease;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  /* BUTTON */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* MESSAGES */
+  .message-container {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: calc(100% - 2rem);
+    max-width: 500px;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message-container.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .message-container.success {
+    background-color: var(--success);
+  }
+
+  .message-container.error {
+    background-color: var(--error);
+  }
+
+  .message-container i {
+    margin-right: 8px;
+    font-size: 1rem;
+  }
+  </style>
+
+  <header class="header">
+    <a href="{% url 'settings' %}" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Edit Profile</div>
+    <div class="header-actions"></div>
+  </header>
+  <div id="successMessage" class="message-container success"></div>
+  <div id="errorMessage" class="message-container error"></div>
+  <main class="main-content">
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input id="username" type="text" class="form-input" placeholder="Enter your username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mobile Number</label>
+      <input id="mobile" type="tel" class="form-input" placeholder="Enter mobile number">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input id="email" type="email" class="form-input" placeholder="Enter email address">
+    </div>
+    <button class="btn btn-primary w-full" id="updateBtn">
+      UPDATE PROFILE
+    </button>
+  </main>
+  <script>
+    // Helper function to show messages
+    function showMessage(type, message) {
+      const msgElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+      const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+      msgElement.classList.add('show');
+      setTimeout(() => {
+        msgElement.classList.remove('show');
+      }, 3000);
+    }
+
+    // CSRF helper
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    // Validation helpers
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function isValidMobile(mobile) {
+      return /^\d{10}$/.test(mobile);
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      const updateBtn = document.getElementById('updateBtn');
+      const usernameInput = document.getElementById('username');
+      const mobileInput = document.getElementById('mobile');
+      const emailInput = document.getElementById('email');
+
+      // Prefill form with current user details
+      try {
+        const profileRes = await fetch('/mysettings/', {
+          method: 'GET',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          usernameInput.value = profile.username || '';
+          mobileInput.value = profile.mobile_number || '';
+          emailInput.value = profile.email || '';
+        } else if (profileRes.status === 401) {
+          window.location.href = '/login/';
+        }
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+        showMessage('error', 'Failed to load profile. Please try again.');
+      }
+
+      // Update profile
+      updateBtn.addEventListener('click', async function () {
+        const username = usernameInput.value.trim();
+        const mobileNumber = mobileInput.value.trim();
+        const email = emailInput.value.trim();
+
+        // ----- VALIDATION -----
+        if (!username || username.length < 3) {
+          showMessage('error', 'Username is required and must be at least 3 characters.');
+          return;
+        }
+        if (!email || !isValidEmail(email)) {
+          showMessage('error', 'Please enter a valid email address.');
+          return;
+        }
+        if (mobileNumber && !isValidMobile(mobileNumber)) {
+          showMessage('error', 'Mobile number must be 10 digits.');
+          return;
+        }
+        // ----------------------
+
+        try {
+          const response = await fetch('/mysettings/', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+              username: username,
+              email: email,
+              mobile_number: mobileNumber
+            })
+          });
+          const data = await response.json();
+          if (response.ok) {
+            showMessage('success', 'Profile saved!');
+          } else {
+            showMessage('error', data.error || data.detail || 'Failed to update profile');
+          }
+        } catch (error) {
+          console.error('Update error:', error);
+          showMessage('error', 'Network error. Please try again.');
+        }
+      });
+    });
+  </script>
+{% endblock %}

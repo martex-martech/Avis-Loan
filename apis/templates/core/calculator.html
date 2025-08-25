@@ -1,0 +1,176 @@
+{% extends "core/base.html" %}
+
+{% block title %}Calculator{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Header */
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+        font-size: 20px;
+        font-weight: 600;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* Layout */
+    .main {
+        margin-top: 60px;
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+    }
+
+    /* Display */
+    .calc-display-area {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        padding: 20px;
+        font-size: 2.2rem;
+        background: #f3f4f6;
+        border-bottom: 1px solid #ddd;
+        overflow-x: auto;
+        word-wrap: break-word;
+    }
+
+    /* Calculator keypad */
+    .calculator {
+        background: #ffffff;
+        padding: 15px;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .calc-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 18px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        background: #e5e7eb; /* uniform light gray */
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn:hover {
+        background: #d1d5db;
+    }
+
+    .btn-equal {
+        grid-column: span 2;
+        background: #4b5563; /* darker gray */
+        color: white;
+    }
+
+    .btn-equal:hover {
+        background: #374151;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="header">
+    <a href="{% url 'collection' %}"><i class="fas fa-chevron-left"></i></a>
+    <div class="header-title">Calculator</div>
+</header>
+
+<!-- Main Layout -->
+<div class="main">
+    <!-- Display -->
+    <div id="display" class="calc-display-area"></div>
+
+    <!-- Calculator keypad -->
+    <div class="calculator">
+        <div class="calc-grid">
+            <button class="btn" onclick="clearDisplay()">C</button>
+            <button class="btn" onclick="deleteLast()">⌫</button>
+            <button class="btn" onclick="appendOperator('%')">%</button>
+            <button class="btn" onclick="appendOperator('/')">÷</button>
+
+            <button class="btn" onclick="appendNumber(7)">7</button>
+            <button class="btn" onclick="appendNumber(8)">8</button>
+            <button class="btn" onclick="appendNumber(9)">9</button>
+            <button class="btn" onclick="appendOperator('*')">×</button>
+
+            <button class="btn" onclick="appendNumber(4)">4</button>
+            <button class="btn" onclick="appendNumber(5)">5</button>
+            <button class="btn" onclick="appendNumber(6)">6</button>
+            <button class="btn" onclick="appendOperator('-')">−</button>
+
+            <button class="btn" onclick="appendNumber(1)">1</button>
+            <button class="btn" onclick="appendNumber(2)">2</button>
+            <button class="btn" onclick="appendNumber(3)">3</button>
+            <button class="btn" onclick="appendOperator('+')">+</button>
+
+            <button class="btn" onclick="appendNumber(0)">0</button>
+            <button class="btn" onclick="appendDot()">.</button>
+            <button class="btn btn-equal" onclick="calculateResult()">=</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const display = document.getElementById("display");
+
+    function appendNumber(num) {
+        display.textContent += num;
+    }
+
+    function appendOperator(op) {
+        if (display.textContent === "") return;
+        const lastChar = display.textContent.slice(-1);
+        if ("+-*/%".includes(lastChar)) {
+            display.textContent = display.textContent.slice(0, -1) + op;
+        } else {
+            display.textContent += op;
+        }
+    }
+
+    function appendDot() {
+        if (display.textContent === "" || /[+\-*/%]$/.test(display.textContent)) {
+            display.textContent += "0.";
+        } else {
+            display.textContent += ".";
+        }
+    }
+
+    function clearDisplay() {
+        display.textContent = "";
+    }
+
+    function deleteLast() {
+        display.textContent = display.textContent.slice(0, -1);
+    }
+
+    function calculateResult() {
+        try {
+            display.textContent = eval(display.textContent);
+        } catch {
+            display.textContent = "Error";
+        }
+    }
+</script>
+{% endblock %}

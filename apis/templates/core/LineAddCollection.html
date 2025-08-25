@@ -1,0 +1,354 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+  }
+
+  .header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 80px 20px 100px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-light);
+  }
+
+  .form-input,
+  .form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: white;
+    transition: border 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .form-input.error,
+  .form-select.error {
+    border-color: var(--error);
+  }
+
+  .error-message {
+    color: var(--error);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .success-message,
+  .api-error-message {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 500px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .success-message.show,
+  .api-error-message.show {
+    opacity: 1;
+  }
+
+  .success-message {
+    background-color: var(--success);
+    color: white;
+  }
+
+  .api-error-message {
+    background-color: var(--error);
+    color: white;
+  }
+
+  .message-icon {
+    margin-right: 8px;
+  }
+
+  .btn {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    max-width: 500px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 16px;
+    border: none;
+    width: calc(100% - 40px);
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+  <header class="header">
+    <a href="LineSettings.html" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Add Line</div>
+  </header>
+
+  <div id="successMessage" class="success-message">
+    <i class="fas fa-check-circle message-icon"></i> Line added successfully!
+  </div>
+  <div id="apiErrorMessage" class="api-error-message">
+    <i class="fas fa-exclamation-circle message-icon"></i>
+    <span id="apiErrorText"></span>
+  </div>
+
+  <div class="container">
+    <div class="form-group">
+      <label class="form-label" for="lineName">Line Name</label>
+      <input type="text" class="form-input" id="lineName" name="line_name" placeholder="Enter line name" required>
+      <div class="error-message" id="lineNameError">Please enter a line name</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="lineType">Line Type</label>
+      <select class="form-input form-select" id="lineType" name="line_type" required>
+        <option value="" disabled selected>Select Type</option>
+        <option value="Daily">Daily</option>
+        <option value="Weekly">Weekly</option>
+        <option value="Monthly">Monthly</option>
+      </select>
+      <div class="error-message" id="lineTypeError">Please select a line type</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="interest">Interest Per Hundred</label>
+      <input type="number" class="form-input" id="interest" name="interest_per_hundred" step="0.01" min="0.01" required>
+      <div class="error-message" id="interestError">Please enter a valid interest rate (minimum 0.01)</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="billAmount">Bill Amount Per Hundred</label>
+      <input type="number" class="form-input" id="billAmount" name="bill_amt_per_100" step="0.01" min="0.01" required>
+      <div class="error-message" id="billAmountError">Please enter a valid bill amount (minimum 0.01)</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="installments">Number of Installments</label>
+      <input type="number" class="form-input" id="installments" name="num_of_installments" min="1" required>
+      <div class="error-message" id="installmentsError">Please enter a valid number of installments (minimum 1)</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="badLoanDays">Bad Loan Days</label>
+      <input type="number" class="form-input" id="badLoanDays" name="bad_loan_days" min="1" required>
+      <div class="error-message" id="badLoanDaysError">Please enter valid bad loan days (minimum 1)</div>
+    </div>
+  </div>
+
+  <button class="btn" id="saveLineBtn">
+    <i class="fas fa-save" style="margin-right: 8px;"></i> SAVE LINE
+  </button>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/api/lines/";
+
+    // Get CSRF token from cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          cookie = cookie.trim();
+          if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    const saveLineBtn = document.getElementById('saveLineBtn');
+    const successMessage = document.getElementById('successMessage');
+    const apiErrorMessage = document.getElementById('apiErrorMessage');
+    const apiErrorText = document.getElementById('apiErrorText');
+
+    const formFields = [
+      { id: 'lineName', validate: (value) => value.trim() !== '' },
+      { id: 'lineType', validate: (value) => value !== '' },
+      { id: 'interest', validate: (value) => !isNaN(parseFloat(value)) && parseFloat(value) >= 0.01 },
+      { id: 'billAmount', validate: (value) => !isNaN(parseFloat(value)) && parseFloat(value) >= 0.01 },
+      { id: 'installments', validate: (value) => !isNaN(parseInt(value)) && parseInt(value) >= 1 },
+      { id: 'badLoanDays', validate: (value) => !isNaN(parseInt(value)) && parseInt(value) >= 1 }
+    ];
+
+    function validateField(field) {
+      const inputElement = document.getElementById(field.id);
+      const errorMessageElement = document.getElementById(field.id + 'Error');
+      const isValid = field.validate(inputElement.value);
+
+      if (isValid) {
+        inputElement.classList.remove('error');
+        errorMessageElement.style.display = 'none';
+      } else {
+        inputElement.classList.add('error');
+        errorMessageElement.style.display = 'block';
+      }
+      return isValid;
+    }
+
+    function validateAllFields() {
+      let isFormValid = true;
+      formFields.forEach(field => {
+        if (!validateField(field)) {
+          isFormValid = false;
+        }
+      });
+      return isFormValid;
+    }
+
+    // Add real-time validation on input change
+    formFields.forEach(field => {
+      const inputElement = document.getElementById(field.id);
+      inputElement.addEventListener('input', () => validateField(field));
+    });
+
+    function showMessage(type, message) {
+      if (type === 'success') {
+        successMessage.classList.add('show');
+        setTimeout(() => {
+          successMessage.classList.remove('show');
+          window.location.href = "LineSettings.html";
+        }, 2000);
+      } else if (type === 'error') {
+        apiErrorText.textContent = message;
+        apiErrorMessage.classList.add('show');
+        setTimeout(() => {
+          apiErrorMessage.classList.remove('show');
+        }, 5000);
+      }
+    }
+
+    saveLineBtn.addEventListener('click', async function () {
+      if (!validateAllFields()) {
+        alert("Please correct the errors in the form before saving.");
+        return;
+      }
+
+      const formData = {
+        line_name: document.getElementById('lineName').value.trim(),
+        line_type: document.getElementById('lineType').value,
+        interest_per_hundred: parseFloat(document.getElementById('interest').value),
+        bill_amt_per_100: parseFloat(document.getElementById('billAmount').value),
+        num_of_installments: parseInt(document.getElementById('installments').value),
+        bad_loan_days: parseInt(document.getElementById('badLoanDays').value)
+      };
+
+      this.disabled = true;
+      this.innerHTML = '<span class="loading"></span> Saving...';
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          showMessage('success', 'Line added successfully!');
+        } else {
+          let errorMessages = "Failed to save line. Check the form for details.";
+          if (data && typeof data === 'object') {
+            const firstError = Object.values(data)[0];
+            errorMessages = Array.isArray(firstError) ? firstError[0] : firstError;
+          }
+          showMessage('error', errorMessages);
+        }
+      } catch (err) {
+        console.error(err);
+        showMessage('error', 'Network error.');
+      } finally {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-save" style="margin-right: 8px;"></i> SAVE LINE';
+      }
+    });
+  </script>
+{% endblock %}

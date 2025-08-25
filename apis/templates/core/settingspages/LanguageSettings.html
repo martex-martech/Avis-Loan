@@ -1,0 +1,104 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+<style>
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    flex: 1;
+  }
+
+  .header-action {
+    width: 24px;
+    text-align: center;
+  }
+
+  .main-content {
+    padding: 24px 0;
+    margin-top: 70px;
+    margin-bottom: 80px;
+    width: 100%;
+  }
+
+  .language-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .language-option.active {
+    background-color: #f9f9ff;
+    border-left: 4px solid var(--primary);
+  }
+
+  .language-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .language-flag {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+  }
+
+  .language-name {
+    font-weight: 500;
+  }
+
+  .language-check {
+    color: var(--primary);
+    font-size: 16px;
+  }
+</style>
+
+<!-- Header -->
+<header class="header">
+  <a href="{% url 'settings' %}" class="header-action">
+    <i class="fas fa-chevron-left"></i>
+  </a>
+  <div class="header-title">Language</div>
+  <div class="header-action"></div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="language-option active">
+    <div class="language-left">
+      <div class="language-flag">EN</div>
+      <div class="language-name">English</div>
+    </div>
+    <i class="fas fa-check language-check"></i>
+  </div>
+</main>
+{% endblock %}

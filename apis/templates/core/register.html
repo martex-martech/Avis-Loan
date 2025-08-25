@@ -1,0 +1,362 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+  <style>
+    .register-container {
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 40px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      height: 80px;
+      width: auto;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-input.error {
+      border-color: var(--error);
+    }
+
+    .error-message {
+      color: var(--error);
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+      margin-bottom: 16px;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-light);
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    /* Message Styles */
+    .message-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 2rem);
+      max-width: 500px;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-container.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .message-container.success {
+      background-color: var(--success);
+    }
+
+    .message-container.error {
+      background-color: var(--error);
+    }
+
+    .message-container i {
+      margin-right: 8px;
+      font-size: 1rem;
+    }
+  </style>
+
+  <div class="register-container">
+    <div class="logo-container">
+      <img
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4hoWbASsAs4jL2FR6g-XiCKz_NLJIdYvdrKEQaIJSDmSjNPPdc6xyNFw5ShXbJ-NLCmgbxxlhD6xZVuEI_zK87mFEY1IP6AR_yL0lpc1w_UqqWnpKxKEFv1k-E4vB8gf8iccB5dSI3fdV56hbD29gNHgwjmhDjbIAn7I3NFgNiy5_uky8uQ2X_-dxLb0ZctCF3aV4jmvWpm6RAlDPKM15TIYrOiIanVohU-JZKjPXqpcBtk8gDZiYjWYk1MAnxYPqgEYvnu4CMgNU"
+        alt="Logo" class="logo">
+      <h1 class="text-2xl font-semibold text-gray-800 mt-4">Create an Account</h1>
+    </div>
+
+    <div id="successMessage" class="message-container success"></div>
+    <div id="errorMessage" class="message-container error"></div>
+
+    <form method="POST" action="{% url 'register' %}" id="registerForm">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" name="full_name" placeholder="Enter your full name" required>
+        <div class="error-message" id="fullNameError">Please enter a valid full name (at least 3 characters)</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-input" name="username" placeholder="Choose a username" required>
+        <div class="error-message" id="usernameError">Username must be 4-20 characters (letters, numbers, underscores)</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" name="email" placeholder="Enter your email" required>
+        <div class="error-message" id="emailError">Please enter a valid email address</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Mobile Number</label>
+        <input type="tel" class="form-input" name="mobile_number" placeholder="Enter your mobile number" required>
+        <div class="error-message" id="mobileError">Please enter a valid 10-digit mobile number</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" class="form-input" name="password1" placeholder="Create a password" required>
+          <i class="password-toggle fas fa-eye" onclick="togglePassword('password')"></i>
+        </div>
+        <div class="error-message" id="passwordError">Password must be at least 8 characters, with 1 uppercase, 1 lowercase, 1 number, and 1 special character</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div class="password-container">
+          <input type="password" id="confirmPassword" class="form-input" name="password2" placeholder="Confirm your password" required>
+          <i class="password-toggle fas fa-eye" onclick="togglePassword('confirmPassword')"></i>
+        </div>
+        <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        CREATE ACCOUNT
+      </button>
+
+      <div class="text-center mt-4 text-sm text-gray-600">
+        Already have an account? <a href="{% url 'login' %}" class="text-indigo-600 hover:text-indigo-800">Sign in</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const icon = input.nextElementSibling;
+
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    }
+
+    // Validation functions
+    function validateFullName(fullName) {
+      return fullName.length >= 3 && /^[a-zA-Z\s]+$/.test(fullName);
+    }
+
+    function validateUsername(username) {
+      return /^[a-zA-Z0-9_]{4,20}$/.test(username);
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validateMobile(mobile) {
+      return /^\d{10}$/.test(mobile);
+    }
+
+    function validatePassword(password) {
+      // At least 8 chars, 1 uppercase, 1 lowercase, 1 number, and 1 special character
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+    }
+
+    function validateConfirmPassword(password, confirmPassword) {
+      return password === confirmPassword;
+    }
+
+    // Helper function to show messages
+    function showMessage(type, message) {
+      const msgElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+      const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+      msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+      msgElement.classList.add('show');
+      setTimeout(() => {
+        msgElement.classList.remove('show');
+      }, 3000);
+    }
+
+    // Form submission validation and AJAX
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      let isValid = true;
+      const inputs = [
+        { name: 'full_name', validate: validateFullName, errorEl: 'fullNameError', message: 'Please enter a valid full name (at least 3 characters)' },
+        { name: 'username', validate: validateUsername, errorEl: 'usernameError', message: 'Username must be 4-20 characters (letters, numbers, underscores)' },
+        { name: 'email', validate: validateEmail, errorEl: 'emailError', message: 'Please enter a valid email address' },
+        { name: 'mobile_number', validate: validateMobile, errorEl: 'mobileError', message: 'Please enter a valid 10-digit mobile number' },
+        { name: 'password1', validate: validatePassword, errorEl: 'passwordError', message: 'Password must be at least 8 characters, with 1 uppercase, 1 lowercase, 1 number, and 1 special character' },
+        { name: 'password2', validate: (val) => validateConfirmPassword(document.getElementById('password').value, val), errorEl: 'confirmPasswordError', message: 'Passwords do not match' }
+      ];
+
+      inputs.forEach(item => {
+        const input = document.querySelector(`input[name="${item.name}"]`);
+        const value = input.value.trim();
+        const errorElement = document.getElementById(item.errorEl);
+        
+        if (!item.validate(value)) {
+          errorElement.style.display = 'block';
+          input.classList.add('error');
+          isValid = false;
+        } else {
+          errorElement.style.display = 'none';
+          input.classList.remove('error');
+        }
+      });
+
+      if (!isValid) {
+        return;
+      }
+      
+      const form = this;
+      const formData = new FormData(form);
+      
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showMessage('success', data.message || 'Account created successfully!');
+          // Redirect to login page after a short delay
+          setTimeout(() => {
+            window.location.href = "{% url 'login' %}";
+          }, 2000);
+        } else {
+          showMessage('error', data.error || data.message || 'An error occurred during registration.');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        showMessage('error', 'Network error. Please try again.');
+      }
+    });
+
+    // Real-time validation on input change
+    document.querySelectorAll('.form-input').forEach(input => {
+      input.addEventListener('input', function() {
+        const name = this.name;
+        const value = this.value.trim();
+        const errorElement = document.getElementById(`${name}Error`);
+        
+        if (name === 'full_name' && validateFullName(value)) {
+          errorElement.style.display = 'none';
+          this.classList.remove('error');
+        } else if (name === 'username' && validateUsername(value)) {
+          errorElement.style.display = 'none';
+          this.classList.remove('error');
+        } else if (name === 'email' && validateEmail(value)) {
+          errorElement.style.display = 'none';
+          this.classList.remove('error');
+        } else if (name === 'mobile_number' && validateMobile(value)) {
+          errorElement.style.display = 'none';
+          this.classList.remove('error');
+        } else if (name === 'password1' && validatePassword(value)) {
+          errorElement.style.display = 'none';
+          this.classList.remove('error');
+        } else if (name === 'password2' && validateConfirmPassword(document.getElementById('password').value, value)) {
+          document.getElementById('confirmPasswordError').style.display = 'none';
+          document.getElementById('confirmPassword').classList.remove('error');
+        }
+      });
+    });
+  </script>
+{% endblock %}

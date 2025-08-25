@@ -1,0 +1,216 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - Loan App{% endblock %}
+
+{% block extra_head %}
+
+  <style>
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+
+    .main-content {
+      padding: 24px 16px;
+      margin-top: 60px;
+      margin-bottom: 80px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Messages */
+    .message-container {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: calc(100% - 2rem);
+      max-width: 500px;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-container.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .message-container.success {
+      background-color: var(--success);
+    }
+
+    .message-container.error {
+      background-color: var(--error);
+    }
+
+    .message-container i {
+      margin-right: 8px;
+      font-size: 1rem;
+    }
+  </style>
+
+
+  <header class="header">
+    <a href="{% url 'area_settings' %}" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Add Area</div>
+  </header>
+
+  <div id="successMessage" class="message-container success"></div>
+  <div id="errorMessage" class="message-container error"></div>
+
+  <main class="main-content">
+    <form id="areaForm" method="POST" action="{% url 'add_area' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Area Name</label>
+        <input type="text" class="form-input" name="area_name" id="areaName" placeholder="Enter area name" autofocus
+          required>
+      </div>
+      <button type="submit" class="btn btn-primary w-full">SAVE AREA</button>
+    </form>
+  </main>
+
+  <script>
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const areaForm = document.getElementById('areaForm');
+
+    function showMessage(type, message) {
+      const msgElement = type === 'success' ? successMessage : errorMessage;
+      const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+
+      msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+      msgElement.classList.add('show');
+
+      setTimeout(() => {
+        msgElement.classList.remove('show');
+      }, 3000);
+    }
+
+    areaForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const areaNameInput = document.getElementById('areaName');
+      const areaName = areaNameInput.value.trim();
+
+      if (!areaName) {
+        showMessage('error', 'Please enter a valid area name.');
+        return;
+      }
+
+      const formData = new FormData(this);
+      const csrfToken = formData.get('csrfmiddlewaretoken');
+
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showMessage('success', data.message || 'Area added successfully!');
+          areaNameInput.value = '';
+        } else {
+          showMessage('error', data.error || 'An error occurred. Please try again.');
+        }
+      } catch (err) {
+        console.error(err);
+        showMessage('error', 'Network error. Please try again.');
+      }
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "core/base.html" %}
+
+{% block title %}Support - Loan App{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Base Styles for the Support Page */
+  body {
+    background-color: #f3f4f6; /* Ensure the body background matches the rest of the app */
+  }
+
+  /* Header Styles */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-action {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+  }
+
+  .header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* Main Content Area */
+  .main-content {
+    padding-top: 80px; /* Adjust for fixed header */
+    padding-bottom: 24px;
+    padding-left: 16px;
+    padding-right: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Card-like Sections */
+  .support-section {
+    margin-bottom: 24px;
+    background-color: white; /* Use a specific color to prevent issues */
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .support-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+  }
+
+  .support-title i {
+    margin-right: 10px;
+  }
+
+  .support-text {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+  }
+
+  .contact-info {
+    font-size: 15px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .contact-info i {
+    margin-right: 8px;
+    color: var(--primary);
+    width: 18px;
+    text-align: center;
+  }
+
+  .contact-info a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .contact-info a:hover {
+    color: var(--primary-light);
+  }
+
+  /* FAQ Section (if you add it later) */
+  .faq-item {
+    margin-bottom: 16px;
+  }
+
+  .faq-question {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    color: var(--text);
+  }
+
+  .faq-question i {
+    margin-right: 10px;
+    color: var(--primary);
+    margin-top: 3px;
+  }
+
+  .faq-answer {
+    font-size: 14px;
+    color: var(--text-light);
+    padding-left: 26px;
+  }
+
+  /* Bottom Navigation (if you add it later) */
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    padding: 12px 0;
+    z-index: 40;
+  }
+
+  .nav-items {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 12px;
+    padding: 4px 12px;
+    transition: color 0.2s;
+  }
+
+  .nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+</style>
+{% endblock %}
+
+
+{% block content %}
+  <header class="header">
+    <a href="{% url 'settings' %}" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Support</div>
+    <div class="header-actions"></div>
+  </header>
+
+  <main class="main-content">
+    <div class="support-section">
+      <div class="support-title">
+        <i class="fas fa-headset"></i> Contact Support
+      </div>
+      <div class="support-text">
+        Our team is available to help you with any questions or issues you may have with the app.
+      </div>
+      <div class="contact-info">
+        <i class="fas fa-envelope"></i>
+        <a href="mailto:avis4u.in@gmail.com">avis4u.in@gmail.com</a>
+      </div>
+    </div>
+
+    <div class="support-section">
+      <div class="support-title">
+        <i class="fas fa-phone-alt"></i> Call Us
+      </div>
+      <div class="support-text">
+        Speak directly with our support team during business hours (9AM-5PM, Mon-Fri).
+      </div>
+      <div class="contact-info">
+        <i class="fas fa-phone"></i>
+        <a href="tel:+919787678785">+91 97876 78785</a>
+      </div>
+    </div>
+  </main>
+{% endblock %}

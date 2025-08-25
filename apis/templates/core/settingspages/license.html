@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+
+{% block title %}License - Loan App{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 bg-indigo-600 text-white p-4 flex items-center justify-between z-50">
+    <a href="{% url 'settings' %}" class="text-xl">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <h1 class="text-xl font-semibold text-center flex-1">License</h1>
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="px-4 py-6 pt-24 max-w-md mx-auto">
+    <!-- Username -->
+    <div class="mb-8 text-center">
+      <h2 class="text-lg font-medium text-gray-700 mb-1">UserName</h2>
+      <p class="text-xl font-semibold text-gray-900">{{ username }}</p>
+    </div>
+
+    <!-- License Info -->
+    <div class="grid grid-cols-2 gap-4 mb-8 text-center">
+      <div>
+        <h3 class="text-sm text-gray-500">Annual Amount</h3>
+        <p class="text-lg font-bold text-indigo-600">{{ annual_amount }}</p>
+      </div>
+      <div>
+        <h3 class="text-sm text-gray-500">Valid Until</h3>
+        <p class="text-lg font-bold text-green-600">{{ valid_until }}</p>
+      </div>
+    </div>
+
+    <!-- QR Code Section -->
+    <div class="bg-slate-100 border-2 border-dashed border-gray-300 rounded-lg p-6 mb-6 flex flex-col items-center">
+      <div class="bg-white p-4 rounded-lg shadow-sm mb-3">
+        <i class="fas fa-qrcode text-6xl text-gray-500"></i>
+      </div>
+      <p class="text-sm text-gray-600">Scan QR code to complete payment</p>
+    </div>
+  </main>
+{% endblock %}
