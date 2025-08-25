@@ -13,7 +13,7 @@ from .views import (
     support, license, mysettings, ProfileUpdateView,
     LineListCreateView, LineDetailView,
     LineViewSet, AreaViewSet, CustomerViewSet, LoanViewSet,
-    add_customer_page, collection, collection_list, user_settings
+    add_customer_page, user_settings
 )
 
 # Router for ViewSets
@@ -52,8 +52,9 @@ urlpatterns = [
     path('expense_list/', views.expense_list, name='expense_list'),
 
     # Collections
-    path("collection/", collection, name="collection"),
-    path("collectionlist/", collection_list, name="collectionlist"),
+    path('collection/', views.collection, name='collection'),
+    path('collection_list/', views.collection_list, name='collection_list'),
+    path('collect_payment/<int:customer_id>/', views.collect_payment, name='collect_payment'),
 
     # Misc
     path('change_password/', change_password, name='change_password'),

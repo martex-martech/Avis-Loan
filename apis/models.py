@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from dateutil.relativedelta import relativedelta
 
 # ------------------------
 # CUSTOM USER MODEL
@@ -142,6 +142,9 @@ class Customer(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # NEW: store the initial loan id
+    loan = models.OneToOneField('Loan', on_delete=models.SET_NULL, null=True, blank=True, related_name='customer_loan')
+
     def __str__(self):
         return f"{self.customer_name or 'No Name'} ({self.customer_code or 'No Code'})"
 
@@ -150,59 +153,67 @@ class Customer(models.Model):
 # LOAN MODEL
 # ------------------------
 class Loan(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="loans")
     line = models.ForeignKey(Line, on_delete=models.CASCADE)
-    area = models.ForeignKey('Area', on_delete=models.SET_NULL, null=True, blank=True)  # <-- new field
+    area = models.ForeignKey('Area', on_delete=models.SET_NULL, null=True, blank=True)
     principal_amount = models.DecimalField(max_digits=10, decimal_places=2)
     total_interest_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     installment_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     num_of_installments = models.IntegerField(null=True, blank=True)
     next_due_date = models.DateField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name='created_loans'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Loan for {self.customer.customer_name} - {self.principal_amount}"
+        return f"Loan - {self.principal_amount}"
 
 
 # ------------------------
 # SIGNAL: CREATE LOAN WHEN CUSTOMER IS CREATED
 # ------------------------
+
 @receiver(post_save, sender=Customer)
 def create_initial_loan(sender, instance, created, **kwargs):
     if created and instance.maximum_loan_amount and instance.line:
-        L = float(instance.maximum_loan_amount)
-        I100 = float(instance.line.interest_per_hundred or 0)
-        B100 = float(instance.line.bill_amt_per_100 or 0)
-        N = int(instance.line.num_of_installments or 0)
+        L = float(instance.maximum_loan_amount)           # Principal
+        I100 = float(instance.line.interest_per_hundred or 0)  # Interest per installment
+        N = int(instance.line.num_of_installments or 0)   # Total installments
 
-        # Loan Calculations
-        total_interest_amount = (L / 100) * I100 * N
-        installment_amount = (L / 100) * B100
-        total_amount_to_pay = installment_amount * N
+        # Flat interest calculation
+        total_interest_amount = (L * I100 / 100) * N
+        total_amount_to_pay = L + total_interest_amount
+        installment_amount = total_amount_to_pay / N
 
-        # Due Date Calculation
-        days_map = {
-            'daily': 1,
-            'weekly': 7,
-            'monthly': 30
-        }
+        # Determine first due date
         next_due = None
         if instance.line.line_type:
-            next_due = timezone.now().date() + timedelta(days=days_map.get(instance.line.line_type.lower(), 0))
+            line_type_name = instance.line.line_type.lower()
+            if line_type_name == 'daily':
+                next_due = timezone.now().date() + timedelta(days=1)
+            elif line_type_name == 'weekly':
+                next_due = timezone.now().date() + timedelta(days=7)
+            elif line_type_name == 'monthly':
+                next_due = timezone.now().date() + relativedelta(months=1)
 
-        # Create Loan Entry including customer area
-        Loan.objects.create(
-            customer=instance,
+        # Create Loan
+        loan = Loan.objects.create(
             line=instance.line,
-            area=instance.area,  # <-- add the area here
+            area=instance.area,
             principal_amount=L,
             total_interest_amount=total_interest_amount,
             installment_amount=installment_amount,
             total_amount_to_pay=total_amount_to_pay,
             num_of_installments=N,
-            next_due_date=next_due
+            next_due_date=next_due,
+            created_by=instance.created_by
         )
+
+        # Save loan in customer
+        instance.loan = loan
+        instance.save(update_fields=['loan'])
+
 
 class Payment(models.Model):
     payment_id = models.AutoField(primary_key=True)
@@ -210,7 +221,7 @@ class Payment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     due_date = models.DateField()
     paid_on = models.DateField(null=True, blank=True)
-    amt_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    amt_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return f"{self.customer} - {self.amt_paid}"

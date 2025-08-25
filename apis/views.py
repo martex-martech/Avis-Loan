@@ -3,11 +3,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from rest_framework import status
-from datetime import timedelta
+from datetime import date, timedelta
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponseNotAllowed
 import json
-
+from dateutil.relativedelta import relativedelta
+from decimal import Decimal, InvalidOperation
+from django.utils.timezone import now
 from rest_framework.views import APIView
 from django.db.models import Sum
 from django.http import JsonResponse
@@ -36,6 +38,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.utils.dateparse import parse_date
+
 
 User = get_user_model()
 
@@ -747,26 +751,191 @@ class CustomerViewSet(viewsets.ModelViewSet):
 # ------------------------
 # LOAN VIEWSET
 # ------------------------
+# If using ViewSets
 class LoanViewSet(viewsets.ModelViewSet):
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
+    permission_classes = [AllowAny]
+    
+    def perform_create(self, serializer):
+        # Automatically set the created_by field to the current user
+        serializer.save(created_by=self.request.user)
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            
+            return Response({
+                'success': True,
+                'message': 'Loan created successfully',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_queryset(self):
+        # Only show loans created by the current user
+        return Loan.objects.filter(created_by=self.request.user)
 
 def add_customer_page(request):
     return render(request, "core/AddCustomer.html")
 
-@login_required
 def collection(request):
+    """
+    Filter page: select date, line, area.
+    """
     user = request.user
+    today = timezone.now().date()
+
+    user_lines = Line.objects.filter(created_by=user)
+    user_areas = Area.objects.filter(created_by=user)
+
     context = {
-        "user_lines": Line.objects.filter(created_by=user),
-        "user_areas": Area.objects.filter(created_by=user)
+        "user_lines": user_lines,
+        "user_areas": user_areas,
+        "today": today,
+        "selected_date": request.GET.get("date", today),
+        "selected_line": request.GET.get("line"),
+        "selected_area": request.GET.get("area"),
     }
     return render(request, "core/collection.html", context)
-    
+
+
 def collection_list(request):
-    return render(request, "core/collectionlist.html")    
+    user = request.user
+    today = timezone.now().date()
 
+    customers = Customer.objects.select_related('loan', 'line', 'area').filter(created_by=user)
 
+    # --- Filters ---
+    selected_date = request.GET.get("date")
+    selected_line = request.GET.get("line")
+    selected_area = request.GET.get("area")
+
+    if selected_date:
+        try:
+            date_obj = datetime.strptime(selected_date, "%Y-%m-%d").date()
+            customers = customers.filter(loan__next_due_date__lte=date_obj)
+        except ValueError:
+            pass
+
+    if selected_line and selected_line != "all":
+        customers = customers.filter(line_id=selected_line)
+
+    if selected_area and selected_area != "all":
+        customers = customers.filter(area_id=selected_area)
+
+    # --- Calculate dynamic overdue + adjusted installment ---
+    for customer in customers:
+        loan = getattr(customer, 'loan', None)
+        if not loan:
+            customer.adjusted_installment = 0
+            customer.bad_loan_days = 0
+            customer.bad_loan_amount = 0
+            continue
+
+        if loan.next_due_date:
+            overdue_days = max(0, (today - loan.next_due_date).days)
+        else:
+            overdue_days = 0
+
+        # Get line-specific daily bad loan percentage
+        bad_percent_per_day = getattr(customer.line, 'bad_loan_days', 0) if customer.line else 0
+
+        # Calculate total penalty amount
+        penalty_amount = loan.installment_amount * overdue_days * bad_percent_per_day / 100
+
+        # Adjusted installment
+        customer.adjusted_installment = round(loan.installment_amount + penalty_amount, 2)
+        customer.bad_loan_days = overdue_days
+        customer.bad_loan_amount = round(penalty_amount, 2)
+
+    context = {
+        "customers": customers.order_by('loan__next_due_date'),
+        "selected_date": selected_date,
+        "today": today,
+    }
+    return render(request, "core/collectionlist.html", context)
+
+@csrf_exempt
+def collect_payment(request, customer_id):
+    try:
+        if request.method != "POST":
+            return JsonResponse({"success": False, "message": "Invalid request method."})
+
+        customer = get_object_or_404(Customer, id=customer_id)
+        loan = getattr(customer, 'loan', None)
+
+        if not loan or loan.total_amount_to_pay <= 0:
+            return JsonResponse({"success": False, "message": "Loan already completed or not found."})
+
+        today = timezone.now().date()
+
+        # --- Overdue calculation ---
+        overdue_days = max(0, (today - loan.next_due_date).days) if loan.next_due_date else 0
+        bad_percent_per_day = getattr(customer.line, 'bad_loan_days', 0) if customer.line else 0
+
+        # Adjusted installment including overdue penalty
+        adjusted_installment = loan.installment_amount
+        if overdue_days > 0:
+            adjusted_installment += loan.installment_amount * overdue_days * bad_percent_per_day / 100
+
+        # --- Deduct payment ---
+        payment_amount = min(adjusted_installment, loan.total_amount_to_pay)
+        loan.total_amount_to_pay -= payment_amount
+        loan.num_of_installments = max(loan.num_of_installments - 1, 0)
+
+        # --- Record payment ---
+        Payment.objects.create(
+            customer=customer,
+            user=request.user,
+            due_date=loan.next_due_date or today,
+            paid_on=today,
+            amt_paid=payment_amount
+        )
+
+        # --- Update next due date if loan is not completed ---
+        is_completed = loan.total_amount_to_pay <= 0 or loan.num_of_installments <= 0
+        if not is_completed:
+            line_type_name = getattr(loan.line, 'line_type', '').lower() if loan.line else ''
+            next_due = loan.next_due_date or today
+            if line_type_name == 'daily':
+                loan.next_due_date = next_due + timedelta(days=1)
+            elif line_type_name == 'weekly':
+                next_due += timedelta(days=7)
+                if next_due.weekday() in [5, 6]:  # skip weekends
+                    next_due += timedelta(days=(7 - next_due.weekday()))
+                loan.next_due_date = next_due
+            elif line_type_name == 'monthly':
+                loan.next_due_date = next_due + relativedelta(months=1)
+        else:
+            # Loan completed: set next_due_date to None
+            loan.next_due_date = None
+            loan.total_amount_to_pay = 0
+            loan.num_of_installments = 0
+
+        loan.save()
+
+        return JsonResponse({
+            "success": True,
+            "payment_collected": float(payment_amount),
+            "remaining_amount": float(loan.total_amount_to_pay),
+            "remaining_installments": loan.num_of_installments,
+            "next_due_date": loan.next_due_date.strftime("%Y-%m-%d") if loan.next_due_date else None,
+            "is_completed": is_completed,
+            "adjusted_installment": round(float(adjusted_installment), 2),
+            "bad_loan_days": overdue_days,
+            "bad_loan_amount": round(adjusted_installment - loan.installment_amount, 2),
+        })
+
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)})
+    
 #----------------
 #  SUPERUSER
 #---------------

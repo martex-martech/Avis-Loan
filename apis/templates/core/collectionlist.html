@@ -1,460 +1,208 @@
 {% extends "core/base.html" %}
 
-{% block title %}Login - Loan App{% endblock %}
+{% block title %}Collection List - Loan App{% endblock %}
 
 {% block extra_head %}
-
 <style>
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    background-color: var(--primary);
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  :root {
+    --primary: #2563eb;
+    --accent: #10b981;
+    --background: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --overdue: #ef4444;
+    --on-time: #10b981;
+    --completed: #6b7280;
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
   }
 
-  .header-title {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
+  body { background-color: var(--background); }
+  .header { position: fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:16px; background-color: var(--primary); color:white; box-shadow: var(--shadow); z-index:50; }
+  .header-back { position:absolute; left:16px; font-size:20px; color:white; }
+  .header-title { font-size:20px; font-weight:600; }
+  .main-content { padding:16px; margin-top:70px; }
 
-  .header-actions {
-    display: flex;
-    gap: 16px;
-  }
+  .customer-card { background-color:var(--card-bg); border-radius:12px; padding:16px; margin-bottom:16px; box-shadow: var(--shadow); display:flex; flex-direction:column; gap:12px; }
+  .customer-header { display:flex; justify-content:space-between; align-items:flex-start; }
+  .customer-info .name { font-weight:700; font-size:18px; color: var(--text-primary); }
+  .customer-info .mobile { font-size:14px; color: var(--text-secondary); margin-top:4px; }
+  .status-dot { width:12px; height:12px; border-radius:50%; background-color: var(--on-time); }
+  .status-dot.overdue { background-color: var(--overdue); }
+  .status-dot.collected { background-color: var(--accent); }
 
-  .header-action {
-    color: white;
-    font-size: 18px;
-    position: relative;
-    padding: 4px;
-  }
+  .customer-details-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:14px; color: var(--text-primary); }
+  .customer-details-grid span { font-weight:500; display:flex; flex-direction:column; color: var(--text-secondary); }
+  .customer-details-grid span strong { font-weight:600; }
+  .overdue { color: var(--overdue); }
+  .on-time { color: var(--on-time); }
+  .completed { color: var(--completed); }
+  .btn-collect { margin-top:8px; padding:12px; width:100%; border-radius:8px; font-weight:600; font-size:16px; background-color: var(--accent); color:white; border:none; cursor:pointer; transition: background-color 0.2s; }
+  .btn-collect:hover { background-color:#059669; }
+  .empty-state { text-align:center; margin-top:40px; color: var(--text-secondary); font-size:16px; }
+  .principal-amount, .next-due, .installment-amount { font-weight:600; }
 
-  .badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background-color: #ef4444;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 9999px;
-    font-weight: bold;
-    min-width: 18px;
-    text-align: center;
-  }
+  /* Notifications */
+  .notification-container { position: fixed; top: 70px; left: 16px; right: 16px; z-index: 100; opacity: 0; transform: translateY(-20px); transition: opacity 0.3s ease, transform 0.3s ease; }
+  .notification-container.show { opacity: 1; transform: translateY(0); }
+  .notification-message { padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; color: white; }
+  .notification-message.success { background-color: var(--accent); }
+  .notification-message.error { background-color: var(--overdue); }
 
-  .main-content {
-    padding: 16px;
-    margin-top: 60px;
-    margin-bottom: 80px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: var(--primary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .customer-row {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    transition: all 0.3s ease;
-  }
-
-  .customer-info {
-    flex: 1;
-    margin-left: 12px;
-  }
-
-  .customer-name {
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .customer-details {
-    display: flex;
-    gap: 12px;
-    font-size: 13px;
-    color: var(--text-light);
-  }
-
-  .payment-amount {
-    font-weight: 600;
-    color: var(--primary);
-    margin: 4px 0;
-  }
-
-  .payment-status {
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-
-  .status-pending {
-    background-color: #fef3c7;
-    color: #92400e;
-  }
-
-  .status-paid {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-
-  .status-overdue {
-    background-color: #fee2e2;
-    color: #991b1b;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    white-space: nowrap;
-  }
-
-  .btn-primary {
-    background-color: var(--primary);
-    color: white;
-  }
-
-  .btn-success {
-    background-color: var(--success);
-    color: white;
-  }
-
-  .btn-danger {
-    background-color: var(--danger);
-    color: white;
-  }
-
-  .btn-outline {
-    background-color: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-light);
-  }
-
-  .nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: white;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    padding: 12px 0;
-    z-index: 40;
-  }
-
-  .nav-items {
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-light);
-    font-size: 12px;
-    padding: 4px 12px;
-    transition: all 0.2s ease;
-  }
-
-  .nav-item i {
-    font-size: 20px;
-    margin-bottom: 4px;
-    transition: all 0.2s ease;
-  }
-
-  .nav-item.active {
-    color: var(--primary);
-    transform: translateY(-2px);
-  }
-
-  .nav-item.active i {
-    transform: scale(1.1);
-  }
-
-  .search-bar {
-    position: relative;
-    margin-bottom: 16px;
-  }
-
-  .search-bar i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-light);
-    z-index: 10;
-  }
-
-  .search-bar input {
-    width: 100%;
-    padding: 12px 16px 12px 44px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 15px;
-    background-color: white;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-  }
-
-  .search-bar input:focus {
-    border-color: var(--primary-light);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-    outline: none;
-  }
-
-  .filter-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: none;
-  }
-
-  .filter-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filter-tab {
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    white-space: nowrap;
-    background-color: #f3f4f6;
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-  }
-
-  .filter-tab.active {
-    background-color: var(--primary);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .customer-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #e0e7ff;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-  }
-
-  .fade-in {
-    animation: fadeIn 0.3s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  /* Search Bar */
+  .search-bar { margin-bottom: 20px; padding: 12px 16px; background-color: var(--card-bg); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); display:flex; align-items:center; }
+  .search-bar i { color: var(--text-secondary); margin-right: 10px; }
+  .search-bar input { flex-grow:1; border:none; outline:none; font-size:16px; color: var(--text-primary); background:transparent; }
+  .search-bar input::placeholder { color: var(--text-secondary); }
 </style>
+{% endblock %}
 
-<!-- Header -->
+{% block content %}
 <header class="header">
-  <a href="Collection.html" class="header-action"><i class="fas fa-chevron-left"></i></a>
-  <div class="header-title">Vasool Collection</div>
-  <div class="header-actions">
-    <a href="#" class="header-action" title="Filter"><i class="fas fa-filter"></i></a>
-    <a href="#" class="header-action" title="Notifications"><i class="fas fa-bell"></i><span class="badge">3</span></a>
-  </div>
+  <a href="{% url 'collection' %}" class="header-back"><i class="fas fa-chevron-left"></i></a>
+  <div class="header-title">Collection</div>
 </header>
 
-<!-- Main Content -->
 <main class="main-content">
-  <!-- Search and Filter -->
+  <div id="notification-container" class="notification-container">
+    <div id="notification-message" class="notification-message"></div>
+  </div>
+
   <div class="search-bar">
     <i class="fas fa-search"></i>
-    <input type="text" id="search-input" placeholder="Search customers...">
+    <input type="search" id="search-input" placeholder="Search by name...">
   </div>
 
-  <div class="filter-tabs">
-    <div class="filter-tab active" data-filter="all">All</div>
-    <div class="filter-tab" data-filter="pending">Pending</div>
-    <div class="filter-tab" data-filter="paid">Paid</div>
-    <div class="filter-tab" data-filter="overdue">Overdue</div>
+  {% if customers %}
+    <div id="customer-list">
+      {% for customer in customers %}
+        {% if customer.loan %}
+          {% with loan=customer.loan %}
+<div class="customer-card">
+
+  <div class="customer-header">
+    <div class="customer-info">
+      <div class="name">{{ customer.customer_name }}</div>
+      <div class="mobile">{{ customer.mobile_number }}</div>
+    </div>
+    <div class="status-dot
+      {% if customer.bad_loan_days|default:0 > 0 %}overdue
+      {% elif customer.is_collected %}collected
+      {% else %}on-time{% endif %}">
+    </div>
   </div>
 
-  <!-- Customer List Title -->
-  <div class="section-title">
-    Today's Collections
-    <span id="customer-count" style="font-size: 14px; color: var(--text-light); font-weight: normal;">0
-      customers</span>
+  <div class="customer-details-grid">
+    <span>Line: <strong>{{ customer.line.line_name|default:"-" }}</strong></span>
+    <span>Area: <strong>{{ customer.area.name|default:"-" }}</strong></span>
+    <span>Principal: <strong class="principal-amount">₹{{ customer.loan.principal_amount|floatformat:2 }}</strong></span>
+    <span>Installment: 
+      <strong class="installment-amount {% if customer.bad_loan_days|default:0 > 0 %}overdue{% else %}on-time{% endif %}">
+        ₹{{ customer.adjusted_installment|default:customer.loan.installment_amount|floatformat:2 }}
+      </strong>
+    </span>
+    <span>Next Due: 
+      <strong class="next-due {% if customer.loan.next_due_date and customer.loan.next_due_date < today %}overdue{% else %}on-time{% endif %}">
+        {{ customer.loan.next_due_date|default:"-" }}
+      </strong>
+    </span>
+
+    {% if customer.bad_loan_days|default:0 > 0 %}
+      <span class="bad-loan-days" style="color:#ef4444; font-weight:600;">
+        Bad Loan Days: {{ customer.bad_loan_days }} (+₹{{ customer.bad_loan_amount|floatformat:2 }})
+      </span>
+    {% endif %}
   </div>
 
-  <!-- Dynamic Customer List -->
-  <div id="customer-list"></div>
+  <button class="btn-collect" onclick="collectPayment('{{ customer.id }}', this)">
+    {% if customer.bad_loan_days|default:0 > 0 %}Collect (Overdue){% else %}Collect{% endif %}
+  </button>
+</div>
+          {% endwith %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No customers found for the selected filters.</p>
+  {% endif %}
+
 </main>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const customerList = document.getElementById("customer-list");
-    const customerCount = document.getElementById("customer-count");
+function showNotification(message, type) {
+    const container = document.getElementById("notification-container");
+    const msgElement = document.getElementById("notification-message");
+    msgElement.innerText = message;
+    container.className = "notification-container show";
+    msgElement.className = "notification-message " + type;
+    setTimeout(() => { container.className = "notification-container"; }, 3000);
+}
+
+function collectPayment(customerId, btn) {
+    // Prevent action if button is disabled (e.g., completed loan)
+    if (btn.disabled) return;
+
+    const csrfToken = "{{ csrf_token|escapejs }}";
+
+    fetch("/collect_payment/" + customerId + "/", {
+        method: "POST",
+        headers: { "X-CSRFToken": csrfToken, "Accept": "application/json" },
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showNotification("Payment collected successfully!", "success");
+
+            const parent = btn.closest(".customer-card");
+            const principalSpan = parent.querySelector(".principal-amount");
+            const nextDueSpan = parent.querySelector(".next-due");
+            const installmentSpan = parent.querySelector(".installment-amount");
+            const statusDot = parent.querySelector(".status-dot");
+
+            // Update principal
+            if (principalSpan) principalSpan.innerText = "₹" + Number(data.remaining_amount || 0).toFixed(2);
+
+            // Update next due date
+            if (nextDueSpan) nextDueSpan.innerText = data.next_due_date || "-";
+
+            // Update installment amount
+            if (installmentSpan) {
+                const baseInstallment = data.adjusted_installment - (data.bad_loan_days * data.base_installment * data.bad_loan_rate / 100 || 0);
+                installmentSpan.innerText = "₹" + Number(baseInstallment).toFixed(2);
+                installmentSpan.classList.remove("overdue");
+                installmentSpan.classList.add("on-time");
+            }
+
+            // Remove bad loan days display
+            let badDaysSpan = parent.querySelector(".bad-loan-days");
+            if (badDaysSpan) badDaysSpan.remove();
+
+            // Update status dot
+            statusDot.classList.remove("overdue");
+            statusDot.classList.add("collected");
+
+            // Remove the collect button entirely
+            btn.remove();
+        } else {
+            showNotification(data.message || "An error occurred.", "error");
+        }
+    })
+    .catch(err => {
+        showNotification("An unexpected error occurred. Please try again.", "error");
+        console.error(err);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("search-input");
-    const filterTabs = document.querySelectorAll(".filter-tab");
-
-    const API_URL = "http://localhost:8000/customers/";
-
-    let allCustomers = [];
-
-    // Fetch Customers from API
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
-        allCustomers = data;
-        renderCustomers(allCustomers);
-      })
-      .catch(err => {
-        console.error("API Error:", err);
-        customerList.innerHTML = `<p style="color:red;">⚠️ Failed to load customers from API</p>`;
-      });
-
-    // Render Customer Rows
-    function renderCustomers(customers) {
-      customerList.innerHTML = "";
-      let visibleCount = 0;
-
-      customers.forEach(cust => {
-        const initials = cust.customer_name.split(" ").map(n => n[0]).join("").toUpperCase();
-
-        const row = document.createElement("div");
-        row.className = "customer-row fade-in";
-        row.dataset.status = cust.status || "pending";
-        row.dataset.name = cust.customer_name.toLowerCase();
-        row.dataset.phone = cust.mobile_number;
-
-        row.innerHTML = `
-          <div class="customer-avatar">${initials}</div>
-          <div class="customer-info">
-            <div class="customer-name">${cust.customer_name}</div>
-            <div class="customer-details">
-              <span><i class="fas fa-phone-alt"></i> ${cust.mobile_number}</span>
-              <span><i class="fas fa-map-marker-alt"></i> Area ${cust.area || "-"}</span>
-            </div>
-            <div class="payment-amount">₹${parseFloat(cust.maximum_loan_amount).toLocaleString("en-IN")}</div>
-            <span class="payment-status ${cust.status === "paid"
-            ? "status-paid"
-            : cust.status === "overdue"
-              ? "status-overdue"
-              : "status-pending"
-          }">
-              ${cust.status === "paid"
-            ? `<i class="fas fa-check-circle"></i> Paid <small style="color:#666;">(${cust.paid_on || "Already Paid"})</small>`
-            : cust.status === "overdue"
-              ? '<i class="fas fa-exclamation-circle"></i> Overdue'
-              : '<i class="fas fa-clock"></i> Due'
-          }
-            </span>
-          </div>
-          <div class="collection-actions">
-            ${cust.status === "paid"
-            ? `<button class="btn btn-outline"><i class="fas fa-receipt"></i></button>`
-            : `<button class="btn ${cust.status === "overdue" ? "btn-danger collect-btn" : "btn-success collect-btn"}">Collect</button>`
-          }
-          </div>
-        `;
-
-        // ✅ Attach Collect Button Functionality
-        const collectBtn = row.querySelector(".collect-btn");
-        if (collectBtn) {
-          collectBtn.addEventListener("click", function () {
-            const status = row.querySelector(".payment-status");
-
-            // Mark as paid
-            row.dataset.status = "paid";
-            const now = new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
-            status.innerHTML = `<i class="fas fa-check-circle"></i> Paid <small style="color:#666;">(${now})</small>`;
-            status.classList.remove("status-pending", "status-overdue");
-            status.classList.add("status-paid");
-
-            // Change button to receipt
-            this.innerHTML = '<i class="fas fa-receipt"></i>';
-            this.classList.remove("btn-success", "btn-danger");
-            this.classList.add("btn-outline");
-            this.classList.remove("collect-btn");
-
-            // (Optional) Update backend API
-            fetch(API_URL + cust.id + "/", {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ status: "paid", paid_on: now })
-            }).catch(err => console.error("Update failed:", err));
-          });
-        }
-
-        customerList.appendChild(row);
-        visibleCount++;
-      });
-
-      customerCount.textContent = `${visibleCount} customer${visibleCount !== 1 ? "s" : ""}`;
-    }
-
-    // 🔍 Search
-    searchInput.addEventListener("input", function () {
-      const query = this.value.toLowerCase();
-      const filtered = allCustomers.filter(c =>
-        c.customer_name.toLowerCase().includes(query) ||
-        c.mobile_number.includes(query) ||
-        (c.area || "").toLowerCase().includes(query)
-      );
-      renderCustomers(filtered);
+    const customerCards = document.querySelectorAll(".customer-card");
+    searchInput.addEventListener("input", function() {
+        const searchText = searchInput.value.toLowerCase();
+        customerCards.forEach(card => {
+            const customerName = card.querySelector(".name").innerText.toLowerCase();
+            card.style.display = customerName.includes(searchText) ? "flex" : "none";
+        });
     });
-
-    // 🔽 Filter Tabs
-    filterTabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        document.querySelector(".filter-tab.active").classList.remove("active");
-        tab.classList.add("active");
-        const filter = tab.dataset.filter;
-        let filtered = allCustomers;
-        if (filter !== "all") {
-          filtered = allCustomers.filter(c => c.status === filter);
-        }
-        renderCustomers(filtered);
-      });
-    });
-  });
+});
 </script>
 {% endblock %}

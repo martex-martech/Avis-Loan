@@ -249,19 +249,18 @@ from .models import Line, Area, Customer, Loan
 # LOAN SERIALIZER
 # ------------------------
 class LoanSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.customer_name', read_only=True)
-
+    created_by_name = serializers.CharField(source='created_by.username', read_only=True)
+    created_by_id = serializers.IntegerField(source='created_by.id', read_only=True)
+    
     class Meta:
         model = Loan
-        fields = '__all__'
-        read_only_fields = (
-            'total_interest_amount',
-            'installment_amount',
-            'total_amount_to_pay',
-            'num_of_installments',
-            'next_due_date',
-            'created_at'
-        )
+        fields = [
+            'id', 'customer', 'principal_amount', 'interest_rate', 
+            'tenure', 'total_amount_to_pay', 'installment_amount',
+            'next_due_date', 'paid_on', 'line', 'area', 'created_by', 
+            'created_by_name', 'created_by_id', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['created_by', 'created_at', 'updated_at']
 
 
 # ------------------------
