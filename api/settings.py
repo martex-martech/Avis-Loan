@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-1880%b^nhacul!j(tt*dl!87nm&a2tgn!_@iwc!%6j-(wkzlrw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -199,4 +199,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/'  # URL where login page is located
 LOGIN_REDIRECT_URL = '/'       # Where to redirect after login
 LOGOUT_REDIRECT_URL = '/accounts/login/'  # Where to redirect after logout
+
 CORS_ALLOW_ALL_ORIGINS = True
