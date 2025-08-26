@@ -1399,3 +1399,7 @@ def reset_password(request):
 
 def calculator(request):
     return render(request, "core/calculator.html")
+
+
+def cron_task(request):
+    return JsonResponse({"status": "ok"})

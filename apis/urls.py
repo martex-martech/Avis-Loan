@@ -30,9 +30,11 @@ router.register(r'loans', LoanViewSet)
 def home(request):
     return render(request, 'login.html') 
 
+
 urlpatterns = [
     # Auth & User
     path('', home, name='home'),
+    path("cron-task/", views.cron_task, name="cron_task"),
     path('register/', views.register_view, name='register'),
     path('login/', login_view, name='login'),
     path('signout/', views.signout, name='signout'),
