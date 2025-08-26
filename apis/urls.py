@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from rest_framework_simplejwt.views import (
@@ -14,7 +15,10 @@ from .views import (
     LineListCreateView, LineDetailView,
     LineViewSet, AreaViewSet, CustomerViewSet, LoanViewSet,
     add_customer_page, user_settings
+    
 )
+from django.shortcuts import render
+
 
 # Router for ViewSets
 router = DefaultRouter()
@@ -23,8 +27,12 @@ router.register(r'areas', AreaViewSet)
 router.register(r'customers', CustomerViewSet)
 router.register(r'loans', LoanViewSet)
 
+def home(request):
+    return render(request, 'login.html') 
+
 urlpatterns = [
     # Auth & User
+    path('', home, name='home'),
     path('register/', views.register_view, name='register'),
     path('login/', login_view, name='login'),
     path('signout/', views.signout, name='signout'),
