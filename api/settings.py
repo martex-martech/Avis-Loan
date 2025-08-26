@@ -82,7 +82,7 @@ TEMPLATES = [
 ]
 
 # ------------------------------
-# Database
+# Database (Render PostgreSQL)
 # ------------------------------
 DATABASES = {
     'default': dj_database_url.config(
@@ -159,7 +159,7 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 # ------------------------------
-# Email (use env vars)
+# Email
 # ------------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
