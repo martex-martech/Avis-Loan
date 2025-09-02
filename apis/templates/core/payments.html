@@ -1,483 +1,569 @@
 {% extends "core/base.html" %}
+{% load static %}
 
-{% block title %}Login - Loan App{% endblock %}
+{% block title %}Payments - Loan App{% endblock %}
 
 {% block extra_head %}
 <style>
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            color: var(--dark);
-            padding: 24px 0;
-            height: 100vh;
-            position: fixed;
-            border-right: 1px solid var(--light-gray);
-            z-index: 1000;
-        }
+    /* Global Styles & Variables */
+    :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #4338ca;
+        --text: #111827;
+        --text-light: #6b7280;
+        --border: #e5e7eb;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        --border-radius: 8px;
+    }
 
-        .sidebar-header {
-            padding: 0 24px 24px;
-            border-bottom: 1px solid var(--light-gray);
-        }
+    body {
+        display: flex;
+        font-family: 'Poppins', sans-serif;
+        background-color: #f3f4f6;
+        color: var(--text);
+        min-height: 100vh;
+    }
 
-        .sidebar-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
+    /* Sidebar Styles */
+    .sidebar {
+        width: 280px;
+        background: white;
+        padding: 24px 0;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        border-right: 1px solid var(--border);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .sidebar-header h3 i {
-            font-size: 1.5rem;
-        }
+    .sidebar-header {
+        padding: 0 24px 24px;
+        border-bottom: 1px solid var(--border);
+    }
 
-        .sidebar-menu {
-            padding: 24px 0;
-        }
+    .sidebar-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0;
+    }
 
-        .menu-title {
-            padding: 0 24px 12px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--gray);
-            font-weight: 600;
-            letter-spacing: 0.05em;
-        }
+    .sidebar-header h3 i {
+        font-size: 1.5rem;
+    }
 
-        .menu-items {
-            list-style: none;
-        }
+    .sidebar-menu {
+        padding: 24px 0;
+        flex-grow: 1;
+    }
 
-        .menu-item {
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            margin: 4px 0;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            color: var(--gray);
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
+    .menu-title {
+        padding: 0 24px 12px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-light);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
 
-        .menu-item:hover {
-            background-color: var(--primary-light);
-            color: var(--primary);
-        }
+    .menu-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
 
-        .menu-item.active {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            position: relative;
-        }
+    .menu-item {
+        display: block;
+        padding: 12px 24px;
+        margin: 4px 0;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        color: var(--text-light);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
 
-        .menu-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 4px;
-            background-color: var(--primary);
-            border-radius: 0 4px 4px 0;
-        }
+    .menu-item:hover {
+        background-color: var(--primary-light);
+        color: var(--primary);
+    }
 
-        .menu-item i {
-            width: 20px;
-            text-align: center;
-            font-size: 1rem;
-        }
+    .menu-item.active {
+        background-color: var(--primary-light);
+        color: var(--primary);
+        position: relative;
+    }
 
-        .menu-item a {
-            text-decoration: none;
-            color: inherit;
-        }
+    .menu-item.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background-color: var(--primary);
+        border-radius: 0 4px 4px 0;
+    }
 
-        .menu-item a:hover {
-            text-decoration: none;
-            color: var(--primary);
-        }
+    .menu-item a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+    }
 
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 32px;
-        }
+    .menu-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 1rem;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
+    /* Main Content Styles */
+    .main-content {
+        flex: 1;
+        margin-left: 280px;
+        padding: 32px;
+    }
 
-        .page-title h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--dark);
-        }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+    }
 
-        .page-title p {
-            font-size: 0.875rem;
-            color: var(--gray);
-            margin-top: 4px;
-        }
+    .page-title h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0;
+    }
 
-        .user-actions {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
+    .page-title p {
+        font-size: 0.875rem;
+        color: var(--text-light);
+        margin-top: 4px;
+        margin-bottom: 0;
+    }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-        .user-info {
-            display: flex;
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .user-role {
+        font-size: 0.75rem;
+        color: var(--text-light);
+    }
+
+    /* Payment History Container */
+    .payment-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+    }
+
+    .table-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        position: relative;
+        flex-grow: 1;
+        max-width: 400px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 0.875rem;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .filter-dropdown {
+        padding: 10px 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        background-color: white;
+        font-size: 0.875rem;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.2s;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 1em;
+        padding-right: 30px;
+    }
+
+    .filter-dropdown:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border);
+    }
+
+    .payment-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .payment-table th {
+        background-color: #f9fafb;
+        padding: 16px 24px;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    .payment-table td {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        color: var(--text-light);
+    }
+
+    .payment-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .payment-table tr:hover {
+        background-color: var(--primary-light);
+    }
+
+    .amount-paid {
+        color: var(--success);
+        font-weight: 600;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        border-radius: var(--border-radius);
+        border: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .receipt-btn {
+        background-color: #d1fae5;
+        color: var(--success);
+    }
+
+    .receipt-btn:hover {
+        background-color: var(--success);
+        color: white;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        body {
             flex-direction: column;
         }
 
-        .user-name {
-            font-weight: 600;
-            font-size: 0.875rem;
+        .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
         }
 
-        .user-role {
-            font-size: 0.75rem;
-            color: var(--gray);
+        .main-content {
+            margin-left: 0;
+            padding: 16px;
         }
 
-        /* Payment History Container */
-        .payment-container {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
         }
 
         .table-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 16px 10px 40px;
-            border: 1px solid var(--light-gray);
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 0.875rem;
-        }
-
-        .filter-group {
-            display: flex;
+            flex-direction: column;
             gap: 12px;
+            align-items: stretch;
         }
 
-        .filter-dropdown {
-            padding: 10px 16px;
-            border: 1px solid var(--light-gray);
-            border-radius: var(--border-radius);
-            background-color: white;
-            font-size: 0.875rem;
-            color: var(--dark);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-dropdown:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        /* Table Styles */
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--light-gray);
-        }
-
-        .payment-table {
+        .search-box, .filter-group {
             width: 100%;
-            border-collapse: collapse;
+            max-width: none;
         }
+    }
+</style>
+{% endblock %}
 
-        .payment-table th {
-            background-color: var(--light);
-            padding: 16px 24px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--dark);
-            border-bottom: 1px solid var(--light-gray);
-            white-space: nowrap;
-        }
-
-        .payment-table td {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--light-gray);
-            vertical-align: middle;
-            color: var(--dark);
-        }
-
-        .payment-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .payment-table tr:hover {
-            background-color: var(--primary-light);
-        }
-
-        .amount-paid {
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        .action-btn {
-            padding: 8px 12px;
-            border-radius: var(--border-radius);
-            border: none;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .receipt-btn {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .receipt-btn:hover {
-            background-color: var(--success);
-            color: white;
-        }
-    </style>
-
-    <!-- Sidebar Navigation -->
-  <div class="sidebar">
+{% block content %}
+<div class="sidebar">
     <div class="sidebar-header">
-      <h3><i class="fas fa-hand-holding-usd"></i> LoanApp</h3>
+        <h3><i class="fas fa-hand-holding-usd"></i> LoanApp</h3>
     </div>
     <div class="sidebar-menu">
-      <div class="menu-title">Main</div>
-      <ul class="menu-items">
-        <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item"><i class="fas fa-chart-line"></i> Dashboard</a>
-        </li>
-        <li><a href="{% url 'payments' %}" class="menu-item"><i
-              class="fas fa-money-bill-wave"></i><span>Subscriptions</span></a></li>
-      </ul>
-      <div class="menu-title">Management</div>
-      <ul class="menu-items">
-        <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-users-cog"></i> User Management</a>
-        </li>
-        <li><a href="{% url 'loan-management-page' %}" class="menu-item"><i class="fas fa-file-contract"></i>
-            Loan Management</a></li>
-        <li><a href="{% url 'payments_page' %}" class="menu-item active"><i class="fas fa-credit-card"></i> Payments</a></li>
-      </ul>
+        <div class="menu-title">Main</div>
+        <ul class="menu-items">
+            <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+            <li><a href="{% url 'payments' %}" class="menu-item"><i class="fas fa-money-bill-wave"></i><span>Subscriptions</span></a></li>
+        </ul>
+        <div class="menu-title">Management</div>
+        <ul class="menu-items">
+            <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-users-cog"></i><span>User Management</span></a></li>
+            <li><a href="{% url 'loan-management-page' %}" class="menu-item"><i class="fas fa-file-contract"></i><span>Loan Management</span></a></li>
+            <li><a href="{% url 'payments_page' %}" class="menu-item active"><i class="fas fa-credit-card"></i><span>Payments</span></a></li>
+        </ul>
     </div>
-  </div>
-  
+</div>
 
-    <!-- Main Content Area -->
-    <div class="main-content">
-        <div class="header">
-            <div class="page-title">
-                <h1>Payment History</h1>
-                <p>View all payment transactions</p>
-            </div>
-            <div class="user-actions">
-                <div class="user-profile">
-                    <div class="user-avatar">SA</div>
-                    <div class="user-info">
-                        <span class="user-name">Super Admin</span>
-                        <span class="user-role">Administrator</span>
-                    </div>
+<div class="main-content">
+    <div id="messageContainer" class="message-container"></div>
+    <div class="header">
+        <div class="page-title">
+            <h1>Payment History</h1>
+            <p>View all payment transactions</p>
+        </div>
+        <div class="user-actions">
+            <div class="user-profile">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <span class="user-name">Super Admin</span>
+                    <span class="user-role">Administrator</span>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Payment Container -->
-        <div class="payment-container">
-            <div class="table-actions">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search payments...">
-                </div>
-                <div class="filter-group">
-                    <input type="date" class="filter-dropdown" id="dateFilter">
-                </div>
+    <div class="payment-container">
+        <div class="table-actions">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search payments..." id="searchInput">
             </div>
-            <div class="table-responsive">
-                <table class="payment-table">
-                    <thead>
-                        <tr>
-                            <th>Payment ID</th>
-                            <th>Date</th>
-                            <th>Customer Name</th>
-                            <th>Agent Name</th>
-                            <th>Amount (INR)</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paymentTableBody">
-                        <!-- Rows dynamically injected here -->
+            <div class="filter-group">
+                <input type="date" class="filter-dropdown" id="dateFilter">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Date</th>
+                        <th>Customer Name</th>
+                        <th>Agent Name</th>
+                        <th>Amount (INR)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
                     </tbody>
-                </table>
-            </div>
+            </table>
         </div>
     </div>
+</div>
 
-    <script>
-        const API = { payments: "http://127.0.0.1:8000/api/transaction/" };
+<script>
+    const API = { payments: "http://127.0.0.1:8000/api/transaction/" };
 
-        // Render payments in table
-        function renderPayments(payments) {
-            const tbody = document.getElementById("paymentTableBody");
-            tbody.innerHTML = "";
+    // Render payments in table
+    function renderPayments(payments) {
+        const tbody = document.getElementById("paymentTableBody");
+        tbody.innerHTML = "";
 
-            if (payments.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--gray);">No payments found</td></tr>`;
-                return;
-            }
-
-            payments.forEach(pay => {
-                const row = `<tr>
-                    <td>${pay.payment_id}</td>
-                    <td>${pay.date || "-"}</td>
-                    <td>${pay.customer_name || "-"}</td>
-                    <td>${pay.agent_name || "-"}</td>
-                    <td class="amount-paid">₹${pay.amt_paid}</td>
-                    <td>
-                        <button class="action-btn receipt-btn" onclick="openReceipt(${pay.payment_id})">
-                            <i class="fas fa-receipt"></i> Receipt
-                        </button>
-                    </td>
-                </tr>`;
-                tbody.insertAdjacentHTML("beforeend", row);
-            });
+        if (payments.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light);">No payments found</td></tr>`;
+            return;
         }
 
-        // Load payments from API
-        let allPayments = [];
-        fetch(API.payments)
+        payments.forEach(pay => {
+            const row = `<tr>
+                <td>${pay.payment_id}</td>
+                <td>${pay.date || "-"}</td>
+                <td>${pay.customer_name || "-"}</td>
+                <td>${pay.agent_name || "-"}</td>
+                <td class="amount-paid">₹${pay.amt_paid}</td>
+                <td>
+                    <button class="action-btn receipt-btn" onclick="openReceipt('${pay.payment_id}')">
+                        <i class="fas fa-receipt"></i> Receipt
+                    </button>
+                </td>
+            </tr>`;
+            tbody.insertAdjacentHTML("beforeend", row);
+        });
+    }
+
+    // Load payments from API
+    let allPayments = [];
+    fetch(API.payments)
+        .then(res => res.json())
+        .then(data => {
+            allPayments = data;
+            renderPayments(allPayments);
+        })
+        .catch(err => {
+            console.error("Failed to load payments:", err);
+            document.getElementById("paymentTableBody").innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger);">Failed to load payments</td></tr>`;
+        });
+
+    // Open receipt in new window for download/print
+    function openReceipt(id) {
+        fetch(`${API.payments}${id}/`)
             .then(res => res.json())
-            .then(data => {
-                allPayments = data;
-                renderPayments(allPayments);
-            })
-            .catch(err => {
-                console.error("Failed to load payments:", err);
-                document.getElementById("paymentTableBody").innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Failed to load payments</td></tr>`;
-            });
-
-        // Open receipt in new window for download/print
-        function openReceipt(id) {
-            fetch(`${API.payments}${id}/`)
-                .then(res => res.json())
-                .then(pay => {
-                    const receiptHTML = `
-                    <html>
-                    <head>
-                        <title>Payment Receipt - PAY-${pay.payment_id}</title>
-                        <style>
-                            body { font-family: 'Inter', sans-serif; padding: 24px; }
-                            .header { display: flex; justify-content: space-between; margin-bottom: 24px; }
-                            .logo { font-size: 1.5rem; font-weight: bold; color: #4361ee; }
-                            .details div { margin-bottom: 8px; }
-                            table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-                            th, td { padding: 12px; border: 1px solid #ddd; }
-                            .total { text-align: right; font-weight: bold; font-size: 1.1rem; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <div class="logo">LoanApp</div>
-                            <div>Receipt ID: PAY-${pay.payment_id}</div>
+            .then(pay => {
+                const receiptHTML = `
+                <html>
+                <head>
+                    <title>Payment Receipt - PAY-${pay.payment_id}</title>
+                    <style>
+                        body { font-family: 'Poppins', sans-serif; padding: 24px; color: var(--text); }
+                        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+                        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+                        .receipt-info { text-align: right; }
+                        .receipt-info h3 { margin: 0; font-size: 1.2rem; }
+                        .receipt-info p { margin: 0; font-size: 0.875rem; color: var(--text-light); }
+                        .details { margin-bottom: 24px; }
+                        .details div { margin-bottom: 8px; font-size: 0.9rem; color: var(--text-light); }
+                        .details div strong { color: var(--text); font-weight: 600; margin-right: 8px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+                        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
+                        th { background-color: #f9fafb; font-weight: 600; }
+                        .total { text-align: right; font-weight: bold; font-size: 1.1rem; color: var(--text); }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">LoanApp</div>
+                        <div class="receipt-info">
+                            <h3>Payment Receipt</h3>
+                            <p>Transaction ID: PAY-${pay.payment_id}</p>
                         </div>
-                        <div class="details">
-                            <div>Payment Date: ${pay.date}</div>
-                            <div>Customer: ${pay.customer_name}</div>
-                            <div>Agent: ${pay.agent_name}</div>
-                            <div>Method: ${pay.method || "Cash"}</div>
-                        </div>
-                        <table>
+                    </div>
+                    <div class="details">
+                        <div><strong>Payment Date:</strong> ${pay.date}</div>
+                        <div><strong>Customer:</strong> ${pay.customer_name}</div>
+                        <div><strong>Agent:</strong> ${pay.agent_name}</div>
+                        <div><strong>Method:</strong> ${pay.method || "Cash"}</div>
+                    </div>
+                    <table>
+                        <thead>
                             <tr><th>Description</th><th>Amount</th></tr>
+                        </thead>
+                        <tbody>
                             <tr><td>Loan Payment</td><td>₹${pay.amt_paid}</td></tr>
-                        </table>
-                        <div class="total">Total: ₹${pay.amt_paid}</div>
-                    </body>
-                    </html>
-                    `;
-                    const receiptWindow = window.open('', '_blank');
-                    receiptWindow.document.write(receiptHTML);
-                    receiptWindow.document.close();
-                    receiptWindow.focus();
-                    receiptWindow.print();
-                });
-        }
+                        </tbody>
+                    </table>
+                    <div class="total">Total: ₹${pay.amt_paid}</div>
+                </body>
+                </html>
+                `;
+                const receiptWindow = window.open('', '_blank');
+                receiptWindow.document.write(receiptHTML);
+                receiptWindow.document.close();
+                receiptWindow.focus();
+                receiptWindow.print();
+            });
+    }
 
-        // Date filter
-        document.getElementById('dateFilter').addEventListener('change', function () {
-            const selectedDate = this.value;
-            const filtered = allPayments.filter(pay => !selectedDate || pay.date.includes(selectedDate));
-            renderPayments(filtered);
-        });
+    // Date filter
+    document.getElementById('dateFilter').addEventListener('change', function () {
+        const selectedDate = this.value;
+        const filtered = allPayments.filter(pay => !selectedDate || pay.date.includes(selectedDate));
+        renderPayments(filtered);
+    });
 
-        // Search filter
-        document.querySelector('.search-box input').addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            const filtered = allPayments.filter(pay =>
-                pay.customer_name?.toLowerCase().includes(searchTerm) ||
-                pay.agent_name?.toLowerCase().includes(searchTerm) ||
-                String(pay.payment_id).includes(searchTerm)
-            );
-            renderPayments(filtered);
-        });
-    </script>
+    // Search filter
+    document.querySelector('.search-box input').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+        const filtered = allPayments.filter(pay =>
+            pay.customer_name?.toLowerCase().includes(searchTerm) ||
+            pay.agent_name?.toLowerCase().includes(searchTerm) ||
+            String(pay.payment_id).includes(searchTerm)
+        );
+        renderPayments(filtered);
+    });
+</script>
 {% endblock %}

@@ -949,7 +949,7 @@ def superadmin_dashboard(request):
     # ---------- Stats ----------
     total_loans_count = Loan.objects.count()
 
-    # Total loan amount from Customers
+    # Total loan amount from Customers (max loan amount field)
     total_loan_amount = Customer.objects.aggregate(
         total=Sum('maximum_loan_amount')
     )['total'] or 0
@@ -983,16 +983,19 @@ def superadmin_dashboard(request):
             'timestamp': customer.created_at
         })
 
-    # Recent loans
+    # Recent loans → fetch related customer via OneToOne
     recent_loans = Loan.objects.order_by('-created_at')[:5]
     for loan in recent_loans:
-        customer_name = getattr(loan.customer, 'customer_name', 'Unknown')
+        # Customer linked to this loan (via OneToOne)
+        customer = getattr(loan, "customer", None)
+        customer_name = customer.customer_name if customer else "Unknown"
         activities.append({
             'type': 'warning',
             'message': f"New loan initiated for: {customer_name}",
             'timestamp': loan.created_at
         })
 
+    # Sort activities (latest first)
     activities.sort(key=lambda x: x['timestamp'], reverse=True)
     activities = activities[:5]
 
@@ -1006,7 +1009,6 @@ def superadmin_dashboard(request):
     loan_data = [float(item['total'] or 0) for item in loan_per_line]
 
     # ---------- User Trend Graph (last 7 days) ----------
-    from django.utils.timezone import now, timedelta
     today = now().date()
     last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
 
@@ -1031,7 +1033,6 @@ def superadmin_dashboard(request):
     }
 
     return render(request, 'core/superadmin_dashboard.html', context)
-
 
 @login_required
 def subscription_page(request):
