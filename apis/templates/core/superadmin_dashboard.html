@@ -1,300 +1,367 @@
 {% extends "core/base.html" %}
+{% load static %}
 
-{% block title %}Login - Loan App{% endblock %}
+{% block title %}Super Admin Dashboard - Loan App{% endblock %}
+
+{% block charts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
 
 {% block extra_head %}
+<style>
+  /* Sidebar Styles */
+  .sidebar {
+    width: 280px;
+    background: white;
+    color: var(--text);
+    padding: 24px 0;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-right: 1px solid var(--border);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+  }
 
-  <style>
-    /* Sidebar Styles */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: white;
-      color: var(--dark);
-      padding: 24px 0;
-      height: 100vh;
-      position: fixed;
-      border-right: 1px solid var(--light-gray);
-      z-index: 1000;
-    }
+  .sidebar-header {
+    padding: 0 24px 24px;
+    border-bottom: 1px solid var(--border);
+  }
 
-    .sidebar-header {
-      padding: 0 24px 24px;
-      border-bottom: 1px solid var(--light-gray);
-    }
+  .sidebar-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0;
+  }
 
-    .sidebar-header h3 {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
+  .sidebar-header h3 i {
+    font-size: 1.5rem;
+  }
 
-    .sidebar-header h3 i {
-      font-size: 1.5rem;
-    }
+  .sidebar-menu {
+    padding: 24px 0;
+    flex-grow: 1;
+  }
 
-    .sidebar-menu {
-      padding: 24px 0;
-    }
+  .menu-title {
+    padding: 0 24px 12px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-light);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
 
-    .menu-title {
-      padding: 0 24px 12px;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: var(--gray);
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
+  .menu-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-    .menu-items {
-      list-style: none;
-    }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    cursor: pointer;
+    margin: 4px 0;
+    border-radius: 0 12px 12px 0;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
 
-    .menu-item {
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      margin: 4px 0;
-      border-radius: 0 var(--border-radius) var(--border-radius) 0;
-      color: var(--gray);
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
+  .menu-item:hover {
+    background-color: var(--primary-light);
+    color: white;
+  }
 
-    .menu-item:hover {
-      background-color: var(--primary-light);
-      color: var(--primary);
-    }
+  .menu-item.active {
+    background-color: var(--primary);
+    color: white;
+    position: relative;
+  }
 
-    .menu-item.active {
-      background-color: var(--primary-light);
-      color: var(--primary);
-      position: relative;
-    }
+  .menu-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background-color: white;
+    border-radius: 0 4px 4px 0;
+  }
 
-    .menu-item.active::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 4px;
-      background-color: var(--primary);
-      border-radius: 0 4px 4px 0;
-    }
+  .menu-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+  }
 
-    .menu-item i {
-      width: 20px;
-      text-align: center;
-      font-size: 1rem;
-    }
+  .menu-item span {
+    white-space: nowrap;
+  }
 
-    .menu-item a {
-      text-decoration: none;
-      color: inherit;
-    }
+  .menu-item a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
 
-    .menu-item a:hover {
-      text-decoration: none;
-      color: var(--primary);
-    }
+  /* Main Content Styles */
+  .main-container {
+    display: flex;
+    width: 100%;
+  }
 
+  .main-content {
+    flex-grow: 1;
+    margin-left: 280px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+  }
 
-    /* Main Content Styles */
-    .main-content {
-      flex: 1;
-      margin-left: var(--sidebar-width);
-      padding: 32px;
-    }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
-    }
+  .page-title h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
 
-    .page-title h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--dark);
-    }
+  .page-title p {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
 
-    .page-title p {
-      font-size: 0.875rem;
-      color: var(--gray);
-      margin-top: 4px;
-    }
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
 
-    .user-actions {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
 
-    .user-info {
-      display: flex;
+  .user-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .user-role {
+    font-size: 0.75rem;
+    color: var(--text-light);
+  }
+
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 8px 0;
+    color: var(--text);
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+
+  .card-icon.loans {
+    background-color: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .card-icon.users {
+    background-color: #d1fae5;
+    color: #10b981;
+  }
+
+  .card-icon.areas {
+    background-color: #dbeafe;
+    color: #3b82f6;
+  }
+
+  .activity-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 32px;
+  }
+
+  .activity-card h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+  }
+
+  .activity-card ul {
+    padding: 0;
+    margin: 0;
+  }
+
+  .activity-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .activity-icon.loans {
+    background-color: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .activity-icon.customers {
+    background-color: #d1fae5;
+    color: #10b981;
+  }
+
+  .activity-icon.areas {
+    background-color: #dbeafe;
+    color: #3b82f6;
+  }
+
+  .activity-icon.agents {
+    background-color: #fef3c7;
+    color: #f59e0b;
+  }
+
+  .activity-details {
+    flex: 1;
+  }
+
+  .activity-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+    margin-top: 0;
+  }
+
+  .activity-time {
+    font-size: 0.75rem;
+    color: var(--text-light);
+  }
+
+  .graphs-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .graphs-container > .card {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  @media (max-width: 768px) {
+    .main-container {
       flex-direction: column;
     }
-
-    .user-name {
-      font-weight: 600;
-      font-size: 0.875rem;
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
     }
-
-    .user-role {
-      font-size: 0.75rem;
-      color: var(--gray);
+    .main-content {
+      margin-left: 0;
+      padding: 16px;
     }
+  }
+</style>
+{% endblock %}
 
-    .dashboard-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .card {
-      background-color: white;
-      border-radius: var(--border-radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-
-    .card-title {
-      font-size: 0.875rem;
-      color: var(--gray);
-      font-weight: 500;
-    }
-
-    .card-value {
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 8px 0;
-      color: var(--dark);
-    }
-
-    .card-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-    }
-
-    .card-icon.loans {
-      background-color: var(--primary-light);
-      color: var(--primary);
-    }
-
-    .card-icon.users {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-    }
-
-    .card-icon.areas {
-      background-color: rgba(59, 130, 246, 0.1);
-      color: var(--info);
-    }
-
-    .activity-card {
-      background: white;
-      border-radius: var(--border-radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-      margin-bottom: 32px;
-    }
-
-    .activity-item {
-      padding: 16px 0;
-      border-bottom: 1px solid var(--light-gray);
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-
-    .activity-item:last-child {
-      border-bottom: none;
-    }
-
-    .activity-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .activity-icon.loans {
-      background-color: var(--primary-light);
-      color: var(--primary);
-    }
-
-    .activity-icon.customers {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-    }
-
-    .activity-icon.areas {
-      background-color: rgba(59, 130, 246, 0.1);
-      color: var(--info);
-    }
-
-    .activity-icon.agents {
-      background-color: rgba(245, 158, 11, 0.1);
-      color: var(--warning);
-    }
-
-    .activity-details {
-      flex: 1;
-    }
-
-    .activity-title {
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .activity-time {
-      font-size: 0.75rem;
-      color: var(--gray);
-    }
-  </style>
-
-
+{% block content %}
+<div class="main-container">
   <div class="sidebar">
     <div class="sidebar-header">
       <h3><i class="fas fa-hand-holding-usd"></i> LoanApp</h3>
@@ -302,22 +369,18 @@
     <div class="sidebar-menu">
       <div class="menu-title">Main</div>
       <ul class="menu-items">
-        <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item active"><i class="fas fa-chart-line"></i> Dashboard</a>
-        </li>
-        <li><a href="{% url 'payments' %}" class="menu-item"><i
-              class="fas fa-money-bill-wave"></i><span>Subscriptions</span></a></li>
+        <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item active"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+        <li><a href="{% url 'subscriptions' %}" class="menu-item"><i class="fas fa-money-bill-wave"></i><span>Subscriptions</span></a></li>
       </ul>
       <div class="menu-title">Management</div>
       <ul class="menu-items">
-        <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-users-cog"></i> User Management</a>
-        </li>
-        <li><a href="{% url 'loan-management-page' %}" class="menu-item"><i class="fas fa-file-contract"></i>
-            Loan Management</a></li>
-        <li><a href="{% url 'payments_page' %}" class="menu-item"><i class="fas fa-credit-card"></i> Payments</a></li>
+        <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-users-cog"></i><span>User Management</span></a></li>
+        <li><a href="{% url 'loan_management' %}" class="menu-item"><i class="fas fa-file-contract"></i><span>Loan Management</span></a></li>
+        <li><a href="{% url 'payments' %}" class="menu-item"><i class="fas fa-credit-card"></i><span>Payments</span></a></li>
       </ul>
     </div>
   </div>
-  
+
   <div class="main-content">
     <div class="header">
       <div class="page-title">
@@ -382,18 +445,14 @@
       </ul>
     </div>
 
-    <!-- Graphs Side by Side -->
-    <div style="display: flex; gap: 24px; margin-top: 32px;">
-      <!-- Loans per Line -->
-      <div class="card" style="flex: 1;">
+    <div class="graphs-container">
+      <div class="card">
         <div class="card-header">
           <div class="card-title">Loans per Line</div>
         </div>
         <canvas id="loanChart" height="200"></canvas>
       </div>
-
-      <!-- New Users Trend -->
-      <div class="card" style="flex: 1;">
+      <div class="card">
         <div class="card-header">
           <div class="card-title">New Users Trend</div>
         </div>
@@ -402,15 +461,15 @@
     </div>
 
   </div>
+</div>
 
-  <script>
-    // Parse Django JSON safely
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
     const loanLabels = JSON.parse('{{ graph_labels|escapejs }}');
     const loanData = JSON.parse('{{ graph_data|escapejs }}');
     const userLabels = JSON.parse('{{ user_graph_labels|escapejs }}');
     const userData = JSON.parse('{{ user_graph_data|escapejs }}');
 
-    // Loans per Line Bar Chart
     const loanCtx = document.getElementById('loanChart').getContext('2d');
     new Chart(loanCtx, {
       type: 'bar',
@@ -419,19 +478,29 @@
         datasets: [{
           label: 'Total Loan Amount (₹)',
           data: loanData,
-          backgroundColor: 'rgba(67, 97, 238, 0.6)',
-          borderColor: 'rgba(67, 97, 238, 1)',
+          backgroundColor: 'rgba(79, 70, 229, 0.6)',
+          borderColor: 'rgba(79, 70, 229, 1)',
           borderWidth: 1
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Loans per Area' }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Amount (₹)' }
+          },
+          x: {
+            title: { display: true, text: 'Area' }
+          }
+        }
       }
     });
 
-    // New Users Trend Line Chart
     const userCtx = document.getElementById('userTrendChart').getContext('2d');
     new Chart(userCtx, {
       type: 'line',
@@ -440,19 +509,30 @@
         datasets: [{
           label: 'New Users',
           data: userData,
-          backgroundColor: 'rgba(16,185,129,0.2)',
-          borderColor: 'rgba(16,185,129,1)',
+          backgroundColor: 'rgba(16, 185, 129, 0.2)',
+          borderColor: 'rgba(16, 185, 129, 1)',
           borderWidth: 2,
           fill: true,
-          tension: 0.3
+          tension: 0.4
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'New Users per Month' }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Number of Users' }
+          },
+          x: {
+            title: { display: true, text: 'Month' }
+          }
+        }
       }
     });
-  </script>
-
+  });
+</script>
 {% endblock %}
