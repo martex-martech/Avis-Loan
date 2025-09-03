@@ -77,6 +77,15 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       font-size: 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* ➡️ Updated focus style to use var(--primary-light) */
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 2px rgba(212, 93, 48, 0.2);
     }
 
     .form-select {
@@ -91,6 +100,7 @@
       text-align: center;
     }
 
+    /* ➡️ Updated and generalized the .btn styles */
     .btn {
       display: inline-block;
       padding: 12px 20px;
@@ -100,11 +110,19 @@
       font-weight: 500;
       cursor: pointer;
       text-align: center;
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.2s;
+      border: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+      width: 50%;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-1px);
     }
 
     .btn:active {
-      transform: scale(0.95);
+      transform: translateY(0);
     }
 
     .expense-empty {
@@ -165,7 +183,6 @@
 
   <main class="main-content">
 
-    <!-- Filters -->
     <div class="filter-box">
       <div class="form-group">
         <label class="form-label">From Date</label>
@@ -189,13 +206,11 @@
       </div>
     </div>
 
-    <!-- Results -->
     <div class="result-box" id="result-box">
       <p>Period: {{ period_display }}</p>
       <p>Total Expenses: <span style="color:green;">₹{{ total|floatformat:2 }}</span></p>
     </div>
 
-    <!-- Expense List -->
     <div id="expense-container">
       {% for expense in expenses %}
       <div class="expense-card">
@@ -211,7 +226,6 @@
 
   </main>
 
-  <!-- Bottom Navigation -->
   <nav class="nav">
     <div class="nav-items">
       <a href="{% url 'collection' %}" class="nav-item">

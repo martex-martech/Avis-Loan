@@ -1,5 +1,5 @@
 """
-Django settings for api project (Production-ready for Render)
+Django settings for api project (Dev = SQLite, Prod = PostgreSQL)
 """
 
 from pathlib import Path
@@ -13,11 +13,20 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ------------------------------
+# Environment
+# ------------------------------
+ENV = os.environ.get("DJANGO_ENV", "development")  # "production" or "development"
+
+# ------------------------------
 # Security
 # ------------------------------
 SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-default-key')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+DEBUG = ENV == "development"
+
+if ENV == "production":
+    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+else:
+    ALLOWED_HOSTS = ["*"]
 
 # ------------------------------
 # Applications
@@ -45,9 +54,9 @@ AUTH_USER_MODEL = 'apis.CustomUser'
 # Middleware
 # ------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # must be first for CORS
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # serve static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,13 +91,21 @@ TEMPLATES = [
 ]
 
 # ------------------------------
-# Database (Render PostgreSQL)
+# Database
 # ------------------------------
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
-    )
-}
+if ENV == "production":
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL')
+        )
+    }
+else:  # development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ------------------------------
 # Password validation
@@ -109,16 +126,13 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------------
-# Static files
+# Static & Media files
 # ------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ------------------------------
-# Media files (Optional: use S3/Cloudinary)
-# ------------------------------
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -128,7 +142,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',  # optional
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -156,18 +170,25 @@ SIMPLE_JWT = {
 # ------------------------------
 # CORS
 # ------------------------------
-CORS_ALLOW_ALL_ORIGINS = True
+if ENV == "production":
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+else:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # ------------------------------
 # Email
 # ------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+if ENV == "production":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # ------------------------------
 # Default auto field

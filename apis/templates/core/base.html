@@ -8,20 +8,16 @@
 
   <title>{% block title %}Loan App{% endblock %}</title>
 
-  <!-- Fonts & Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="icon" href="data:,">
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Chart.js (only if needed by child templates) -->
   {% block charts %}
   {% endblock %}
 
-  <!-- PWA -->
   <link rel="manifest" href="{% static 'manifest.json' %}">
   <script>
     if ('serviceWorker' in navigator) {
@@ -31,14 +27,13 @@
     }
   </script>
 
-  <!-- Global styles -->
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-light: #6366f1;
-      --secondary: #f9fafb;
-      --text: #111827;
-      --text-light: #6b7280;
+      --primary: #28485d;
+      --primary-light: #d45d30;
+      --secondary: #c23000;
+      --text: #1d1d1f;
+      --text-light: #6a6a6a;
       --border: #e5e7eb;
       --success: #10b981;
       --error: #ef4444;
@@ -55,7 +50,6 @@
     }
   </style>
 
-  <!-- Extra head (child templates can override) -->
   {% block extra_head %}
   {% endblock %}
 </head>

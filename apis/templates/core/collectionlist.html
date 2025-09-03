@@ -4,56 +4,238 @@
 
 {% block extra_head %}
 <style>
-  :root {
-    --primary: #2563eb;
-    --accent: #10b981;
-    --background: #f3f4f6;
-    --card-bg: #ffffff;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --overdue: #ef4444;
-    --on-time: #10b981;
-    --completed: #6b7280;
-    --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  body {
+    background-color: var(--background);
   }
 
-  body { background-color: var(--background); }
-  .header { position: fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:center; padding:16px; background-color: var(--primary); color:white; box-shadow: var(--shadow); z-index:50; }
-  .header-back { position:absolute; left:16px; font-size:20px; color:white; }
-  .header-title { font-size:20px; font-weight:600; }
-  .main-content { padding:16px; margin-top:70px; }
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: var(--shadow);
+    z-index: 50;
+  }
 
-  .customer-card { background-color:var(--card-bg); border-radius:12px; padding:16px; margin-bottom:16px; box-shadow: var(--shadow); display:flex; flex-direction:column; gap:12px; }
-  .customer-header { display:flex; justify-content:space-between; align-items:flex-start; }
-  .customer-info .name { font-weight:700; font-size:18px; color: var(--text-primary); }
-  .customer-info .mobile { font-size:14px; color: var(--text-secondary); margin-top:4px; }
-  .status-dot { width:12px; height:12px; border-radius:50%; background-color: var(--on-time); }
-  .status-dot.overdue { background-color: var(--overdue); }
-  .status-dot.collected { background-color: var(--accent); }
+  .header-back {
+    position: absolute;
+    left: 16px;
+    font-size: 20px;
+    color: white;
+  }
 
-  .customer-details-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:14px; color: var(--text-primary); }
-  .customer-details-grid span { font-weight:500; display:flex; flex-direction:column; color: var(--text-secondary); }
-  .customer-details-grid span strong { font-weight:600; }
-  .overdue { color: var(--overdue); }
-  .on-time { color: var(--on-time); }
-  .completed { color: var(--completed); }
-  .btn-collect { margin-top:8px; padding:12px; width:100%; border-radius:8px; font-weight:600; font-size:16px; background-color: var(--accent); color:white; border:none; cursor:pointer; transition: background-color 0.2s; }
-  .btn-collect:hover { background-color:#059669; }
-  .empty-state { text-align:center; margin-top:40px; color: var(--text-secondary); font-size:16px; }
-  .principal-amount, .next-due, .installment-amount { font-weight:600; }
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .main-content {
+    padding: 16px;
+    margin-top: 70px;
+  }
+
+  .customer-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+  }
+
+  .customer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .customer-info .name {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-primary);
+  }
+
+  .customer-info .mobile {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--on-time);
+  }
+
+  .status-dot.overdue {
+    background-color: var(--overdue);
+  }
+
+  .status-dot.collected {
+    background-color: var(--accent);
+  }
+
+  .customer-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .customer-details-grid span {
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-secondary);
+  }
+
+  .customer-details-grid span strong {
+    font-weight: 600;
+  }
+
+  .overdue {
+    color: var(--overdue);
+  }
+
+  .on-time {
+    color: var(--on-time);
+  }
+
+  .completed {
+    color: var(--completed);
+  }
+
+  /* Collect button styles */
+  .btn-collect {
+    margin-top: 8px;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.2s, transform 0.2s;
+    display: block;
+  }
+
+  .btn-collect:hover {
+    background-color: var(--primary-light);
+  }
+
+  .btn-collect:active {
+    transform: translateY(0);
+  }
+
+  /* Paid mark styles */
+  .paid-mark {
+    margin-top: 8px;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    background-color: #10b981;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .paid-mark i {
+    font-size: 18px;
+  }
+
+  .empty-state {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--text-secondary);
+    font-size: 16px;
+  }
+
+  .principal-amount,
+  .next-due,
+  .installment-amount {
+    font-weight: 600;
+  }
 
   /* Notifications */
-  .notification-container { position: fixed; top: 70px; left: 16px; right: 16px; z-index: 100; opacity: 0; transform: translateY(-20px); transition: opacity 0.3s ease, transform 0.3s ease; }
-  .notification-container.show { opacity: 1; transform: translateY(0); }
-  .notification-message { padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; color: white; }
-  .notification-message.success { background-color: var(--accent); }
-  .notification-message.error { background-color: var(--overdue); }
+  .notification-container {
+    position: fixed;
+    top: 70px;
+    left: 16px;
+    right: 16px;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .notification-container.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .notification-message {
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    color: white;
+  }
+
+  .notification-message.success {
+    background-color: var(--accent);
+  }
+
+  .notification-message.error {
+    background-color: var(--overdue);
+  }
 
   /* Search Bar */
-  .search-bar { margin-bottom: 20px; padding: 12px 16px; background-color: var(--card-bg); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); display:flex; align-items:center; }
-  .search-bar i { color: var(--text-secondary); margin-right: 10px; }
-  .search-bar input { flex-grow:1; border:none; outline:none; font-size:16px; color: var(--text-primary); background:transparent; }
-  .search-bar input::placeholder { color: var(--text-secondary); }
+  .search-bar {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+  }
+
+  .search-bar i {
+    color: var(--text-secondary);
+    margin-right: 10px;
+  }
+
+  .search-bar input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--text-primary);
+    background: transparent;
+  }
+
+  .search-bar input::placeholder {
+    color: var(--text-secondary);
+  }
 </style>
 {% endblock %}
 
@@ -74,135 +256,142 @@
   </div>
 
   {% if customers %}
-    <div id="customer-list">
-      {% for customer in customers %}
-        {% if customer.loan %}
-          {% with loan=customer.loan %}
-<div class="customer-card">
+  <div id="customer-list">
+    {% for customer in customers %}
+    {% if customer.loan %}
+    {% with loan=customer.loan %}
+    <div class="customer-card">
 
-  <div class="customer-header">
-    <div class="customer-info">
-      <div class="name">{{ customer.customer_name }}</div>
-      <div class="mobile">{{ customer.mobile_number }}</div>
-    </div>
-    <div class="status-dot
+      <div class="customer-header">
+        <div class="customer-info">
+          <div class="name">{{ customer.customer_name }}</div>
+          <div class="mobile">{{ customer.mobile_number }}</div>
+        </div>
+        <div class="status-dot
       {% if customer.bad_loan_days|default:0 > 0 %}overdue
       {% elif customer.is_collected %}collected
       {% else %}on-time{% endif %}">
-    </div>
-  </div>
+        </div>
+      </div>
 
-  <div class="customer-details-grid">
-    <span>Line: <strong>{{ customer.line.line_name|default:"-" }}</strong></span>
-    <span>Area: <strong>{{ customer.area.name|default:"-" }}</strong></span>
-    <span>Principal: <strong class="principal-amount">₹{{ customer.loan.principal_amount|floatformat:2 }}</strong></span>
-    <span>Installment: 
-      <strong class="installment-amount {% if customer.bad_loan_days|default:0 > 0 %}overdue{% else %}on-time{% endif %}">
-        ₹{{ customer.adjusted_installment|default:customer.loan.installment_amount|floatformat:2 }}
-      </strong>
-    </span>
-    <span>Next Due: 
-      <strong class="next-due {% if customer.loan.next_due_date and customer.loan.next_due_date < today %}overdue{% else %}on-time{% endif %}">
-        {{ customer.loan.next_due_date|default:"-" }}
-      </strong>
-    </span>
+      <div class="customer-details-grid">
+        <span>Line: <strong>{{ customer.line.line_name|default:"-" }}</strong></span>
+        <span>Area: <strong>{{ customer.area.name|default:"-" }}</strong></span>
+        <span>Principal: <strong class="principal-amount">₹{{ customer.loan.principal_amount|floatformat:2 }}</strong></span>
+        <span>Installment:
+          <strong
+            class="installment-amount {% if customer.bad_loan_days|default:0 > 0 %}overdue{% else %}on-time{% endif %}">
+            ₹{{ customer.adjusted_installment|default:customer.loan.installment_amount|floatformat:2 }}
+          </strong>
+        </span>
+        <span>Next Due:
+          <strong
+            class="next-due {% if customer.loan.next_due_date and customer.loan.next_due_date < today %}overdue{% else %}on-time{% endif %}">
+            {{ customer.loan.next_due_date|default:"-" }}
+          </strong>
+        </span>
 
-    {% if customer.bad_loan_days|default:0 > 0 %}
-      <span class="bad-loan-days" style="color:#ef4444; font-weight:600;">
-        Bad Loan Days: {{ customer.bad_loan_days }} (+₹{{ customer.bad_loan_amount|floatformat:2 }})
-      </span>
-    {% endif %}
-  </div>
-
-  <button class="btn-collect" onclick="collectPayment('{{ customer.id }}', this)">
-    {% if customer.bad_loan_days|default:0 > 0 %}Collect (Overdue){% else %}Collect{% endif %}
-  </button>
-</div>
-          {% endwith %}
+        {% if customer.bad_loan_days|default:0 > 0 %}
+        <span class="bad-loan-days" style="color:#ef4444; font-weight:600;">
+          Bad Loan Days: {{ customer.bad_loan_days }} (+₹{{ customer.bad_loan_amount|floatformat:2 }})
+        </span>
         {% endif %}
-      {% endfor %}
+      </div>
+
+      {% if customer.is_collected %}
+      <div class="paid-mark">
+        <i class="fas fa-check-circle"></i>
+        Paid
+      </div>
+      {% else %}
+      <button class="btn-collect" onclick="collectPayment('{{ customer.id }}', this)">
+        {% if customer.bad_loan_days|default:0 > 0 %}Collect (Overdue){% else %}Collect{% endif %}
+      </button>
+      {% endif %}
     </div>
+    {% endwith %}
+    {% endif %}
+    {% endfor %}
+  </div>
   {% else %}
-    <p class="empty-state">No customers found for the selected filters.</p>
+  <p class="empty-state">No customers found for the selected filters.</p>
   {% endif %}
 
 </main>
 
 <script>
-function showNotification(message, type) {
+  function showNotification(message, type) {
     const container = document.getElementById("notification-container");
     const msgElement = document.getElementById("notification-message");
     msgElement.innerText = message;
     container.className = "notification-container show";
     msgElement.className = "notification-message " + type;
     setTimeout(() => { container.className = "notification-container"; }, 3000);
-}
+  }
 
-function collectPayment(customerId, btn) {
+  function collectPayment(customerId, btn) {
     // Prevent action if button is disabled (e.g., completed loan)
     if (btn.disabled) return;
 
     const csrfToken = "{{ csrf_token|escapejs }}";
 
     fetch("/collect_payment/" + customerId + "/", {
-        method: "POST",
-        headers: { "X-CSRFToken": csrfToken, "Accept": "application/json" },
+      method: "POST",
+      headers: { "X-CSRFToken": csrfToken, "Accept": "application/json" },
     })
-    .then(res => res.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
-            showNotification("Payment collected successfully!", "success");
+          showNotification("Payment collected successfully!", "success");
 
-            const parent = btn.closest(".customer-card");
-            const principalSpan = parent.querySelector(".principal-amount");
-            const nextDueSpan = parent.querySelector(".next-due");
-            const installmentSpan = parent.querySelector(".installment-amount");
-            const statusDot = parent.querySelector(".status-dot");
+          const parent = btn.closest(".customer-card");
+          const nextDueSpan = parent.querySelector(".next-due");
+          const installmentSpan = parent.querySelector(".installment-amount");
+          const statusDot = parent.querySelector(".status-dot");
 
-            // Update principal
-            if (principalSpan) principalSpan.innerText = "₹" + Number(data.remaining_amount || 0).toFixed(2);
+          // Update next due date
+          if (nextDueSpan) nextDueSpan.innerText = data.next_due_date || "-";
 
-            // Update next due date
-            if (nextDueSpan) nextDueSpan.innerText = data.next_due_date || "-";
+          // Update installment amount
+          if (installmentSpan && data.adjusted_installment) {
+            installmentSpan.innerText = "₹" + Number(data.adjusted_installment).toFixed(2);
+            installmentSpan.classList.remove("overdue");
+            installmentSpan.classList.add("on-time");
+          }
 
-            // Update installment amount
-            if (installmentSpan) {
-                const baseInstallment = data.adjusted_installment - (data.bad_loan_days * data.base_installment * data.bad_loan_rate / 100 || 0);
-                installmentSpan.innerText = "₹" + Number(baseInstallment).toFixed(2);
-                installmentSpan.classList.remove("overdue");
-                installmentSpan.classList.add("on-time");
-            }
+          // Remove bad loan days display
+          let badDaysSpan = parent.querySelector(".bad-loan-days");
+          if (badDaysSpan) badDaysSpan.remove();
 
-            // Remove bad loan days display
-            let badDaysSpan = parent.querySelector(".bad-loan-days");
-            if (badDaysSpan) badDaysSpan.remove();
+          // Update status dot
+          statusDot.classList.remove("overdue");
+          statusDot.classList.add("collected");
 
-            // Update status dot
-            statusDot.classList.remove("overdue");
-            statusDot.classList.add("collected");
-
-            // Remove the collect button entirely
-            btn.remove();
+          // Replace the collect button with a "Paid" mark
+          const paidMark = document.createElement("div");
+          paidMark.className = "paid-mark";
+          paidMark.innerHTML = '<i class="fas fa-check-circle"></i> Paid';
+          btn.parentNode.replaceChild(paidMark, btn);
         } else {
-            showNotification(data.message || "An error occurred.", "error");
+          showNotification(data.message || "An error occurred.", "error");
         }
-    })
-    .catch(err => {
+      })
+      .catch(err => {
         showNotification("An unexpected error occurred. Please try again.", "error");
         console.error(err);
-    });
-}
+      });
+  }
 
-document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search-input");
     const customerCards = document.querySelectorAll(".customer-card");
-    searchInput.addEventListener("input", function() {
-        const searchText = searchInput.value.toLowerCase();
-        customerCards.forEach(card => {
-            const customerName = card.querySelector(".name").innerText.toLowerCase();
-            card.style.display = customerName.includes(searchText) ? "flex" : "none";
-        });
+    searchInput.addEventListener("input", function () {
+      const searchText = searchInput.value.toLowerCase();
+      customerCards.forEach(card => {
+        const customerName = card.querySelector(".name").innerText.toLowerCase();
+        card.style.display = customerName.includes(searchText) ? "flex" : "none";
+      });
     });
-});
+  });
 </script>
 {% endblock %}

@@ -4,11 +4,6 @@
 
 {% block extra_head %}
 <style>
-  :root {
-    --primary: #2563eb;
-    --text-light: #6b7280;
-  }
-
   /* Header */
   .header {
     background-color: var(--primary);
@@ -26,7 +21,8 @@
 
   /* Form styling */
   form {
-    margin-top: 80px; /* to avoid overlap with header */
+    margin-top: 80px;
+    /* to avoid overlap with header */
     padding: 0 16px;
     width: 100%;
     box-sizing: border-box;
@@ -38,12 +34,22 @@
 
   .form-input,
   .form-select {
-    width: 100vw; /* full viewport width */
-    max-width: 100%; /* prevent horizontal scroll */
+    width: 100%;
+    max-width: 100%;
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #d1d5db;
     box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* ➡️ Updated focus styles with matching box-shadow color */
+  .form-input:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    /* RGB for #d45d30 (primary-light) */
+    box-shadow: 0 0 0 3px rgba(212, 93, 48, 0.2);
   }
 
   /* Line + Add button layout */
@@ -53,7 +59,8 @@
   }
 
   .line-add-container select {
-    flex: 1; /* select takes remaining space */
+    flex: 1;
+    /* select takes remaining space */
   }
 
   .add-btn {
@@ -71,7 +78,8 @@
 
   /* Submit button */
   .btn-submit {
-    width: 100vw; /* full width */
+    width: 100vw;
+    /* full width */
     max-width: 100%;
     padding: 14px;
     background-color: var(--primary);
@@ -84,7 +92,7 @@
   }
 
   .btn-submit:hover {
-    background-color: #4f46e5;
+    background-color: #d45d30;
   }
 
   /* Bottom navigation */
@@ -97,6 +105,7 @@
     padding: 12px 0;
     z-index: 40;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    height: 80px;
   }
 
   .nav-items {
@@ -108,9 +117,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 12px;
     color: var(--text-light);
-    text-decoration: none;
+    font-size: 12px;
+    padding: 4px 12px;
   }
 
   .nav-item i {
@@ -135,24 +144,22 @@
 </header>
 
 <form method="GET" action="{% url 'collection_list' %}">
-  <!-- Date Picker -->
   <div class="form-section">
     <label class="block mb-2">Collection Date</label>
     <input type="date" name="date" value="{{ selected_date|default:today|date:'Y-m-d' }}" class="form-input" required>
   </div>
 
-  <!-- Line Selection -->
   <div class="form-section">
     <label class="block mb-2">Select Line</label>
     <div class="line-add-container">
       <select name="line" class="form-select" required>
         <option value="" disabled {% if not selected_line %}selected{% endif %}>Select line</option>
         {% for line in user_lines %}
-          <option value="{{ line.id }}" {% if line.id|stringformat:"s" == selected_line|stringformat:"s" %}selected{% endif %}>
-            {{ line.line_name }}{% if line.line_type %}{% endif %}
-          </option>
+        <option value="{{ line.id }}" {% if line.id|stringformat:"s" == selected_line|stringformat:"s" %}selected{% endif %}>
+          {{ line.line_name }}{% if line.line_type %}{% endif %}
+        </option>
         {% empty %}
-          <option disabled>No lines found</option>
+        <option disabled>No lines found</option>
         {% endfor %}
       </select>
       <a href="{% url 'line_add_collection' %}" class="add-btn">
@@ -161,22 +168,20 @@
     </div>
   </div>
 
-  <!-- Area Selection -->
   <div class="form-section">
     <label class="block mb-2">Select Area</label>
     <select name="area" class="form-select" required>
       <option value="" disabled {% if not selected_area %}selected{% endif %}>Select area</option>
       {% for area in user_areas %}
-        <option value="{{ area.id }}" {% if area.id|stringformat:"s" == selected_area|stringformat:"s" %}selected{% endif %}>
-          {{ area.name }}
-        </option>
+      <option value="{{ area.id }}" {% if area.id|stringformat:"s" == selected_area|stringformat:"s" %}selected{% endif %}>
+        {{ area.name }}
+      </option>
       {% empty %}
-        <option disabled>No areas found</option>
+      <option disabled>No areas found</option>
       {% endfor %}
     </select>
   </div>
 
-  <!-- Submit Button -->
   <button type="submit" class="btn-submit">Submit</button>
 </form>
 
@@ -194,6 +199,10 @@
       <i class="fas fa-users"></i>
       <span>Customers</span>
     </a>
+    <!-- <a href="Reports.html" class="nav-item">
+        <i class="fas fa-chart-pie"></i>
+        <span>Reports</span>
+      </a> -->
     <a href="{% url 'settings' %}" class="nav-item">
       <i class="fas fa-cog"></i>
       <span>Settings</span>

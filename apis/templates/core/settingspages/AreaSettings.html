@@ -167,6 +167,23 @@
       transform: scale(1);
     }
   }
+
+  /* New style for "No areas found" message */
+  .no-data-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .no-data-found i {
+    font-size: 50px;
+    margin-bottom: 16px;
+  }
 </style>
 
 <header class="header">
@@ -211,8 +228,9 @@
     </div>
     {% endif %}
     {% empty %}
-    <div class="area-item">
-      <span class="area-name">No areas found</span>
+    <div class="no-data-found">
+      <i class="fas fa-search"></i>
+      <p>No areas found.</p>
     </div>
     {% endfor %}
   </div>
