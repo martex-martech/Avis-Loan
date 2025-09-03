@@ -1250,11 +1250,29 @@ def send_code(request):
         request.session['reset_email'] = user.email
         request.session['reset_username'] = username
 
-        # Email content
+        # Email subject and sender
         subject = "🔐 Vasool App - Password Reset Request"
         to = [user.email]
         from_email = settings.DEFAULT_FROM_EMAIL
 
+        # Plain-text version (fallback)
+        text_content = f"""
+Hello {username},
+
+We received a request to reset the password for your Vasool App account.
+
+Your OTP is: {code}
+
+This OTP is valid for 15 minutes. Please do not share it with anyone.
+
+If you did not request this, you can safely ignore this email.
+
+For assistance, contact our support team at support@vasoolapp.com
+
+© 2025 Vasool App. All rights reserved.
+"""
+
+        # HTML version
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -1301,16 +1319,6 @@ def send_code(request):
               border-radius: 6px;
               letter-spacing: 3px;
             }}
-            .button {{
-              display: inline-block;
-              background-color: #4361ee;
-              color: #ffffff !important;
-              text-decoration: none;
-              padding: 12px 20px;
-              border-radius: 6px;
-              margin-top: 20px;
-              font-weight: bold;
-            }}
             .footer {{
               font-size: 12px;
               color: #777;
@@ -1332,8 +1340,9 @@ def send_code(request):
               
               <p>This OTP is valid for <strong>15 minutes</strong>. Please do not share it with anyone. If you did not request a password reset, you can safely ignore this email.</p>
             
-              
-              <p>For assistance, contact our support team at <a href="mailto:support@vasoolapp.com">support@vasoolapp.com</a>.</p>
+              <p>For assistance, contact our support team at 
+                 <a href="mailto:support@vasoolapp.com">support@vasoolapp.com</a>.
+              </p>
               
               <div class="footer">
                 &copy; 2025 Vasool App. All rights reserved.
@@ -1344,8 +1353,8 @@ def send_code(request):
         </html>
         """
 
-        # Send the email
-        email = EmailMultiAlternatives(subject, "Your email client does not support HTML.", from_email, to)
+        # Send the email with both plain text + HTML
+        email = EmailMultiAlternatives(subject, text_content, from_email, to)
         email.attach_alternative(html_content, "text/html")
         email.send(fail_silently=False)
 

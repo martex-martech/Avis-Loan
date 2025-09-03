@@ -95,15 +95,23 @@
     .btn-primary:active {
       transform: translateY(0);
     }
-
+    
+    /* ➡️ Updated secondary button to use an outline style */
     .btn-secondary {
-      background-color: var(--secondary);
-      color: var(--text);
-      border: 1px solid var(--border);
+      background-color: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      transition: all 0.2s;
     }
 
     .btn-secondary:hover {
-      background-color: #f3f4f6;
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:active {
+      transform: translateY(0);
     }
 
     .forgot-password {
@@ -197,8 +205,8 @@
         <p id="passwordError" class="error-msg">Password must be at least 6 characters</p>
       </div>
 
-      <div class="forgot-password text-right mt-2 mb-6">
-        <a href="{% url 'enter_username' %}" class="text-indigo-600 hover:underline">Forgot Password?</a>
+      <div class="forgot-password">
+        <a href="{% url 'enter_username' %}">Forgot Password?</a>
       </div>
 
       <button type="submit" class="btn btn-primary">LOGIN</button>
