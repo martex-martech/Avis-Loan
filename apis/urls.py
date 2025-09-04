@@ -73,7 +73,7 @@ urlpatterns = [
     path('languagae/', views.languagae, name='languagae'),
 
     #superadmin urls
-    path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
+    # path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
     path('payments/', views.subscription_page , name='payments'),
     path('api/users/', CustomUserListView.as_view(), name='user-list'),
     path('api/users/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
@@ -92,6 +92,9 @@ urlpatterns = [
     path('send-code/', views.send_code, name='send_code'),
     path('verify-code/', views.verify_code, name='verify_code'),
     path('reset-password/', views.reset_password, name='reset_password'),
+
+    #StaffPage
+    path("staff-dashboard/", views.staff_user_management, name="staff_userManagement"),
 
     # API endpoints
     path('send-code/', views.send_code, name='send_code'),

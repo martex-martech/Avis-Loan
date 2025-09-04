@@ -940,99 +940,99 @@ def collect_payment(request, customer_id):
 #  SUPERUSER
 #---------------
 
-@login_required
-def superadmin_dashboard(request):
-    # Restrict access
-    if request.user.role != 'superadmin':
-        return redirect('/')
+# @login_required
+# def superadmin_dashboard(request):
+#     # Restrict access
+#     if request.user.role != 'superadmin':
+#         return redirect('/')
 
-    # ---------- Stats ----------
-    total_loans_count = Loan.objects.count()
+#     # ---------- Stats ----------
+#     total_loans_count = Loan.objects.count()
 
-    # Total loan amount from Customers (max loan amount field)
-    total_loan_amount = Customer.objects.aggregate(
-        total=Sum('maximum_loan_amount')
-    )['total'] or 0
+#     # Total loan amount from Customers (max loan amount field)
+#     total_loan_amount = Customer.objects.aggregate(
+#         total=Sum('maximum_loan_amount')
+#     )['total'] or 0
 
-    total_active_users = CustomUser.objects.filter(
-        is_active=True
-    ).exclude(role__in=['superadmin', 'staff']).count()
+#     total_active_users = CustomUser.objects.filter(
+#         is_active=True
+#     ).exclude(role__in=['superadmin', 'staff']).count()
 
-    total_areas = Area.objects.count()
+#     total_areas = Area.objects.count()
 
-    # ---------- Activities ----------
-    activities = []
+#     # ---------- Activities ----------
+#     activities = []
 
-    # Recent agents
-    recent_agents = CustomUser.objects.filter(
-        role='agent'
-    ).order_by('-date_joined')[:5]
-    for agent in recent_agents:
-        activities.append({
-            'type': 'success',
-            'message': f"New agent joined: {agent.full_name}",
-            'timestamp': agent.date_joined
-        })
+#     # Recent agents
+#     recent_agents = CustomUser.objects.filter(
+#         role='agent'
+#     ).order_by('-date_joined')[:5]
+#     for agent in recent_agents:
+#         activities.append({
+#             'type': 'success',
+#             'message': f"New agent joined: {agent.full_name}",
+#             'timestamp': agent.date_joined
+#         })
 
-    # Recent customers
-    recent_customers = Customer.objects.order_by('-created_at')[:5]
-    for customer in recent_customers:
-        activities.append({
-            'type': 'info',
-            'message': f"New customer added: {customer.customer_name}",
-            'timestamp': customer.created_at
-        })
+#     # Recent customers
+#     recent_customers = Customer.objects.order_by('-created_at')[:5]
+#     for customer in recent_customers:
+#         activities.append({
+#             'type': 'info',
+#             'message': f"New customer added: {customer.customer_name}",
+#             'timestamp': customer.created_at
+#         })
 
-    # Recent loans → fetch related customer via OneToOne
-    recent_loans = Loan.objects.order_by('-created_at')[:5]
-    for loan in recent_loans:
-        # Customer linked to this loan (via OneToOne)
-        customer = getattr(loan, "customer", None)
-        customer_name = customer.customer_name if customer else "Unknown"
-        activities.append({
-            'type': 'warning',
-            'message': f"New loan initiated for: {customer_name}",
-            'timestamp': loan.created_at
-        })
+#     # Recent loans → fetch related customer via OneToOne
+#     recent_loans = Loan.objects.order_by('-created_at')[:5]
+#     for loan in recent_loans:
+#         # Customer linked to this loan (via OneToOne)
+#         customer = getattr(loan, "customer", None)
+#         customer_name = customer.customer_name if customer else "Unknown"
+#         activities.append({
+#             'type': 'warning',
+#             'message': f"New loan initiated for: {customer_name}",
+#             'timestamp': loan.created_at
+#         })
 
-    # Sort activities (latest first)
-    activities.sort(key=lambda x: x['timestamp'], reverse=True)
-    activities = activities[:5]
+#     # Sort activities (latest first)
+#     activities.sort(key=lambda x: x['timestamp'], reverse=True)
+#     activities = activities[:5]
 
-    # ---------- Loan Graph ----------
-    loan_per_line = (
-        Loan.objects.values('line__line_name')
-        .annotate(total=Sum('principal_amount'))
-        .order_by('line__line_name')
-    )
-    loan_labels = [item['line__line_name'] for item in loan_per_line]
-    loan_data = [float(item['total'] or 0) for item in loan_per_line]
+#     # ---------- Loan Graph ----------
+#     loan_per_line = (
+#         Loan.objects.values('line__line_name')
+#         .annotate(total=Sum('principal_amount'))
+#         .order_by('line__line_name')
+#     )
+#     loan_labels = [item['line__line_name'] for item in loan_per_line]
+#     loan_data = [float(item['total'] or 0) for item in loan_per_line]
 
-    # ---------- User Trend Graph (last 7 days) ----------
-    today = now().date()
-    last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+#     # ---------- User Trend Graph (last 7 days) ----------
+#     today = now().date()
+#     last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
 
-    user_labels = [d.strftime("%b %d") for d in last_7_days]
-    user_data = []
-    for day in last_7_days:
-        count = CustomUser.objects.filter(
-            date_joined__date=day
-        ).exclude(role__in=['superadmin', 'staff']).count()
-        user_data.append(count)
+#     user_labels = [d.strftime("%b %d") for d in last_7_days]
+#     user_data = []
+#     for day in last_7_days:
+#         count = CustomUser.objects.filter(
+#             date_joined__date=day
+#         ).exclude(role__in=['superadmin', 'staff']).count()
+#         user_data.append(count)
 
-    context = {
-        'total_loans_count': total_loans_count,
-        'total_loan_amount': total_loan_amount,
-        'total_active_users': total_active_users,
-        'total_areas': total_areas,
-        'activities': activities,
-        'graph_labels': json.dumps(loan_labels),
-        'graph_data': json.dumps(loan_data),
-        'user_graph_labels': json.dumps(user_labels),
-        'user_graph_data': json.dumps(user_data),
-    }
+#     context = {
+#         'total_loans_count': total_loans_count,
+#         'total_loan_amount': total_loan_amount,
+#         'total_active_users': total_active_users,
+#         'total_areas': total_areas,
+#         'activities': activities,
+#         'graph_labels': json.dumps(loan_labels),
+#         'graph_data': json.dumps(loan_data),
+#         'user_graph_labels': json.dumps(user_labels),
+#         'user_graph_data': json.dumps(user_data),
+#     }
 
-    return render(request, 'core/superadmin_dashboard.html', context)
+#     return render(request, 'core/superadmin_dashboard.html', context)
 
 @login_required
 def subscription_page(request):
@@ -1105,7 +1105,7 @@ def user_management(request):
     
     # Get all users except superadmin and staff
     users = CustomUser.objects.exclude(role__in=['superadmin', 'staff']).order_by('-date_joined')
-    
+
     context = {
         'users': users
     }
@@ -1413,3 +1413,17 @@ def calculator(request):
 
 def cron_task(request):
     return JsonResponse({"status": "ok"})
+
+@login_required
+def staff_user_management(request):
+    # Restrict access to superadmin only
+    if request.user.role != 'staff':
+        return redirect('/')
+    
+    # Get all users except superadmin and staff
+    users = CustomUser.objects.exclude(role__in=['superadmin', 'staff']).order_by('-date_joined')
+
+    context = {
+        'users': users
+    }
+    return render(request, 'core/staffuserManagement.html', context)
