@@ -1,286 +1,299 @@
 {% extends "core/base.html" %}
 
-{% block title %}Login - Loan App{% endblock %}
+{% block title %}Expense Tracker - Loan App{% endblock %}
 
 {% block extra_head %}
 
-  <style>
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      background-color: var(--primary);
-      color: white;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
+<style>
+  body {
+    background-color: #f3f4f6;
+  }
 
-    .header-title {
-      font-size: 20px;
-      font-weight: 600;
-    }
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
 
-    .header-actions a {
-      color: white;
-      font-size: 18px;
-      padding: 4px;
-      transition: transform 0.2s;
-    }
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
 
-    .header-actions a:active {
-      transform: scale(0.95);
-    }
+  .header-actions a {
+    color: white;
+    font-size: 18px;
+    padding: 4px;
+    transition: transform 0.2s;
+  }
 
-    .main-content {
-      padding: 20px 16px;
-      width: 100%;
-      margin: 0 auto;
-      margin-top: 80px;
-      margin-bottom: 100px;
-    }
+  .header-actions a:active {
+    transform: scale(0.95);
+  }
 
-    /* 🔹 Simplified flat style */
-    .filter-box,
-    .result-box,
-    .expense-card,
-    .expense-empty {
-      background: none;
-      border: none;
-      box-shadow: none;
-      border-bottom: 1px solid var(--border);
-      border-radius: 0;
-      padding: 12px 0;
-      margin: 0;
-    }
+  .main-content {
+    padding: 20px 16px;
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 80px;
+    margin-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
+  /* Card styles applied to sections */
+  .filter-box,
+  .result-box {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+  }
 
-    .form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 6px;
-      color: var(--text-light);
-    }
+  .form-group {
+    margin-bottom: 16px;
+  }
 
-    .form-input,
-    .form-select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 14px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-light);
+  }
 
-    /* ➡️ Updated focus style to use var(--primary-light) */
-    .form-input:focus,
-    .form-select:focus {
-      outline: none;
-      border-color: var(--primary-light);
-      box-shadow: 0 0 0 2px rgba(212, 93, 48, 0.2);
-    }
+  .form-input,
+  .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
 
-    .form-select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
-    }
+  .form-input:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 2px rgba(212, 93, 48, 0.2);
+  }
 
-    .btn-container {
-      text-align: center;
-    }
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+  }
 
-    /* ➡️ Updated and generalized the .btn styles */
-    .btn {
-      display: inline-block;
-      padding: 12px 20px;
-      background-color: var(--primary);
-      color: white;
-      border-radius: 6px;
-      font-weight: 500;
-      cursor: pointer;
-      text-align: center;
-      transition: transform 0.2s, background-color 0.2s;
-      border: none;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-      width: 50%;
-    }
+  .btn-container {
+    text-align: center;
+  }
 
-    .btn:hover {
-      background-color: var(--primary-light);
-      transform: translateY(-1px);
-    }
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s, background-color 0.2s;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    width: 50%;
+  }
 
-    .btn:active {
-      transform: translateY(0);
-    }
+  .btn:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
 
-    .expense-empty {
-      text-align: center;
-      color: var(--text-light);
-      padding: 20px 0;
-    }
+  .btn:active {
+    transform: translateY(0);
+  }
 
-    .expense-card p {
-      margin: 4px 0;
-    }
+  /* Expense list card styles */
+  .expense-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
 
-    /* Bottom nav unchanged */
-    .nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: white;
-      padding: 12px 0;
-      z-index: 40;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-      height: 80px;
-    }
+  .expense-empty {
+    text-align: center;
+    color: var(--text-light);
+    padding: 20px 0;
+  }
 
-    .nav-items {
-      display: flex;
-      justify-content: space-around;
-    }
+  .expense-card p {
+    margin: 4px 0;
+  }
 
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: var(--text-light);
-      font-size: 12px;
-      padding: 4px 12px;
-    }
+  /* Bottom nav unchanged */
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    padding: 12px 0;
+    z-index: 40;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    height: 80px;
+  }
 
-    .nav-item i {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
+  .nav-items {
+    display: flex;
+    justify-content: space-around;
+  }
 
-    .nav-item.active {
-      color: var(--primary);
-    }
-  </style>
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-light);
+    font-size: 12px;
+    padding: 4px 12px;
+  }
 
-  <header class="header">
-    <div class="header-title">Expense Tracker</div>
-    <div class="header-actions">
-      <a href="{% url 'add_expense' %}" title="Add Expense">
-        <i class="fas fa-plus"></i>
-      </a>
+  .nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+</style>
+
+<header class="header">
+  <div class="header-title">Expense Tracker</div>
+  <div class="header-actions">
+    <a href="{% url 'add_expense' %}" title="Add Expense">
+      <i class="fas fa-plus"></i>
+    </a>
+  </div>
+</header>
+
+<main class="main-content">
+
+  <div class="filter-box">
+    <div class="form-group">
+      <label class="form-label">From Date</label>
+      <input type="date" class="form-input" id="from-date" value="{{ from_date }}">
     </div>
-  </header>
-
-  <main class="main-content">
-
-    <div class="filter-box">
-      <div class="form-group">
-        <label class="form-label">From Date</label>
-        <input type="date" class="form-input" id="from-date" value="{{ from_date }}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">To Date</label>
-        <input type="date" class="form-input" id="to-date" value="{{ to_date }}">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Line</label>
-        <select class="form-select" id="line">
-          <option value="all" {% if line == 'all' %}selected{% endif %}>All Lines</option>
-          {% for l in lines %}
-          <option value="{{ l.id }}" {% if line|stringformat:"s" == l.id|stringformat:"s" %}selected{% endif %}>{{ l.line_name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="form-group btn-container">
-        <div class="btn" id="calculate-btn">Calculate</div>
-      </div>
+    <div class="form-group">
+      <label class="form-label">To Date</label>
+      <input type="date" class="form-input" id="to-date" value="{{ to_date }}">
     </div>
-
-    <div class="result-box" id="result-box">
-      <p>Period: {{ period_display }}</p>
-      <p>Total Expenses: <span style="color:green;">₹{{ total|floatformat:2 }}</span></p>
+    <div class="form-group">
+      <label class="form-label">Line</label>
+      <select class="form-select" id="line">
+        <option value="all" {% if line == 'all' %}selected{% endif %}>All Lines</option>
+        {% for l in lines %}
+        <option value="{{ l.id }}" {% if line|stringformat:"s" == l.id|stringformat:"s" %}selected{% endif %}>{{ l.line_name }}</option>
+        {% endfor %}
+      </select>
     </div>
-
-    <div id="expense-container">
-      {% for expense in expenses %}
-      <div class="expense-card">
-        <p><strong>Date:</strong> {{ expense.date }}</p>
-        <p><strong>Line Name:</strong> {{ expense.line.line_name }}</p>
-        <p><strong>Expense Name:</strong> {{ expense.name }}</p>
-        <p><strong>Amount:</strong> ₹{{ expense.amount|floatformat:2 }}</p>
-      </div>
-      {% empty %}
-      <div class="expense-empty">No expenses found for the selected period</div>
-      {% endfor %}
+    <div class="form-group btn-container">
+      <div class="btn" id="calculate-btn">Calculate</div>
     </div>
+  </div>
 
-  </main>
+  <div class="result-box" id="result-box">
+    <p>Period: {{ period_display }}</p>
+    <p>Total Expenses: <span style="color:green;">₹{{ total|floatformat:2 }}</span></p>
+  </div>
 
-  <nav class="nav">
-    <div class="nav-items">
-      <a href="{% url 'collection' %}" class="nav-item">
-        <i class="fas fa-coins"></i>
-        <span>Collection</span>
-      </a>
-      <a href="{% url 'expense_list' %}" class="nav-item active">
-        <i class="fas fa-receipt"></i>
-        <span>Expense</span>
-      </a>
-      <a href="{% url 'add_customer' %}" class="nav-item">
-        <i class="fas fa-users"></i>
-        <span>Customers</span>
-      </a>
-      <a href="{% url 'settings' %}" class="nav-item">
-        <i class="fas fa-cog"></i>
-        <span>Settings</span>
-      </a>
+  <div id="expense-container">
+    {% for expense in expenses %}
+    <div class="expense-card">
+      <p><strong>Date:</strong> {{ expense.date }}</p>
+      <p><strong>Line Name:</strong> {{ expense.line.line_name }}</p>
+      <p><strong>Expense Name:</strong> {{ expense.name }}</p>
+      <p><strong>Amount:</strong> ₹{{ expense.amount|floatformat:2 }}</p>
     </div>
-  </nav>
+    {% empty %}
+    <div class="expense-empty">No expenses found for the selected period</div>
+    {% endfor %}
+  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const fromDateInput = document.getElementById('from-date');
-      const toDateInput = document.getElementById('to-date');
-      const lineSelect = document.getElementById('line');
-      const expenseContainer = document.getElementById('expense-container');
-      const resultBox = document.getElementById('result-box');
-      const calculateBtn = document.getElementById('calculate-btn');
+</main>
 
-      async function fetchExpenses() {
-        const fromDate = fromDateInput.value;
-        const toDate = toDateInput.value;
-        const line = lineSelect.value;
+<nav class="nav">
+  <div class="nav-items">
+    <a href="{% url 'collection' %}" class="nav-item">
+      <i class="fas fa-coins"></i>
+      <span>Collection</span>
+    </a>
+    <a href="{% url 'expense_list' %}" class="nav-item active">
+      <i class="fas fa-receipt"></i>
+      <span>Expense</span>
+    </a>
+    <a href="{% url 'add_customer' %}" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Customers</span>
+    </a>
+    <a href="{% url 'settings' %}" class="nav-item">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+</nav>
 
-        const url = `/expense_list/?from_date=${fromDate}&to_date=${toDate}&line=${line}`;
-        try {
-          const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-          const html = await response.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const fromDateInput = document.getElementById('from-date');
+    const toDateInput = document.getElementById('to-date');
+    const lineSelect = document.getElementById('line');
+    const expenseContainer = document.getElementById('expense-container');
+    const resultBox = document.getElementById('result-box');
+    const calculateBtn = document.getElementById('calculate-btn');
 
-          const newExpenses = doc.querySelectorAll('#expense-container > *');
-          expenseContainer.innerHTML = '';
-          newExpenses.forEach(el => expenseContainer.appendChild(el));
+    async function fetchExpenses() {
+      const fromDate = fromDateInput.value;
+      const toDate = toDateInput.value;
+      const line = lineSelect.value;
 
-          const newResult = doc.querySelector('#result-box').innerHTML;
-          resultBox.innerHTML = newResult;
-        } catch (err) {
-          console.error('Error fetching expenses:', err);
-        }
+      const url = `/expense_list/?from_date=${fromDate}&to_date=${toDate}&line=${line}`;
+      try {
+        const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const newExpenses = doc.querySelectorAll('#expense-container > *');
+        expenseContainer.innerHTML = '';
+        newExpenses.forEach(el => expenseContainer.appendChild(el));
+
+        const newResult = doc.querySelector('#result-box').innerHTML;
+        resultBox.innerHTML = newResult;
+      } catch (err) {
+        console.error('Error fetching expenses:', err);
       }
+    }
 
-      calculateBtn.addEventListener('click', fetchExpenses);
-    });
-  </script>
+    calculateBtn.addEventListener('click', fetchExpenses);
+  });
+</script>
 
 {% endblock %}

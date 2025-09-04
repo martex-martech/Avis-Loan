@@ -3,6 +3,7 @@
 {% block title %}Login - Loan App{% endblock %}
 
 {% block extra_head %}
+
 <style>
   .header {
     position: fixed;
@@ -32,26 +33,29 @@
   }
 
   .main-content {
-    padding: 24px 0;
+    padding: 24px 16px;
     margin-top: 70px;
     margin-bottom: 80px;
-    width: 100%;
   }
 
+  /* Card Styles */
   .language-option {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px;
     background-color: white;
-    border-bottom: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    width: 100%;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
+
 
   .language-option.active {
     background-color: #f9f9ff;
-    border-left: 4px solid var(--primary);
+    border: 1px solid var(--primary); /* Use border on all sides for a cleaner look */
   }
 
   .language-left {
@@ -70,6 +74,7 @@
     justify-content: center;
     font-size: 13px;
     font-weight: bold;
+    border: 1px solid #ddd;
   }
 
   .language-name {
@@ -82,7 +87,6 @@
   }
 </style>
 
-<!-- Header -->
 <header class="header">
   <a href="{% url 'settings' %}" class="header-action">
     <i class="fas fa-chevron-left"></i>
@@ -91,7 +95,6 @@
   <div class="header-action"></div>
 </header>
 
-<!-- Main Content -->
 <main class="main-content">
   <div class="language-option active">
     <div class="language-left">

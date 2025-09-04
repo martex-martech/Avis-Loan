@@ -3,44 +3,142 @@
 {% block title %}License - Loan App{% endblock %}
 
 {% block extra_head %}
+<style>
+  /* Custom styles for the License page */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-action {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+  }
+
+  .header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .main-content {
+    padding-top: 5rem;
+    /* Space for the fixed header */
+    padding-bottom: 2rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .info-grid>div {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background-color: #f3f4f6;
+  }
+
+  .qr-card {
+    background-color: #eef2ff;
+    /* A very light shade of indigo */
+    border: 2px dashed #a5b4fc;
+    /* A slightly darker shade for the border */
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .qr-code-box {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+  }
+
+  .qr-code-icon {
+    font-size: 4rem;
+    color: #9ca3af;
+  }
+
+  .qr-info-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-  <!-- Header -->
-  <header class="fixed top-0 left-0 right-0 bg-indigo-600 text-white p-4 flex items-center justify-between z-50">
-    <a href="{% url 'settings' %}" class="text-xl">
-      <i class="fas fa-chevron-left"></i>
-    </a>
-    <h1 class="text-xl font-semibold text-center flex-1">License</h1>
-    <div class="w-6"></div>
-  </header>
+<header class="header">
+  <a href="{% url 'settings' %}" class="text-xl">
+    <i class="fas fa-chevron-left"></i>
+  </a>
+  <h1 class="text-xl font-semibold text-center flex-1">License</h1>
+  <div class="w-6"></div>
+</header>
 
-  <!-- Main Content -->
-  <main class="px-4 py-6 pt-24 max-w-md mx-auto">
-    <!-- Username -->
-    <div class="mb-8 text-center">
-      <h2 class="text-lg font-medium text-gray-700 mb-1">UserName</h2>
-      <p class="text-xl font-semibold text-gray-900">{{ username }}</p>
-    </div>
+<main class="main-content">
 
-    <!-- License Info -->
-    <div class="grid grid-cols-2 gap-4 mb-8 text-center">
-      <div>
-        <h3 class="text-sm text-gray-500">Annual Amount</h3>
-        <p class="text-lg font-bold text-indigo-600">{{ annual_amount }}</p>
-      </div>
-      <div>
-        <h3 class="text-sm text-gray-500">Valid Until</h3>
-        <p class="text-lg font-bold text-green-600">{{ valid_until }}</p>
-      </div>
-    </div>
+  <div class="card">
+    <h2 class="card-title">Username</h2>
+    <p class="card-text">{{ username }}</p>
+  </div>
 
-    <!-- QR Code Section -->
-    <div class="bg-slate-100 border-2 border-dashed border-gray-300 rounded-lg p-6 mb-6 flex flex-col items-center">
-      <div class="bg-white p-4 rounded-lg shadow-sm mb-3">
-        <i class="fas fa-qrcode text-6xl text-gray-500"></i>
-      </div>
-      <p class="text-sm text-gray-600">Scan QR code to complete payment</p>
+  <div class="card info-grid">
+    <div>
+      <h3 class="card-title">Annual Amount</h3>
+      <p class="card-text text-indigo-600">{{ annual_amount }}</p>
     </div>
-  </main>
+    <div>
+      <h3 class="card-title">Valid Until</h3>
+      <p class="card-text text-green-600">{{ valid_until }}</p>
+    </div>
+  </div>
+
+  <div class="qr-card">
+    <div class="qr-code-box">
+      <i class="fas fa-qrcode qr-code-icon"></i>
+    </div>
+    <p class="qr-info-text">Scan QR code to complete payment</p>
+  </div>
+</main>
 {% endblock %}

@@ -26,6 +26,7 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    text-align: center;
   }
 
   .main-content {
@@ -163,32 +164,27 @@
         <option value="{{ line.id }}">{{ line.line_name }}</option>
         {% endfor %}
       </select>
-      <div class="error-message" id="line-error">Please select a line.</div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Expense Name</label>
       <input type="text" class="form-input" id="expense-name" name="name" placeholder="Enter expense name" required />
-      <div class="error-message" id="name-error">Please enter expense name.</div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Amount</label>
       <input type="number" class="form-input" id="amount" name="amount" placeholder="Enter amount" step="0.01" min="0"
         required />
-      <div class="error-message" id="amount-error">Please enter a valid amount.</div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Expense Date</label>
       <input type="date" class="form-input" id="date" name="date" required />
-      <div class="error-message" id="date-error">Please select a date.</div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Comments</label>
       <textarea class="form-input" id="comments" name="comments" rows="3" placeholder="Enter any remarks..."></textarea>
-      <div class="error-message" id="comments-error">Please enter comments.</div>
     </div>
 
     <button class="btn" type="submit">
@@ -215,21 +211,36 @@
 
       dateInput.value = new Date().toISOString().substr(0, 10);
 
-      [lineSelect, nameInput, amountInput, dateInput, commentsInput].forEach(field => {
-        field.addEventListener('input', () => document.getElementById(`${field.id}-error`).style.display = 'none');
-        field.addEventListener('change', () => document.getElementById(`${field.id}-error`).style.display = 'none');
-      });
+      function validateForm() {
+        if (!lineSelect.value) {
+          showMessage('error', 'Please select a line.');
+          return false;
+        }
+        if (!nameInput.value.trim()) {
+          showMessage('error', 'Please enter an expense name.');
+          return false;
+        }
+        if (!amountInput.value || parseFloat(amountInput.value) <= 0) {
+          showMessage('error', 'Please enter a valid amount.');
+          return false;
+        }
+        if (!dateInput.value) {
+          showMessage('error', 'Please select a date.');
+          return false;
+        }
+        if (!commentsInput.value.trim()) {
+          showMessage('error', 'Please enter comments.');
+          return false;
+        }
+        return true;
+      }
 
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        let valid = true;
 
-        if (!lineSelect.value) { document.getElementById('line-error').style.display = 'block'; valid = false; }
-        if (!nameInput.value.trim()) { document.getElementById('name-error').style.display = 'block'; valid = false; }
-        if (!amountInput.value || parseFloat(amountInput.value) <= 0) { document.getElementById('amount-error').style.display = 'block'; valid = false; }
-        if (!dateInput.value) { document.getElementById('date-error').style.display = 'block'; valid = false; }
-        if (!commentsInput.value.trim()) { document.getElementById('comments-error').style.display = 'block'; valid = false; }
-        if (!valid) return;
+        if (!validateForm()) {
+          return;
+        }
 
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const formData = new FormData(this);

@@ -1,6 +1,6 @@
 {% extends "core/base.html" %}
 
-{% block title %}Login - Loan App{% endblock %}
+{% block title %}Area Settings - Loan App{% endblock %}
 
 {% block extra_head %}
 
@@ -10,42 +10,60 @@
     top: 0;
     left: 0;
     right: 0;
-    background-color: #4f46e5;
-    color: white;
-    padding: 1rem;
+    z-index: 50;
     display: flex;
     align-items: center;
-    z-index: 50;
+    padding: 16px 20px;
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .header-action {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
   }
 
   .header-title {
     position: absolute;
-    left: 0;
-    right: 0;
-    text-align: center;
-    margin: 0 auto;
-    font-weight: 500;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
 
+  /* Card Layout for the list */
   .area-list {
     margin: 0;
-    padding: 0.5rem 1rem;
-    margin-top: 50px;
-    font-weight: 600;
-    color: #111827;
+    padding: 1rem;
+    margin-top: 70px; /* Increased margin to accommodate the fixed header */
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Spacing between cards */
   }
 
+  .area-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
   .area-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 1.25rem 1.5rem; /* Increased padding for a more spacious card */
   }
 
-  .area-item:last-child {
-    border-bottom: none;
+  /* Existing Styles */
+  .area-name {
+    font-weight: 600;
+    color: #111827;
+    flex: 1;
   }
 
   /* Message styles */
@@ -214,16 +232,18 @@
   <div class="area-list">
     {% for area in areas %}
     {% if area.created_by == user %}
-    <div class="area-item">
-      <span class="area-name">{{ area.name }}</span>
-      <div class="area-actions">
-        <form action="{% url 'delete_area' area.id %}" method="POST" class="inline-form delete-form"
-          data-name="{{ area.name }}">
-          {% csrf_token %}
-          <button type="submit" class="delete-btn">
-            <i class="fas fa-trash"></i>
-          </button>
-        </form>
+    <div class="area-card">
+      <div class="area-item">
+        <span class="area-name">{{ area.name }}</span>
+        <div class="area-actions">
+          <form action="{% url 'delete_area' area.id %}" method="POST" class="inline-form delete-form"
+            data-name="{{ area.name }}">
+            {% csrf_token %}
+            <button type="submit" class="delete-btn">
+              <i class="fas fa-trash"></i>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
     {% endif %}
@@ -290,7 +310,7 @@
           })
             .then(response => {
               if (response.ok) {
-                const areaItem = this.closest('.area-item');
+                const areaItem = this.closest('.area-card'); // Changed from .area-item to .area-card
                 if (areaItem) areaItem.remove();
                 showMessage('success', 'Area deleted successfully!');
               } else {
