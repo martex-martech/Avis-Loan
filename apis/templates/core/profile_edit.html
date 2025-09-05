@@ -1,0 +1,242 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile - Loan App{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        background-color: var(--background);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-action {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+    }
+
+    .header-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+        padding: 100px 20px 100px;
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .form-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        font-size: 14px;
+        color: var(--text-light);
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        background-color: white;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(212, 93, 48, 0.2);
+    }
+
+    /* BUTTON */
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: var(--shadow);
+    }
+
+    .btn:hover {
+        background-color: var(--primary-light); /* Darker shade of primary */
+    }
+    
+
+    /* MESSAGES */
+    .message-container {
+        position: fixed;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        width: calc(100% - 2rem);
+        max-width: 500px;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
+        text-align: center;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .message-container.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .message-container.success {
+        background-color: var(--success);
+    }
+
+    .message-container.error {
+        background-color: var(--danger);
+    }
+
+    .message-container i {
+        margin-right: 8px;
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="header">
+    <a href="{% url 'staff_settings' %}" class="header-action">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <div class="header-title">Edit Profile</div>
+    <div class="header-actions"></div>
+</header>
+<div id="successMessage" class="message-container success"></div>
+<div id="errorMessage" class="message-container error"></div>
+
+<div class="main-content">
+    <div class="form-card">
+        <form id="profileForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="full_name" class="form-input" value="{{ user.full_name }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" value="{{ user.email }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" id="mobile_number" class="form-input" value="{{ user.mobile_number }}">
+            </div>
+
+            <button type="submit" class="btn">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showMessage(type, message) {
+        const msgElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+        const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+        msgElement.classList.add('show');
+        setTimeout(() => {
+            msgElement.classList.remove('show');
+        }, 3000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.getElementById("profileForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const data = {
+            full_name: document.getElementById("full_name").value,
+            email: document.getElementById("email").value,
+            mobile_number: document.getElementById("mobile_number").value,
+        };
+        
+        const csrfToken = getCookie('csrftoken');
+
+        try {
+            const res = await fetch("/api/edit-profile/", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+                showMessage('success', result.message);
+            } else {
+                showMessage('error', result.error || "Failed to update profile.");
+            }
+        } catch (err) {
+            console.error(err);
+            showMessage('error', "An unexpected error occurred.");
+        }
+    });
+</script>
+{% endblock %}

@@ -303,6 +303,7 @@
           showMessage('success', 'Login successful!');
           setTimeout(() => {
             if (data.role === 'agent') window.location.href = '/collection';
+            else if (data.role === 'superadmin') window.location.href = "{% url 'superadmin_dashboard' %}";
             else if (data.role === 'staff') window.location.href = "{% url 'staff_userManagement' %}";
             else window.location.href = '/';
           }, 1000);

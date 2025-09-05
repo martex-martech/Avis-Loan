@@ -26,7 +26,16 @@ class CustomUser(AbstractUser):
     )
     full_name = models.CharField(max_length=255)
     expiry_date = models.DateField(null=True, blank=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='agent')  # new field
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='agent')
+
+    # NEW FIELD
+    created_by = models.ForeignKey(
+        "self",  # a user can be created by another user
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_users"
+    )
 
     def save(self, *args, **kwargs):
         if not self.pk and self.date_joined:

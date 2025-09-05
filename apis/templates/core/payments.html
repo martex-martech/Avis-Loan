@@ -5,550 +5,413 @@
 
 {% block extra_head %}
 <style>
+    :root {
+        --primary: #28485d;
+        --secondary: #d45d30;
+        --text: #1d1d1f;
+        --text-light: #6a6a6a;
+        --border: #e5e7eb;
+        --background: #f9fafb;
+        --success: #10b981;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --warning: #f59e0b;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                   0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        --border-radius: 0.5rem;
+    }
+
     body {
-        display: flex;
+        background-color: var(--background);
         font-family: 'Poppins', sans-serif;
-        background-color: #f3f4f6;
         color: var(--text);
-        min-height: 100vh;
     }
 
-    /* Sidebar Styles */
-    .sidebar {
-        width: 280px;
-        background: white;
-        padding: 24px 0;
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        top: 0;
-        border-right: 1px solid var(--border);
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .sidebar-header {
-        padding: 0 24px 24px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .sidebar-header h3 {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--primary);
-        margin: 0;
-    }
-
-    .sidebar-header h3 i {
-        font-size: 1.5rem;
-    }
-
-    .sidebar-menu {
-        padding: 24px 0;
-        flex-grow: 1;
-    }
-
-    .menu-title {
-        padding: 0 24px 12px;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        color: var(--text-light);
-        font-weight: 600;
-        letter-spacing: 0.05em;
-    }
-
-    .menu-items {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .menu-item {
-        display: block;
-        padding: 12px 24px;
-        margin: 4px 0;
-        border-radius: 0 var(--border-radius) var(--border-radius) 0;
-        color: var(--text-light);
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .menu-item:hover {
-        background-color: var(--primary-light);
-        color: var(--primary);
-    }
-
-    .menu-item.active {
-        background-color: var(--primary-light);
-        color: var(--primary);
-        position: relative;
-    }
-
-    .menu-item.active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 4px;
-        background-color: var(--primary);
-        border-radius: 0 4px 4px 0;
-    }
-
-    .menu-item a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .menu-item i {
-        width: 20px;
-        text-align: center;
-        font-size: 1rem;
-    }
-
-    /* Main Content Styles */
     .main-content {
-        flex: 1;
-        margin-left: 280px;
-        padding: 32px;
+        padding: 16px;
+        padding-top: 80px;
+        /* This is the key fix */
+        padding-bottom: 96px; 
     }
 
     .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 32px;
-    }
-
-    .page-title h1 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text);
-        margin: 0;
-    }
-
-    .page-title p {
-        font-size: 0.875rem;
-        color: var(--text-light);
-        margin-top: 4px;
-        margin-bottom: 0;
-    }
-
-    .user-actions {
-        display: flex;
-        align-items: center;
-        gap: 24px;
-    }
-
-    .user-profile {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
         background-color: var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-
-    .user-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-name {
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-
-    .user-role {
-        font-size: 0.75rem;
-        color: var(--text-light);
-    }
-
-    /* Payment History Container */
-    .payment-container {
-        background-color: white;
-        border-radius: var(--border-radius);
-        padding: 24px;
+        color: #fff;
+        padding: 16px;
+        text-align: center;
+        font-weight: bold;
         box-shadow: var(--shadow);
-    }
-
-    .table-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        gap: 16px;
-        flex-wrap: wrap;
+        z-index: 50;
     }
 
     .search-box {
-        position: relative;
-        flex-grow: 1;
-        max-width: 400px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 0 12px;
+    }
+
+    .search-box i {
+        color: var(--text-light);
+        margin-right: 12px;
     }
 
     .search-box input {
         width: 100%;
-        padding: 10px 16px 10px 40px;
-        border: 1px solid var(--border);
-        border-radius: var(--border-radius);
-        font-size: 0.875rem;
-        transition: all 0.2s;
-    }
-
-    .search-box input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-light);
-        font-size: 0.875rem;
-    }
-
-    .filter-group {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .filter-dropdown {
-        padding: 10px 16px;
-        border: 1px solid var(--border);
-        border-radius: var(--border-radius);
-        background-color: white;
-        font-size: 0.875rem;
-        color: var(--text);
-        cursor: pointer;
-        transition: all 0.2s;
-        appearance: none;
-        -webkit-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        background-size: 1em;
-        padding-right: 30px;
-    }
-
-    .filter-dropdown:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    /* Table Styles */
-    .table-responsive {
-        overflow-x: auto;
-        border-radius: var(--border-radius);
-        border: 1px solid var(--border);
-    }
-
-    .payment-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .payment-table th {
-        background-color: #f9fafb;
-        padding: 16px 24px;
-        text-align: left;
-        font-weight: 600;
-        color: var(--text);
-        border-bottom: 1px solid var(--border);
-        white-space: nowrap;
-    }
-
-    .payment-table td {
-        padding: 16px 24px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-        color: var(--text-light);
-    }
-
-    .payment-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .payment-table tr:hover {
-        background-color: var(--primary-light);
-    }
-
-    .amount-paid {
-        color: var(--success);
-        font-weight: 600;
-    }
-
-    .action-btn {
-        padding: 8px 12px;
-        border-radius: var(--border-radius);
+        padding: 12px 0;
         border: none;
-        cursor: pointer;
-        font-size: 0.8rem;
+        background: transparent;
+        font-size: 1rem;
+        color: var(--text);
+        outline: none;
+    }
+
+    .payments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .payment-card {
+        background: #fff;
+        padding: 16px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .payment-card-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+    }
+
+    .payment-card-label {
+        color: var(--text-light);
         font-weight: 500;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+    }
+
+    .payment-card-value {
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .status-paid,
+    .status-pending {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-paid {
+        background: #d1fae5;
+        color: var(--success);
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: var(--warning);
     }
 
     .receipt-btn {
-        background-color: #d1fae5;
-        color: var(--success);
+        padding: 6px 12px;
+        border: none;
+        background: var(--info);
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+        transition: background-color 0.2s ease;
     }
 
     .receipt-btn:hover {
-        background-color: var(--success);
-        color: white;
+        background-color: #2563eb;
     }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        body {
-            flex-direction: column;
-        }
 
-        .sidebar {
-            width: 100%;
-            height: auto;
-            position: relative;
-            border-right: none;
-            border-bottom: 1px solid var(--border);
-            padding: 16px 0;
-        }
+    .nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 12px 0;
+        z-index: 40;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        height: 80px;
+    }
 
-        .main-content {
-            margin-left: 0;
-            padding: 16px;
-        }
+    .nav-items {
+        display: flex;
+        justify-content: space-around;
+    }
 
-        .header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
-        }
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--text-light);
+        font-size: 12px;
+        padding: 4px 12px;
+    }
 
-        .table-actions {
-            flex-direction: column;
-            gap: 12px;
-            align-items: stretch;
-        }
+    .nav-item i {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
 
-        .search-box, .filter-group {
-            width: 100%;
-            max-width: none;
-        }
+    .nav-item.active {
+        color: var(--primary);
+    }
+
+    /* Message styles */
+    .message-container {
+        position: fixed;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        width: calc(100% - 2rem);
+        max-width: 500px;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .message-container.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .message-container.success {
+        background-color: var(--success);
+    }
+
+    .message-container.error {
+        background-color: var(--danger);
+    }
+
+    .message-container i {
+        margin-right: 8px;
+        font-size: 1rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h3><i class="fas fa-hand-holding-usd"></i> LoanApp</h3>
-    </div>
-    <div class="sidebar-menu">
-        <div class="menu-title">Main</div>
-        <ul class="menu-items">
-            <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
-            <li><a href="{% url 'payments' %}" class="menu-item"><i class="fas fa-money-bill-wave"></i><span>Subscriptions</span></a></li>
-        </ul>
-        <div class="menu-title">Management</div>
-        <ul class="menu-items">
-            <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-users-cog"></i><span>User Management</span></a></li>
-            <li><a href="{% url 'loan-management-page' %}" class="menu-item"><i class="fas fa-file-contract"></i><span>Loan Management</span></a></li>
-            <li><a href="{% url 'payments_page' %}" class="menu-item active"><i class="fas fa-credit-card"></i><span>Payments</span></a></li>
-        </ul>
-    </div>
-</div>
+<header class="header">
+    Payment History
+</header>
+<div id="successMessage" class="message-container success"></div>
+<div id="errorMessage" class="message-container error"></div>
 
 <div class="main-content">
-    <div id="messageContainer" class="message-container"></div>
-    <div class="header">
-        <div class="page-title">
-            <h1>Payment History</h1>
-            <p>View all payment transactions</p>
-        </div>
-        <div class="user-actions">
-            <div class="user-profile">
-                <div class="user-avatar">SA</div>
-                <div class="user-info">
-                    <span class="user-name">Super Admin</span>
-                    <span class="user-role">Administrator</span>
-                </div>
-            </div>
-        </div>
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by agent, customer, or amount...">
     </div>
-
-    <div class="payment-container">
-        <div class="table-actions">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search payments..." id="searchInput">
-            </div>
-            <div class="filter-group">
-                <input type="date" class="filter-dropdown" id="dateFilter">
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="payment-table">
-                <thead>
-                    <tr>
-                        <th>Payment ID</th>
-                        <th>Date</th>
-                        <th>Customer Name</th>
-                        <th>Agent Name</th>
-                        <th>Amount (INR)</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="paymentTableBody">
-                    </tbody>
-            </table>
-        </div>
-    </div>
+    <div id="paymentsList" class="payments-list"></div>
 </div>
 
+<nav class="nav">
+    <div class="nav-items">
+        <a href="{% url 'staff_userManagement' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a href="{% url 'payments' %}" class="nav-item active">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payments</span>
+        </a>
+        <a href="" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reports</span>
+        </a>
+        <a href="{% url 'staff_settings' %}" class="nav-item">
+            <i class="fas fa-user-cog"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
-    const API = { payments: "http://127.0.0.1:8000/api/transaction/" };
+    const API_PAYMENTS = "http://127.0.0.1:8000/api/payments/";
 
-    // Render payments in table
-    function renderPayments(payments) {
-        const tbody = document.getElementById("paymentTableBody");
-        tbody.innerHTML = "";
-
-        if (payments.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-light);">No payments found</td></tr>`;
-            return;
-        }
-
-        payments.forEach(pay => {
-            const row = `<tr>
-                <td>${pay.payment_id}</td>
-                <td>${pay.date || "-"}</td>
-                <td>${pay.customer_name || "-"}</td>
-                <td>${pay.agent_name || "-"}</td>
-                <td class="amount-paid">₹${pay.amt_paid}</td>
-                <td>
-                    <button class="action-btn receipt-btn" onclick="openReceipt('${pay.payment_id}')">
-                        <i class="fas fa-receipt"></i> Receipt
-                    </button>
-                </td>
-            </tr>`;
-            tbody.insertAdjacentHTML("beforeend", row);
-        });
+    function showMessage(type, message) {
+        const msgElement = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+        const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+        msgElement.classList.add('show');
+        setTimeout(() => {
+            msgElement.classList.remove('show');
+        }, 3000);
     }
 
-    // Load payments from API
-    let allPayments = [];
-    fetch(API.payments)
-        .then(res => res.json())
-        .then(data => {
-            allPayments = data;
-            renderPayments(allPayments);
-        })
-        .catch(err => {
-            console.error("Failed to load payments:", err);
-            document.getElementById("paymentTableBody").innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger);">Failed to load payments</td></tr>`;
-        });
+    async function loadPayments() {
+        try {
+            const res = await fetch(API_PAYMENTS);
+            if (!res.ok) {
+                throw new Error('Failed to fetch payment data');
+            }
+            const data = await res.json();
+            const paymentsList = document.getElementById("paymentsList");
+            paymentsList.innerHTML = "";
 
-    // Open receipt in new window for download/print
-    function openReceipt(id) {
-        fetch(`${API.payments}${id}/`)
-            .then(res => res.json())
-            .then(pay => {
-                const receiptHTML = `
-                <html>
-                <head>
-                    <title>Payment Receipt - PAY-${pay.payment_id}</title>
-                    <style>
-                        body { font-family: 'Poppins', sans-serif; padding: 24px; color: var(--text); }
-                        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
-                        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
-                        .receipt-info { text-align: right; }
-                        .receipt-info h3 { margin: 0; font-size: 1.2rem; }
-                        .receipt-info p { margin: 0; font-size: 0.875rem; color: var(--text-light); }
-                        .details { margin-bottom: 24px; }
-                        .details div { margin-bottom: 8px; font-size: 0.9rem; color: var(--text-light); }
-                        .details div strong { color: var(--text); font-weight: 600; margin-right: 8px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-                        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; }
-                        th { background-color: #f9fafb; font-weight: 600; }
-                        .total { text-align: right; font-weight: bold; font-size: 1.1rem; color: var(--text); }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <div class="logo">LoanApp</div>
-                        <div class="receipt-info">
-                            <h3>Payment Receipt</h3>
-                            <p>Transaction ID: PAY-${pay.payment_id}</p>
+            if (data.length === 0) {
+                 paymentsList.innerHTML = `
+                    <p style="text-align: center; color: var(--text-light); margin-top: 2rem;">No payments found.</p>
+                 `;
+                 return;
+            }
+
+            data.forEach(p => {
+                const card = document.createElement("div");
+                card.classList.add("payment-card");
+
+                let paidOnHtml = '';
+                if (p.paid_on) {
+                    paidOnHtml = `
+                        <div class="payment-card-row">
+                            <span class="payment-card-label">Paid On:</span>
+                            <span class="payment-card-value">${p.paid_on}</span>
                         </div>
+                        <button class="receipt-btn" onclick='downloadReceipt(${JSON.stringify(p)})'>
+                            <i class="fas fa-file-pdf"></i> Download Receipt
+                        </button>
+                    `;
+                } else {
+                    paidOnHtml = `
+                        <div class="payment-card-row">
+                            <span class="payment-card-label">Paid On:</span>
+                            <span class="payment-card-value">-</span>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Agent:</span>
+                        <span class="payment-card-value">${p.agent_name || 'N/A'}</span>
                     </div>
-                    <div class="details">
-                        <div><strong>Payment Date:</strong> ${pay.date}</div>
-                        <div><strong>Customer:</strong> ${pay.customer_name}</div>
-                        <div><strong>Agent:</strong> ${pay.agent_name}</div>
-                        <div><strong>Method:</strong> ${pay.method || "Cash"}</div>
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Customer:</span>
+                        <span class="payment-card-value">${p.customer_name || 'N/A'}</span>
                     </div>
-                    <table>
-                        <thead>
-                            <tr><th>Description</th><th>Amount</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Loan Payment</td><td>₹${pay.amt_paid}</td></tr>
-                        </tbody>
-                    </table>
-                    <div class="total">Total: ₹${pay.amt_paid}</div>
-                </body>
-                </html>
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Amount Paid:</span>
+                        <span class="payment-card-value">₹${p.amt_paid}</span>
+                    </div>
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Due Date:</span>
+                        <span class="payment-card-value">${p.due_date || '-'}</span>
+                    </div>
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Status:</span>
+                        <span class="payment-card-value">
+                            ${p.paid_on
+                                ? `<span class="status-paid">Paid</span>`
+                                : `<span class="status-pending">Not Paid</span>`}
+                        </span>
+                    </div>
+                    ${paidOnHtml}
                 `;
-                const receiptWindow = window.open('', '_blank');
-                receiptWindow.document.write(receiptHTML);
-                receiptWindow.document.close();
-                receiptWindow.focus();
-                receiptWindow.print();
+                paymentsList.appendChild(card);
             });
+        } catch (error) {
+            console.error("Failed to load payments", error);
+            document.getElementById("paymentsList").innerHTML =
+                `<p style="text-align: center; color: var(--text-light);">
+                    Failed to load payment data. Please try again.
+                 </p>`;
+        }
     }
 
-    // Date filter
-    document.getElementById('dateFilter').addEventListener('change', function () {
-        const selectedDate = this.value;
-        const filtered = allPayments.filter(pay => !selectedDate || pay.date.includes(selectedDate));
-        renderPayments(filtered);
+    function downloadReceipt(p) {
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const logo = new Image();
+            logo.src = "/static/icons/icon.png";
+
+            logo.onload = () => {
+                doc.addImage(logo, "PNG", 20, 10, 40, 20);
+                
+                doc.setFontSize(18);
+                doc.setFont("helvetica", "bold");
+                doc.text("Payment Receipt", 105, 25, { align: "center" });
+
+                doc.setDrawColor(200, 200, 200);
+                doc.line(20, 35, 190, 35);
+
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                let y = 50;
+                const gap = 10;
+
+                doc.text(`Receipt ID: ${p.payment_id || "-"}`, 20, y); y += gap;
+                doc.text(`Agent: ${p.agent_name || "N/A"}`, 20, y); y += gap;
+                doc.text(`Customer: ${p.customer_name || "N/A"}`, 20, y); y += gap;
+                doc.text(`Amount Paid: ₹${p.amt_paid}`, 20, y); y += gap;
+                doc.text(`Due Date: ${p.due_date || "-"}`, 20, y); y += gap;
+                doc.text(`Status: ${p.paid_on ? "Paid" : "Not Paid"}`, 20, y); y += gap;
+                doc.text(`Paid On: ${p.paid_on || "-"}`, 20, y);
+
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                doc.text("Thank you for your payment!", 105, 280, { align: "center" });
+                doc.text("Company Name - Confidential", 105, 287, { align: "center" });
+
+                doc.save(`receipt_${p.payment_id || "payment"}.pdf`);
+                showMessage('success', 'PDF receipt downloaded!');
+            };
+
+            logo.onerror = () => {
+                showMessage('error', 'Failed to load logo for PDF. Please try again.');
+            };
+
+        } catch (error) {
+            console.error("Failed to generate PDF", error);
+            showMessage('error', 'An error occurred while generating the PDF.');
+        }
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll(".payment-card").forEach(card => {
+            card.style.display = card.textContent.toLowerCase().includes(filter) ? "flex" : "none";
+        });
     });
 
-    // Search filter
-    document.querySelector('.search-box input').addEventListener('input', function () {
-        const searchTerm = this.value.toLowerCase();
-        const filtered = allPayments.filter(pay =>
-            pay.customer_name?.toLowerCase().includes(searchTerm) ||
-            pay.agent_name?.toLowerCase().includes(searchTerm) ||
-            String(pay.payment_id).includes(searchTerm)
-        );
-        renderPayments(filtered);
+    document.addEventListener("DOMContentLoaded", function() {
+        // Show a loading message
+        document.getElementById("paymentsList").innerHTML =
+            `<p style="text-align: center; color: var(--text-light); margin-top: 2rem;">Loading payments...</p>`;
+        loadPayments();
     });
 </script>
 {% endblock %}

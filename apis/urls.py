@@ -1,16 +1,12 @@
 from django.http import HttpResponse
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-    TokenVerifyView
-)
+from rest_framework_simplejwt.views import ( TokenRefreshView, TokenVerifyView)
 from rest_framework.routers import DefaultRouter
-
 from . import views
 from .custom_auth import CustomTokenObtainPairView
 from .views import (
-    CustomUserListView, PaymentDetail, PaymentList, login_view, settings, area_settings, change_password, subscription_page,
+    PaymentList, edit_user, edit_user_api, login_view, settings, area_settings, change_password, subscription_page,
     support, license, mysettings, ProfileUpdateView,
     LineListCreateView, LineDetailView,
     LineViewSet, AreaViewSet, CustomerViewSet, LoanViewSet,
@@ -72,20 +68,9 @@ urlpatterns = [
     path('license/', license, name='license'),
     path('languagae/', views.languagae, name='languagae'),
 
-    #superadmin urls
-    # path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
-    path('payments/', views.subscription_page , name='payments'),
-    path('api/users/', CustomUserListView.as_view(), name='user-list'),
-    path('api/users/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
-    path('superadmin/users/', views.user_management, name='user_management'),
-    path('api/users/<int:user_id>/edit/', views.edit_user, name='edit_user'),
-    path('api/users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
-    path('api/loans/', views.loan_list, name='loan-list-api'),
-    path('loan-management/', views.loan_management_page, name='loan-management-page'),
-    path('api/loans/<int:loan_id>/', views.delete_loan, name='delete_loan'),
-    path('transaction/', views.payments_page, name='payments_page'),
-    path('api/transaction/', views.PaymentList.as_view(), name='payments_details'),  
-    path('api/transaction/<int:pk>/', views.PaymentDetail.as_view(), name='payment-detail'),
+    path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
+    path('superadmin-userManagement/', views.superadmin_userManagement, name='superadmin_userManagement'),
+    path('edit-user/<int:user_id>/', edit_user_api, name='edit_user_api'),
 
     #forget password
     path('forgot-password/', views.enter_username, name='enter_username'),
@@ -95,6 +80,16 @@ urlpatterns = [
 
     #StaffPage
     path("staff-dashboard/", views.staff_user_management, name="staff_userManagement"),
+    path('api/users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
+    path("api/my-agents/", views.my_agents, name="my_agents"),
+    path("api/my-agents/<int:pk>/", views.agent_detail, name="agent_detail"),
+    path("payments/", views.payment_history, name="payments"),
+    path("api/payments/", views.user_payments, name="user-payments"),
+    path("profile/edit/", views.profile_edit, name="profile_edit"),
+    path("api/edit-profile/", views.edit_profile_api, name="edit-profile-api"),
+    path("staff/settings/", views.settings_view, name="staff_settings"),
+    path("staff/changePassword/", views.staff_changepassword, name="staff_changepassword"),
+    path('api/users/<int:user_id>/change-password/', views.change_password, name='change_password'),
 
     # API endpoints
     path('send-code/', views.send_code, name='send_code'),

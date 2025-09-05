@@ -1,0 +1,211 @@
+{% extends "core/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block extra_head %}
+
+<style>
+    /* General styles for the page */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 20px;
+        background-color: var(--primary, #007bff);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        height: 60px;
+    }
+
+    .header-title {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .main-content {
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+
+    /* Card-specific styles */
+    .settings-group-card {
+        background-color: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .settings-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .settings-item {
+        display: flex;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333;
+        text-decoration: none;
+        transition: background 0.2s ease;
+    }
+
+    .settings-item:last-child {
+        border-bottom: none;
+    }
+
+    .settings-item:hover {
+        background-color: #f5f5f5;
+    }
+
+    .settings-icon {
+        font-size: 20px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        color: var(--primary, #007bff);
+    }
+
+    .settings-label {
+        flex-grow: 1;
+        font-weight: 500;
+    }
+
+    .settings-arrow {
+        color: #b0b0b0;
+        font-size: 16px;
+    }
+
+    .sign-out {
+        color: #d9534f;
+    }
+
+    .sign-out .settings-icon,
+    .sign-out .settings-label {
+        color: #d9534f;
+    }
+
+    /* Standalone Sign Out Button */
+    .main-content>.settings-item.sign-out {
+        display: flex;
+        /* keep it flex */
+        align-items: center;
+        /* center vertically */
+        background-color: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 18px 20px;
+        text-align: left;
+        gap: 10px;
+        /* space between icon and label */
+    }
+
+
+    /* Bottom Navigation */
+    .nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 12px 0;
+        z-index: 40;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        height: 80px;
+    }
+
+    .nav-items {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #888;
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+
+    .nav-item i {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+        color: var(--primary, #007bff);
+    }
+</style>
+
+<header class="header">
+    <div class="header-title">Settings</div>
+</header>
+
+<main class="main-content">
+    <div class="settings-group-card">
+        <ul class="settings-list">
+            <a href="{% url 'profile_edit' %}" class="settings-item">
+                <span class="settings-icon"><i class="fas fa-user-edit"></i></span>
+                <span class="settings-label">Edit Profile</span>
+                <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="{% url 'staff_changepassword' %}" class="settings-item">
+                <span class="settings-icon"><i class="fas fa-lock"></i></span>
+                <span class="settings-label">Change Password</span>
+                <span class="settings-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+        </ul>
+    </div>
+
+
+    <a href="{% url 'login' %}" class="settings-item sign-out">
+        <span class="settings-icon"><i class="fas fa-sign-out-alt"></i></span>
+        <span class="settings-label">Sign out</span>
+    </a>
+</main>
+
+<nav class="nav">
+    <div class="nav-items">
+        <a href="{% url 'staff_userManagement' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a href="{% url 'payments' %}" class="nav-item">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payments</span>
+        </a>
+        <a href="" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Reports</span>
+        </a>
+        <a href="{% url 'staff_settings' %}" class="nav-item active">
+            <i class="fas fa-user-cog"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+</nav>
+
+{% endblock %}

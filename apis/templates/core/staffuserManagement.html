@@ -35,23 +35,40 @@
     .main-content {
         flex: 1;
         padding: 16px;
-        margin-top: 0;
+        padding-top: 80px;
+        /* a bit more than header height */
     }
-      .header {
-    background-color: var(--primary);
-    color: white;
-    padding: 16px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-  }
 
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 16px 20px;
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
 
+    .header-title {
+        font-size: 20px;
+        font-weight: 600;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+
+    .header-actions a {
+        color: white;
+        font-size: 18px;
+        padding: 4px;
+        transition: transform 0.2s;
+    }
 
 
     .page-title h1 {
@@ -156,10 +173,6 @@
         font-size: 0.875rem;
     }
 
-    .add-user-btn:hover {
-        background-color: var(--secondary);
-    }
-
     /* User Card List */
     .user-list {
         display: flex;
@@ -174,11 +187,6 @@
         cursor: pointer;
         transition: box-shadow 0.2s ease, transform 0.2s ease;
         overflow: hidden;
-    }
-
-    .user-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.1);
     }
 
     .user-card-header {
@@ -553,16 +561,11 @@
 {% endblock %}
 
 {% block content %}
+<header class="header">
+    <div class="text-lg font-semibold">Users</div>
+</header>
 <div class="main-content">
     <div id="messageContainer" class="message-container"></div>
-    <header class="header">
-        <div class="text-lg font-semibold">Collection</div>
-        <div>
-            <a href="{% url 'calculator' %}" title="Calculator">
-                <i class="fas fa-calculator"></i>
-            </a>
-        </div>
-    </header>
 
     <div class="table-actions">
         <div class="search-box">
@@ -654,11 +657,11 @@
 
 <nav class="nav">
     <div class="nav-items">
-        <a href="" class="nav-item active">
+        <a href="{% url 'staff_userManagement' %}" class="nav-item active">
             <i class="fas fa-users"></i>
             <span>Users</span>
         </a>
-        <a href="" class="nav-item">
+        <a href="{% url 'payments' %}" class="nav-item">
             <i class="fas fa-money-bill-wave"></i>
             <span>Payments</span>
         </a>
@@ -666,7 +669,7 @@
             <i class="fas fa-chart-line"></i>
             <span>Reports</span>
         </a>
-        <a href="" class="nav-item">
+        <a href="{% url 'staff_settings' %}" class="nav-item">
             <i class="fas fa-user-cog"></i>
             <span>Profile</span>
         </a>
@@ -674,7 +677,8 @@
 </nav>
 
 <script>
-    const API_USERS = "http://127.0.0.1:8000/api/users/";
+    const API_USERS = "http://127.0.0.1:8000/api/my-agents/";
+
     const userModal = document.getElementById('userModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalActionButton = document.getElementById('modalActionButton');
@@ -874,8 +878,8 @@
             mobile_number: document.getElementById("mobile").value,
             is_active: document.getElementById("status").value === "true"
         };
-        const res = await fetch(`http://127.0.0.1:8000/api/users/${id}/edit/`, {
-            method: "PUT",
+        const res = await fetch(`http://127.0.0.1:8000/api/my-agents/${id}/`, {
+            method: "PATCH",
             headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
             body: JSON.stringify(data)
         });

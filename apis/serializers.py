@@ -280,11 +280,19 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = '__all__'   # fetch everything from the DB
 
 class PaymentSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.customer_name', read_only=True)
-    agent_name = serializers.CharField(source='user.username', read_only=True)
-    date = serializers.DateField(source='paid_on', read_only=True)
+    agent_name = serializers.CharField(source="user.full_name", read_only=True)
+    customer_name = serializers.CharField(source="customer.customer_name", read_only=True)
+    customer_code = serializers.CharField(source="customer.customer_code", read_only=True)
 
     class Meta:
         model = Payment
-        fields = ['payment_id', 'date', 'customer_name', 'agent_name', 'amt_paid']
+        fields = [
+            "payment_id",
+            "customer_name",
+            "customer_code",
+            "agent_name",
+            "amt_paid",
+            "due_date",
+            "paid_on",
+        ]
     

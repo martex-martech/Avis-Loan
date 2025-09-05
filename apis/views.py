@@ -39,7 +39,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils.dateparse import parse_date
-
+from django.views.decorators.http import require_GET
+from django.contrib.auth.hashers import make_password
 
 User = get_user_model()
 
@@ -156,16 +157,12 @@ def register_view(request):
 
             username = data.get('username')
             email = data.get('email')
-            password = data.get('password1')
-            password2 = data.get('password2')
+            password = data.get('password')   # ✅ only one password now
             full_name = data.get('full_name')
             mobile_number = data.get('mobile_number')
         
-            if not all([username, email, password, password2, full_name, mobile_number]):
+            if not all([username, email, password, full_name, mobile_number]):
                 return JsonResponse({'error': 'All fields are required.'}, status=400)
-            
-            if password != password2:
-                return JsonResponse({'error': 'Passwords do not match.'}, status=400)
             
             try:
                 validate_email(email)
@@ -184,13 +181,24 @@ def register_view(request):
             if len(password) < 8 or not re.search(r'[A-Za-z]', password) or not re.search(r'[0-9]', password):
                 return JsonResponse({'error': 'Password must be at least 8 characters long and contain both letters and numbers.'}, status=400)
             
-            # Create user (role defaults to 'agent')
+            # ✅ Determine role based on who is logged in
+            created_by = request.user if request.user.is_authenticated else None
+            if created_by and created_by.role == "superadmin":
+                role = "staff"
+            elif created_by and created_by.role == "staff":
+                role = "agent"
+            else:
+                role = "agent"  # default fallback
+            
+            # ✅ Create user with role + created_by
             user = User.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
                 full_name=full_name,
-                mobile_number=mobile_number
+                mobile_number=mobile_number,
+                role=role,
+                created_by=created_by
             )
             
             return JsonResponse({'message': 'Registration successful!'}, status=200)
@@ -199,6 +207,7 @@ def register_view(request):
             return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
     
     return render(request, 'core/register.html')
+
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -940,99 +949,101 @@ def collect_payment(request, customer_id):
 #  SUPERUSER
 #---------------
 
-# @login_required
-# def superadmin_dashboard(request):
-#     # Restrict access
-#     if request.user.role != 'superadmin':
-#         return redirect('/')
+@login_required
+def superadmin_dashboard(request):
+    # Restrict access
+    if request.user.role != 'superadmin':
+        return redirect('/')
 
-#     # ---------- Stats ----------
-#     total_loans_count = Loan.objects.count()
+    # ---------- Stats ----------
+    total_loans_count = Loan.objects.count()
 
-#     # Total loan amount from Customers (max loan amount field)
-#     total_loan_amount = Customer.objects.aggregate(
-#         total=Sum('maximum_loan_amount')
-#     )['total'] or 0
+    # Total loan amount from Customers (max loan amount field)
+    total_loan_amount = Customer.objects.aggregate(
+        total=Sum('maximum_loan_amount')
+    )['total'] or 0
 
-#     total_active_users = CustomUser.objects.filter(
-#         is_active=True
-#     ).exclude(role__in=['superadmin', 'staff']).count()
+    total_active_users = CustomUser.objects.filter(
+        is_active=True
+    ).exclude(role__in=['superadmin', 'staff']).count()
 
-#     total_areas = Area.objects.count()
+    total_areas = Area.objects.count()
 
-#     # ---------- Activities ----------
-#     activities = []
+    # ---------- Activities ----------
+    activities = []
 
-#     # Recent agents
-#     recent_agents = CustomUser.objects.filter(
-#         role='agent'
-#     ).order_by('-date_joined')[:5]
-#     for agent in recent_agents:
-#         activities.append({
-#             'type': 'success',
-#             'message': f"New agent joined: {agent.full_name}",
-#             'timestamp': agent.date_joined
-#         })
+    # Recent agents
+    recent_agents = CustomUser.objects.filter(
+        role='agent'
+    ).order_by('-date_joined')[:5]
+    for agent in recent_agents:
+        activities.append({
+            'type': 'success',
+            'message': f"New agent joined: {agent.full_name}",
+            'timestamp': agent.date_joined
+        })
 
-#     # Recent customers
-#     recent_customers = Customer.objects.order_by('-created_at')[:5]
-#     for customer in recent_customers:
-#         activities.append({
-#             'type': 'info',
-#             'message': f"New customer added: {customer.customer_name}",
-#             'timestamp': customer.created_at
-#         })
+    # Recent customers
+    recent_customers = Customer.objects.order_by('-created_at')[:5]
+    for customer in recent_customers:
+        activities.append({
+            'type': 'info',
+            'message': f"New customer added: {customer.customer_name}",
+            'timestamp': customer.created_at
+        })
 
-#     # Recent loans → fetch related customer via OneToOne
-#     recent_loans = Loan.objects.order_by('-created_at')[:5]
-#     for loan in recent_loans:
-#         # Customer linked to this loan (via OneToOne)
-#         customer = getattr(loan, "customer", None)
-#         customer_name = customer.customer_name if customer else "Unknown"
-#         activities.append({
-#             'type': 'warning',
-#             'message': f"New loan initiated for: {customer_name}",
-#             'timestamp': loan.created_at
-#         })
+    # Recent loans → fetch related customer via OneToOne
+    recent_loans = Loan.objects.order_by('-created_at')[:5]
+    for loan in recent_loans:
+        # Customer linked to this loan (via OneToOne)
+        customer = getattr(loan, "customer", None)
+        customer_name = customer.customer_name if customer else "Unknown"
+        activities.append({
+            'type': 'warning',
+            'message': f"New loan initiated for: {customer_name}",
+            'timestamp': loan.created_at
+        })
 
-#     # Sort activities (latest first)
-#     activities.sort(key=lambda x: x['timestamp'], reverse=True)
-#     activities = activities[:5]
+    # Sort activities (latest first)
+    activities.sort(key=lambda x: x['timestamp'], reverse=True)
+    activities = activities[:5]
 
-#     # ---------- Loan Graph ----------
-#     loan_per_line = (
-#         Loan.objects.values('line__line_name')
-#         .annotate(total=Sum('principal_amount'))
-#         .order_by('line__line_name')
-#     )
-#     loan_labels = [item['line__line_name'] for item in loan_per_line]
-#     loan_data = [float(item['total'] or 0) for item in loan_per_line]
+    # ---------- Loan Graph ----------
+    loan_per_line = (
+        Loan.objects.values('line__line_name')
+        .annotate(total=Sum('principal_amount'))
+        .order_by('line__line_name')
+    )
+    loan_labels = [item['line__line_name'] for item in loan_per_line]
+    loan_data = [float(item['total'] or 0) for item in loan_per_line]
 
-#     # ---------- User Trend Graph (last 7 days) ----------
-#     today = now().date()
-#     last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+    # ---------- User Trend Graph (last 7 days) ----------
+    today = now().date()
+    last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
 
-#     user_labels = [d.strftime("%b %d") for d in last_7_days]
-#     user_data = []
-#     for day in last_7_days:
-#         count = CustomUser.objects.filter(
-#             date_joined__date=day
-#         ).exclude(role__in=['superadmin', 'staff']).count()
-#         user_data.append(count)
+    user_labels = [d.strftime("%b %d") for d in last_7_days]
+    user_data = []
+    for day in last_7_days:
+        count = CustomUser.objects.filter(
+            date_joined__date=day
+        ).exclude(role__in=['superadmin', 'staff']).count()
+        user_data.append(count)
 
-#     context = {
-#         'total_loans_count': total_loans_count,
-#         'total_loan_amount': total_loan_amount,
-#         'total_active_users': total_active_users,
-#         'total_areas': total_areas,
-#         'activities': activities,
-#         'graph_labels': json.dumps(loan_labels),
-#         'graph_data': json.dumps(loan_data),
-#         'user_graph_labels': json.dumps(user_labels),
-#         'user_graph_data': json.dumps(user_data),
-#     }
+    context = {
+        'total_loans_count': total_loans_count,
+        'total_loan_amount': total_loan_amount,
+        'total_active_users': total_active_users,
+        'total_areas': total_areas,
+        'activities': activities,
+        'graph_labels': json.dumps(loan_labels),
+        'graph_data': json.dumps(loan_data),
+        'user_graph_labels': json.dumps(user_labels),
+        'user_graph_data': json.dumps(user_data),
+    }
 
-#     return render(request, 'core/superadmin_dashboard.html', context)
+    return render(request, 'core/superadmin_dashboard.html', context)
+
+
 
 @login_required
 def subscription_page(request):
@@ -1111,42 +1122,48 @@ def user_management(request):
     }
     return render(request, 'core/user_management.html', context)
 
-@csrf_exempt
+@csrf_exempt  # remove this if using proper CSRF in frontend
 def edit_user(request, user_id):
-    if request.method != "PUT":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
-
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=405)
+    
     try:
         data = json.loads(request.body)
-
-        # Update password if provided
-        if "password" in data and data["password"]:
-            user.set_password(data["password"])
-
-        # Update other fields
-        user.full_name = data.get("full_name", user.full_name)
-        user.username = data.get("username", user.username)
-        user.email = data.get("email", user.email)
-        user.mobile_number = data.get("mobile_number", user.mobile_number)
-        if "is_active" in data:
-            user.is_active = data["is_active"]
-
+        user = User.objects.get(id=user_id)
+        
+        # Update fields
+        user.full_name = data.get('full_name', user.full_name)
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        user.mobile_number = data.get('mobile_number', user.mobile_number)
         user.save()
-        return JsonResponse({
-            "id": user.id,
-            "full_name": user.full_name,
-            "username": user.username,
-            "email": user.email,
-            "mobile_number": user.mobile_number,
-            "is_active": user.is_active
-        })
+        
+        return JsonResponse({'success': True, 'message': 'User updated successfully'})
+    
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+
+def change_password(request, user_id):
+    if request.method == 'POST':
+        user = get_object_or_404(CustomUser, id=user_id)
+        import json
+        data = json.loads(request.body)
+        new_password = data.get('new_password')
+
+        if not new_password:
+            return JsonResponse({'success': False, 'message': 'Password cannot be empty'})
+
+        try:
+            user.password = make_password(new_password)
+            user.save()
+            return JsonResponse({'success': True, 'message': 'Password updated successfully'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 
 @csrf_exempt
@@ -1427,3 +1444,136 @@ def staff_user_management(request):
         'users': users
     }
     return render(request, 'core/staffuserManagement.html', context)
+
+@login_required
+@require_GET
+def my_agents(request):
+    agents = User.objects.filter(role="agent", created_by=request.user)
+
+    data = [
+        {
+            "id": u.id,
+            "username": u.username,
+            "full_name": u.full_name,
+            "email": u.email,
+            "mobile_number": u.mobile_number,
+            "is_active": u.is_active,
+            "role": u.role,
+        }
+        for u in agents
+    ]
+
+    return JsonResponse(data, safe=False)
+
+from django.views.decorators.http import require_http_methods
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@login_required
+@csrf_exempt
+def agent_detail(request, pk):
+    agent = get_object_or_404(User, id=pk, created_by=request.user)
+
+    if request.method == "GET":
+        return JsonResponse({
+            "id": agent.id,
+            "username": agent.username,
+            "full_name": agent.full_name,
+            "email": agent.email,
+            "mobile_number": agent.mobile_number,
+            "is_active": agent.is_active,
+        })
+
+    elif request.method in ["PUT", "PATCH"]:
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+
+            agent.full_name = data.get("full_name", agent.full_name)
+            agent.username = data.get("username", agent.username)
+            agent.email = data.get("email", agent.email)
+            agent.mobile_number = data.get("mobile_number", agent.mobile_number)
+            agent.is_active = data.get("is_active", agent.is_active)
+
+            agent.save()
+
+            return JsonResponse({"message": "Agent updated successfully!"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+@login_required
+def payment_history(request):
+    return render(request, "core/payments.html")
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def user_payments(request):
+    # Get agents created by logged-in user
+    agents = CustomUser.objects.filter(created_by=request.user.id)
+    agent_ids = agents.values_list("id", flat=True)
+
+    # Get payments made by those agents
+    payments = Payment.objects.filter(user_id__in=agent_ids).select_related("user", "customer")
+
+    serializer = PaymentSerializer(payments, many=True)
+    return Response(serializer.data)
+
+@login_required
+def profile_edit(request):
+    return render(request, "core/profile_edit.html", {"user": request.user})
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def edit_profile_api(request):
+    user = request.user
+    data = request.data
+
+    user.full_name = data.get("full_name", user.full_name)
+    user.email = data.get("email", user.email)
+    user.mobile_number = data.get("mobile_number", user.mobile_number)
+    user.save()
+
+    return Response({"message": "Profile updated successfully!"})
+
+@login_required
+def settings_view(request):
+    return render(request, "core/staffSetting.html")
+
+@login_required
+def staff_changepassword(request):
+    return render(request, "core/staffChangepassword.html")
+
+@login_required
+def superadmin_userManagement(request):
+    staff_users = User.objects.filter(role__iexact='staff')
+    
+    context = {
+        'staff_users': staff_users
+    }
+
+    return render(request, "core/superadmin_userManagement.html", context)
+
+@csrf_exempt  # Remove this if your frontend is sending CSRF tokens
+def edit_user_api(request, user_id):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Only POST requests are allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        user = User.objects.get(id=user_id)
+
+        # Update fields
+        user.full_name = data.get('full_name', user.full_name)
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        user.mobile_number = data.get('mobile_number', user.mobile_number)
+        user.save()
+
+        return JsonResponse({'success': True, 'message': 'User updated successfully'})
+
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
