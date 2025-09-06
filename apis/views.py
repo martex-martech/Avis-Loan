@@ -1532,7 +1532,7 @@ def payment_history(request):
 def user_payments(request):
     """
     Return payments made by agents created by the logged-in user.
-    Shows 'No transaction made yet' if no records are found.
+    Always return a consistent response format.
     """
     try:
         # Get agents created by logged-in user
@@ -1540,7 +1540,7 @@ def user_payments(request):
 
         if not agents.exists():
             return Response(
-                {"message": "No transaction made yet."},
+                {"message": "No transaction made yet.", "data": []},
                 status=status.HTTP_200_OK
             )
 
@@ -1551,16 +1551,19 @@ def user_payments(request):
 
         if not payments.exists():
             return Response(
-                {"message": "No transaction made yet."},
+                {"message": "No transaction made yet.", "data": []},
                 status=status.HTTP_200_OK
             )
 
         serializer = PaymentSerializer(payments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Payments fetched successfully.", "data": serializer.data},
+            status=status.HTTP_200_OK
+        )
 
     except Exception:
         return Response(
-            {"error": "Something went wrong while fetching payments. Please try again later."},
+            {"error": "Something went wrong while fetching payments. Please try again later.", "data": []},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
@@ -1714,7 +1717,7 @@ def superadmin_dashboard(request):
 
 
 
-    
+
 def enter_username(request):
     return render(request, 'core/forget_password.html')
 

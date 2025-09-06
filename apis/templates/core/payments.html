@@ -271,84 +271,88 @@
         }, 3000);
     }
 
-    async function loadPayments() {
-        try {
-            const res = await fetch(API_PAYMENTS);
-            if (!res.ok) {
-                throw new Error('Failed to fetch payment data');
-            }
-            const data = await res.json();
-            const paymentsList = document.getElementById("paymentsList");
-            paymentsList.innerHTML = "";
-
-            if (data.length === 0) {
-                 paymentsList.innerHTML = `
-                    <p style="text-align: center; color: var(--text-light); margin-top: 2rem;">No payments found.</p>
-                 `;
-                 return;
-            }
-
-            data.forEach(p => {
-                const card = document.createElement("div");
-                card.classList.add("payment-card");
-
-                let paidOnHtml = '';
-                if (p.paid_on) {
-                    paidOnHtml = `
-                        <div class="payment-card-row">
-                            <span class="payment-card-label">Paid On:</span>
-                            <span class="payment-card-value">${p.paid_on}</span>
-                        </div>
-                        <button class="receipt-btn" onclick='downloadReceipt(${JSON.stringify(p)})'>
-                            <i class="fas fa-file-pdf"></i> Download Receipt
-                        </button>
-                    `;
-                } else {
-                    paidOnHtml = `
-                        <div class="payment-card-row">
-                            <span class="payment-card-label">Paid On:</span>
-                            <span class="payment-card-value">-</span>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="payment-card-row">
-                        <span class="payment-card-label">Agent:</span>
-                        <span class="payment-card-value">${p.agent_name || 'N/A'}</span>
-                    </div>
-                    <div class="payment-card-row">
-                        <span class="payment-card-label">Customer:</span>
-                        <span class="payment-card-value">${p.customer_name || 'N/A'}</span>
-                    </div>
-                    <div class="payment-card-row">
-                        <span class="payment-card-label">Amount Paid:</span>
-                        <span class="payment-card-value">₹${p.amt_paid}</span>
-                    </div>
-                    <div class="payment-card-row">
-                        <span class="payment-card-label">Due Date:</span>
-                        <span class="payment-card-value">${p.due_date || '-'}</span>
-                    </div>
-                    <div class="payment-card-row">
-                        <span class="payment-card-label">Status:</span>
-                        <span class="payment-card-value">
-                            ${p.paid_on
-                                ? `<span class="status-paid">Paid</span>`
-                                : `<span class="status-pending">Not Paid</span>`}
-                        </span>
-                    </div>
-                    ${paidOnHtml}
-                `;
-                paymentsList.appendChild(card);
-            });
-        } catch (error) {
-            console.error("Failed to load payments", error);
-            document.getElementById("paymentsList").innerHTML =
-                `<p style="text-align: center; color: var(--text-light);">
-                    Failed to load payment data. Please try again.
-                 </p>`;
+async function loadPayments() {
+    try {
+        const res = await fetch(API_PAYMENTS);
+        if (!res.ok) {
+            throw new Error('Failed to fetch payment data');
         }
+        const result = await res.json();   // result = { message: "...", data: [...] }
+        const payments = result.data || []; // always fallback to []
+
+        const paymentsList = document.getElementById("paymentsList");
+        paymentsList.innerHTML = "";
+
+        if (payments.length === 0) {
+             paymentsList.innerHTML = `
+                <p style="text-align: center; color: var(--text-light); margin-top: 2rem;">
+                    No payments found.
+                </p>
+             `;
+             return;
+        }
+
+        payments.forEach(p => {
+            const card = document.createElement("div");
+            card.classList.add("payment-card");
+
+            let paidOnHtml = '';
+            if (p.paid_on) {
+                paidOnHtml = `
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Paid On:</span>
+                        <span class="payment-card-value">${p.paid_on}</span>
+                    </div>
+                    <button class="receipt-btn" onclick='downloadReceipt(${JSON.stringify(p)})'>
+                        <i class="fas fa-file-pdf"></i> Download Receipt
+                    </button>
+                `;
+            } else {
+                paidOnHtml = `
+                    <div class="payment-card-row">
+                        <span class="payment-card-label">Paid On:</span>
+                        <span class="payment-card-value">-</span>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="payment-card-row">
+                    <span class="payment-card-label">Agent:</span>
+                    <span class="payment-card-value">${p.agent_name || 'N/A'}</span>
+                </div>
+                <div class="payment-card-row">
+                    <span class="payment-card-label">Customer:</span>
+                    <span class="payment-card-value">${p.customer_name || 'N/A'}</span>
+                </div>
+                <div class="payment-card-row">
+                    <span class="payment-card-label">Amount Paid:</span>
+                    <span class="payment-card-value">₹${p.amt_paid}</span>
+                </div>
+                <div class="payment-card-row">
+                    <span class="payment-card-label">Due Date:</span>
+                    <span class="payment-card-value">${p.due_date || '-'}</span>
+                </div>
+                <div class="payment-card-row">
+                    <span class="payment-card-label">Status:</span>
+                    <span class="payment-card-value">
+                        ${p.paid_on
+                            ? `<span class="status-paid">Paid</span>`
+                            : `<span class="status-pending">Not Paid</span>`}
+                    </span>
+                </div>
+                ${paidOnHtml}
+            `;
+            paymentsList.appendChild(card);
+        });
+    } catch (error) {
+        console.error("Failed to load payments", error);
+        document.getElementById("paymentsList").innerHTML =
+            `<p style="text-align: center; color: var(--text-light);">
+                Failed to load payment data. Please try again.
+             </p>`;
     }
+}
 
     function downloadReceipt(p) {
         try {
