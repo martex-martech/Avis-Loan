@@ -1,4 +1,5 @@
 from datetime import timedelta, date
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
@@ -92,11 +93,24 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Area(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=255)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # safer than direct User import
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'created_by'],
+                name='unique_area_per_user'
+            )
+        ]
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.created_by})"
 
 
 

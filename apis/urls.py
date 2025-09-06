@@ -6,11 +6,10 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from .custom_auth import CustomTokenObtainPairView
 from .views import (
-    PaymentList, edit_user, edit_user_api, login_view, settings, area_settings, change_password, subscription_page,
+    agent_settings, login_view, area_settings, change_password,
     support, license, mysettings, ProfileUpdateView,
     LineListCreateView, LineDetailView,
     LineViewSet, AreaViewSet, CustomerViewSet, LoanViewSet,
-    add_customer_page, user_settings
     
 )
 from django.shortcuts import render
@@ -28,30 +27,36 @@ def home(request):
 
 
 urlpatterns = [
-    # Auth & User
+    # Auth
     path('', home, name='home'),
     path("cron-task/", views.cron_task, name="cron_task"),
     path('register/', views.register_view, name='register'),
     path('login/', login_view, name='login'),
-    path('signout/', views.signout, name='signout'),
-    path("calculator/", views.calculator, name="calculator"),
 
-    # Settings
-    path('settings/', user_settings, name='settings'),
+    #forget password
+    path('forgot-password/', views.enter_username, name='enter_username'),
+    path('send-code/', views.send_code, name='send_code'),
+    path('verify-code/', views.verify_code, name='verify_code'),
+    path('reset-password/', views.reset_password, name='reset_password'),
+
+    # Agent Settings
+    path('settings/', agent_settings, name='settings'),
+    path('support/', support, name='support'),
+    path('license/', license, name='license'),
     path('settings/LineSettings.html', views.line_settings, name='line_settings'),
     path('settings/LineAddCollection.html', views.add_line, name='line_add_collection'),
-    path('settings/mySettings.html', mysettings, name='mysettings_alt'),
-    path('settings/SignOut.html', views.signout, name='signout_alt'),
-    path('mysettings/', mysettings, name='mysettings'),
-
-    # Area
-    path('add_area/', views.add_area, name='add_area'),
     path('area_settings/', area_settings, name='area_settings'),
+    path('add_area/', views.add_area, name='add_area'),
     path('delete/<int:area_id>/', views.delete_area, name='delete_area'),
+    path('settings/agentProfileEdit.html', mysettings, name='mysettings_alt'),
+    path('mysettings/', mysettings, name='mysettings'),
+    path('languagae/', views.languagae, name='languagae'),
+    path('change_password/', change_password, name='change_password'),
+    path('settings/SignOut.html', views.signout, name='signout_alt'),
+    path('signout/', views.signout, name='signout'),
 
-    # Customer
+    # Agent Customer
     path('add-customer/', views.add_customer, name='add_customer'),
-    path("add-customer/page/", add_customer_page, name="create_customer"),
 
     # Expenses
     path('add-expense/', views.add_expense, name='add_expense'),
@@ -61,24 +66,9 @@ urlpatterns = [
     path('collection/', views.collection, name='collection'),
     path('collection_list/', views.collection_list, name='collection_list'),
     path('collect_payment/<int:customer_id>/', views.collect_payment, name='collect_payment'),
+    path("calculator/", views.calculator, name="calculator"),
 
-    # Misc
-    path('change_password/', change_password, name='change_password'),
-    path('support/', support, name='support'),
-    path('license/', license, name='license'),
-    path('languagae/', views.languagae, name='languagae'),
-
-    path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
-    path('superadmin-userManagement/', views.superadmin_userManagement, name='superadmin_userManagement'),
-    path('edit-user/<int:user_id>/', edit_user_api, name='edit_user_api'),
-
-    #forget password
-    path('forgot-password/', views.enter_username, name='enter_username'),
-    path('send-code/', views.send_code, name='send_code'),
-    path('verify-code/', views.verify_code, name='verify_code'),
-    path('reset-password/', views.reset_password, name='reset_password'),
-
-    #StaffPage
+    # Staff Panel
     path("staff-dashboard/", views.staff_user_management, name="staff_userManagement"),
     path('api/users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
     path("api/my-agents/", views.my_agents, name="my_agents"),
@@ -90,6 +80,9 @@ urlpatterns = [
     path("staff/settings/", views.settings_view, name="staff_settings"),
     path("staff/changePassword/", views.staff_changepassword, name="staff_changepassword"),
     path('api/users/<int:user_id>/change-password/', views.change_password, name='change_password'),
+
+    # Superadmin Panel
+    path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
 
     # API endpoints
     path('send-code/', views.send_code, name='send_code'),

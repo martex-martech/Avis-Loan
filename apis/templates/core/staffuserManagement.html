@@ -185,8 +185,10 @@
         border: 1px solid var(--border);
         border-radius: var(--border-radius);
         cursor: pointer;
-        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        transition: all 0.3s ease;
         overflow: hidden;
+        height: auto;
+        margin-bottom: 12px;
     }
 
     .user-card-header {
@@ -264,18 +266,17 @@
 
     .user-card-details {
         padding: 0 16px;
-        display: grid;
-        grid-template-rows: 0fr;
-        transition: grid-template-rows 0.3s ease-in-out;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
     }
 
     .user-card.expanded .user-card-details {
-        grid-template-rows: 1fr;
+        max-height: 200px;
+        /* Adjust this value based on your content height */
     }
 
     .details-inner {
-        min-height: 0;
-        overflow: hidden;
         padding-top: 16px;
         border-top: 1px solid var(--border);
         display: flex;
@@ -733,6 +734,11 @@
         // Prevent event from propagating to parent elements
         event.stopPropagation();
 
+        // If clicking on action buttons, don't toggle the card
+        if (event.target.closest('.card-actions')) {
+            return;
+        }
+
         const card = event.currentTarget.closest('.user-card');
 
         // If a different card is already expanded, collapse it
@@ -753,7 +759,12 @@
 
     async function loadUsers() {
         try {
-            const res = await fetch(API_USERS);
+            const res = await fetch(API_USERS, {
+                credentials: 'include'
+            });
+
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
             const data = await res.json();
             const listContainer = document.getElementById("userListContainer");
             listContainer.innerHTML = "";
@@ -767,39 +778,42 @@
                 const initial = u.full_name ? u.full_name.charAt(0).toUpperCase() : u.username.charAt(0).toUpperCase();
 
                 userCard.innerHTML = `
-                    <div class="user-card-header" onclick="toggleUserCardDetails(event)">
-                        <div class="user-avatar-small">${initial}</div>
-                        <div class="user-info-main">
-                            <h4>${u.full_name || 'N/A'}</h4>
-                            <p class="username-unique">@${u.username}</p>
-                        </div>
-                        <span class="status-badge ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span>
-                        <i class="fas fa-chevron-down toggle-icon"></i>
+                <div class="user-card-header" onclick="toggleUserCardDetails(event)">
+                    <div class="user-avatar-small">${initial}</div>
+                    <div class="user-info-main">
+                        <h4>${u.full_name || 'N/A'}</h4>
+                        <p class="username-unique">@${u.username}</p>
                     </div>
-                    <div class="user-card-details">
-                        <div class="details-inner">
-                            <div class="detail-item">
-                                <i class="fas fa-phone"></i>
-                                <span>${u.mobile_number || 'N/A'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-envelope"></i>
-                                <span>${u.email || 'N/A'}</span>
-                            </div>
-                            <div class="card-actions">
-                                <button class="action-btn edit-btn" onclick="openModal('edit', ${u.id})"><i class="fas fa-edit"></i> Edit</button>
-                                <button class="action-btn password-btn" onclick="openModal('password', ${u.id})"><i class="fas fa-key"></i> Password</button>
-                                <button class="action-btn delete-btn" onclick="openDeleteModal(${u.id})"><i class="fas fa-trash"></i> Delete</button>
-                            </div>
+                    <span class="status-badge ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="user-card-details">
+                    <div class="details-inner">
+                        <div class="detail-item">
+                            <i class="fas fa-phone"></i>
+                            <span>${u.mobile_number || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>${u.email || 'N/A'}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn edit-btn" onclick="openModal('edit', ${u.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="action-btn password-btn" onclick="openModal('password', ${u.id})"><i class="fas fa-key"></i> Password</button>
+                            <button class="action-btn delete-btn" onclick="openDeleteModal(${u.id})"><i class="fas fa-trash"></i> Delete</button>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
                 listContainer.appendChild(userCard);
             });
         } catch (error) {
+            console.error(error); // log the exact error
             showMessage('Failed to load users.', 'error');
         }
     }
+
+
 
     document.getElementById("searchInput").addEventListener("input", function () {
         const filter = this.value.toLowerCase();
@@ -816,9 +830,36 @@
         const val = this.value;
         document.querySelectorAll(".user-card").forEach(card => {
             const status = card.querySelector(".status-badge").textContent.toLowerCase();
-            if (val === "all") card.style.display = "flex";
-            else if (val === "active") card.style.display = (status === "active") ? "flex" : "none";
-            else if (val === "inactive") card.style.display = (status === "inactive") ? "flex" : "none";
+            if (val === "all") {
+                card.style.opacity = "1";
+                card.style.height = "auto";
+                card.style.marginBottom = "12px";
+                card.style.pointerEvents = "auto";
+            } else if (val === "active") {
+                if (status === "active") {
+                    card.style.opacity = "1";
+                    card.style.height = "auto";
+                    card.style.marginBottom = "12px";
+                    card.style.pointerEvents = "auto";
+                } else {
+                    card.style.opacity = "0.5";
+                    card.style.height = "0";
+                    card.style.marginBottom = "0";
+                    card.style.pointerEvents = "none";
+                }
+            } else if (val === "inactive") {
+                if (status === "inactive") {
+                    card.style.opacity = "1";
+                    card.style.height = "auto";
+                    card.style.marginBottom = "12px";
+                    card.style.pointerEvents = "auto";
+                } else {
+                    card.style.opacity = "0.5";
+                    card.style.height = "0";
+                    card.style.marginBottom = "0";
+                    card.style.pointerEvents = "none";
+                }
+            }
         });
     });
 
@@ -896,31 +937,51 @@
     }
 
     async function changePassword(id) {
-        const password = document.getElementById("newPassword").value;
+        const password = document.getElementById("newPassword").value.trim();
 
         if (!password) {
             showMessage("Please enter a new password.", "error");
             return;
         }
 
-        const res = await fetch(`http://127.0.0.1:8000/api/users/${id}/edit/`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken()
-            },
-            body: JSON.stringify({ password: password })
-        });
+        if (password.length < 6) {
+            showMessage("Password must be at least 6 characters long.", "error");
+            return;
+        }
 
-        if (res.ok) {
-            closeModal();
-            showMessage("Password changed successfully!", "success");
-        } else {
-            const errorData = await res.json();
-            const errorMsg = "Failed to change password: " + (errorData.detail || JSON.stringify(errorData));
-            showMessage(errorMsg, "error");
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/my-agents/${id}/`, {
+                method: "PATCH", // PATCH works for updating just password
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify({ password: password })
+            });
+
+            // Check if response is JSON
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                showMessage("Unexpected server response. Please try again.", "error");
+                return;
+            }
+
+            const data = await res.json();
+
+            if (res.ok) {
+                closeModal();
+                showMessage("Password changed successfully!", "success");
+            } else {
+                // Use backend-provided error if available
+                const errorMsg = data.error || "Failed to change password.";
+                showMessage(errorMsg, "error");
+            }
+
+        } catch (err) {
+            showMessage("Network error: " + err.message, "error");
         }
     }
+
 
     function openDeleteModal(id) {
         document.getElementById('deleteUserId').value = id;
