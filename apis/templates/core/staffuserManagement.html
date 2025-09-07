@@ -20,25 +20,6 @@
         --border-radius: 0.5rem;
     }
 
-    body {
-        display: flex;
-        flex-direction: column;
-        font-family: 'Poppins', sans-serif;
-        background-color: var(--background);
-        color: var(--text);
-        min-height: 100vh;
-        padding-bottom: 70px;
-        box-sizing: border-box;
-    }
-
-    /* Main Content Styles */
-    .main-content {
-        flex: 1;
-        padding: 16px;
-        padding-top: 80px;
-        /* a bit more than header height */
-    }
-
     .header {
         position: fixed;
         top: 0;
@@ -530,31 +511,31 @@
         left: 0;
         right: 0;
         background-color: white;
-        padding: 12px 0;
+        padding: 0.75rem 0;
         z-index: 40;
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-        height: 80px;
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-
+    
     .nav-items {
         display: flex;
         justify-content: space-around;
     }
-
+    
     .nav-item {
         display: flex;
         flex-direction: column;
         align-items: center;
         color: var(--text-light);
-        font-size: 12px;
-        padding: 4px 12px;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        text-decoration: none;
     }
-
+    
     .nav-item i {
-        font-size: 20px;
-        margin-bottom: 4px;
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
     }
-
+    
     .nav-item.active {
         color: var(--primary);
     }
@@ -563,7 +544,7 @@
 
 {% block content %}
 <header class="header">
-    <div class="text-lg font-semibold">Users</div>
+    <div class="text-lg font-semibold">Agent Management</div>
 </header>
 <div class="main-content">
     <div id="messageContainer" class="message-container"></div>
@@ -658,6 +639,10 @@
 
 <nav class="nav">
     <div class="nav-items">
+        <a href="{% url 'staff_dashboard' %}" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
         <a href="{% url 'staff_userManagement' %}" class="nav-item active">
             <i class="fas fa-users"></i>
             <span>Users</span>
@@ -666,16 +651,17 @@
             <i class="fas fa-money-bill-wave"></i>
             <span>Payments</span>
         </a>
-        <a href="" class="nav-item">
+        <a href="{% url 'staff_reports' %}" class="nav-item">
             <i class="fas fa-chart-line"></i>
             <span>Reports</span>
         </a>
         <a href="{% url 'staff_settings' %}" class="nav-item">
             <i class="fas fa-user-cog"></i>
-            <span>Profile</span>
+            <span>Settings</span>
         </a>
     </div>
 </nav>
+
 
 <script>
     const API_USERS = "http://127.0.0.1:8000/api/my-agents/";

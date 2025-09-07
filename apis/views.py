@@ -10,12 +10,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 import re
+from django.db.models import Sum, IntegerField
+from django.db.models.functions import Cast
+from datetime import datetime
 from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Line, Area, Customer, Loan
 from .serializers import LineSerializer, AreaSerializer, CustomerSerializer, LoanSerializer
 from datetime import datetime
 from django.shortcuts import render
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
@@ -898,7 +903,7 @@ def add_expense(request):
 
         # ✅ Validate date
         try:
-            expense_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            expense_date = datetime.strptime(date, "%Y-%m-%d").date()
         except ValueError:
             error_msg = "❌ Please enter a valid date in YYYY-MM-DD format."
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -1373,6 +1378,57 @@ def calculator(request):
 #-----------------------
 #Staff Panel
 #-----------------------
+
+@login_required
+def staff_dashboard(request):
+    user = request.user
+
+    # ✅ Get all users created by this staff
+    created_users = CustomUser.objects.filter(created_by_id=user.id)
+
+    # 1. Active Agents
+    active_agents_count = created_users.count()
+
+    # 2. Loans Initiated
+    loans_initiated_count = Loan.objects.filter(
+        created_by_id__in=created_users.values("id")
+    ).count()
+
+    # 3. Total Expense
+    total_expense_sum = Expense.objects.filter(
+        created_by_id__in=created_users.values("id")
+    ).aggregate(total=Sum("amount"))["total"] or 0
+
+    # 4. Recent Activity
+    recent_activities = created_users.order_by("-date_joined")[:5]
+    activities_list = [f"{u.username} recently joined" for u in recent_activities]
+
+    # 5. Users Joined Trend (group by month)
+    users_per_month = (
+        created_users.annotate(month=TruncMonth("date_joined"))
+        .values("month")
+        .annotate(count=Count("id"))
+        .order_by("month")
+    )
+
+    labels = [u["month"].strftime("%b %Y") for u in users_per_month]
+    data = [u["count"] for u in users_per_month]
+
+    context = {
+        "active_agents": active_agents_count,
+        "loans_initiated": loans_initiated_count,
+        "total_expense": total_expense_sum,
+        "recent_activities": activities_list,
+        "trend_labels": json.dumps(labels),
+        "trend_data": json.dumps(data),
+    }
+
+
+    return render(request, "core/staff_dashboard.html", context)
+
+@login_required
+def staff_reports(request):
+    return render(request, "core/staff_reports.html")
 
 @login_required
 def staff_user_management(request):

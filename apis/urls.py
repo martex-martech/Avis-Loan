@@ -69,12 +69,14 @@ urlpatterns = [
     path("calculator/", views.calculator, name="calculator"),
 
     # Staff Panel
-    path("staff-dashboard/", views.staff_user_management, name="staff_userManagement"),
+    path("staff-dashboard/", views.staff_dashboard, name="staff_dashboard"),
+    path("user-management/", views.staff_user_management, name="staff_userManagement"),
     path('api/users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
     path("api/my-agents/", views.my_agents, name="my_agents"),
     path("api/my-agents/<int:pk>/", views.agent_detail, name="agent_detail"),
     path("payments/", views.payment_history, name="payments"),
     path("api/payments/", views.user_payments, name="user-payments"),
+    path('staff/reports/', views.staff_reports, name='staff_reports'),
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("api/edit-profile/", views.edit_profile_api, name="edit-profile-api"),
     path("staff/settings/", views.settings_view, name="staff_settings"),

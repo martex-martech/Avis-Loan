@@ -1,0 +1,159 @@
+{% extends "core/base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block extra_head %}
+
+<style>
+    /* Header & Main Content */
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 16px 20px;
+        background-color: var(--primary, #007bff);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        height: 60px;
+    }
+
+    .header-title {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .main-content {
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+
+    /* Card Styles */
+    .report-card {
+        background-color: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 18px 20px;
+        color: #333;
+    }
+
+    .report-icon {
+        font-size: 24px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        color: var(--primary, #007bff);
+    }
+
+    .report-label {
+        font-weight: 500;
+        flex-grow: 1;
+        font-size: 16px;
+    }
+
+    .report-arrow {
+        color: #b0b0b0;
+        font-size: 16px;
+    }
+
+    /* Bottom Navigation */
+    .nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 0.75rem 0;
+        z-index: 40;
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-items {
+        display: flex;
+        justify-content: space-around;
+    }
+    
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--text-light);
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        text-decoration: none;
+    }
+    
+    .nav-item i {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-item.active {
+        color: var(--primary);
+    }
+</style>
+
+<header class="header">
+    <div class="header-title">Reports</div>
+</header>
+
+<main class="main-content">
+    <a href="" class="report-card">
+        <span class="report-icon"><i class="fas fa-stream"></i></span>
+        <span class="report-label">Line Report</span>
+        <span class="report-arrow"><i class="fas fa-chevron-right"></i></span>
+    </a>
+
+    <a href="" class="report-card">
+        <span class="report-icon"><i class="fas fa-map-marked-alt"></i></span>
+        <span class="report-label">Area Report</span>
+        <span class="report-arrow"><i class="fas fa-chevron-right"></i></span>
+    </a>
+
+    <a href="" class="report-card">
+        <span class="report-icon"><i class="fas fa-money-bill-wave"></i></span>
+        <span class="report-label">Expense Report</span>
+        <span class="report-arrow"><i class="fas fa-chevron-right"></i></span>
+    </a>
+</main>
+
+<nav class="nav">
+    <div class="nav-items">
+        <a href="{% url 'staff_dashboard' %}" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{% url 'staff_userManagement' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a href="{% url 'payments' %}" class="nav-item">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payments</span>
+        </a>
+        <a href="{% url 'staff_reports' %}" class="nav-item active">
+            <i class="fas fa-chart-line"></i>
+            <span>Reports</span>
+        </a>
+        <a href="{% url 'staff_settings' %}" class="nav-item">
+            <i class="fas fa-user-cog"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+</nav>
+
+{% endblock %}

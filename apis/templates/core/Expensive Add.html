@@ -246,7 +246,15 @@
         const formData = new FormData(this);
 
         try {
-          const response = await fetch(this.action, { method: 'POST', body: formData, headers: { 'X-CSRFToken': csrftoken } });
+          const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-CSRFToken': csrftoken,
+              'X-Requested-With': 'XMLHttpRequest', // <-- add this
+            },
+          });
+
           const data = await response.json();
           if (response.ok) {
             showMessage('success', data.message || 'Expense added successfully!');
