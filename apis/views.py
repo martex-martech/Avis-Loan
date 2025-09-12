@@ -4,6 +4,8 @@ import json
 import traceback
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
+from django.http import HttpResponse
+import csv
 from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -18,6 +20,7 @@ from rest_framework import viewsets
 from .models import Line, Area, Customer, Loan
 from .serializers import LineSerializer, AreaSerializer, CustomerSerializer, LoanSerializer
 from datetime import datetime
+from django.db.models import Sum, Prefetch
 from django.shortcuts import render
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
@@ -96,6 +99,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Line
 from .serializers import LineSerializer
+from apis import models
 
 User = get_user_model()
 
@@ -1647,13 +1651,128 @@ def settings_view(request):
 def staff_changepassword(request):
     return render(request, "core/staffChangepassword.html")
 
+@login_required
+def line_report(request):
+    from_date_str = request.GET.get("from_date")
+    to_date_str = request.GET.get("to_date")
 
+    report_entries = []
+    total_principal = 0
+    total_loans = 0
 
+    if request.GET:
+        if not from_date_str or not to_date_str:
+            messages.error(request, "Please select both From and To dates.")
+        else:
+            try:
+                from_date_parsed = date.fromisoformat(from_date_str)
+                to_date_parsed = date.fromisoformat(to_date_str)
 
+                if from_date_parsed > to_date_parsed:
+                    messages.error(request, "From Date cannot be after To Date.")
+                else:
+                    # Step 1: Agents created by logged-in user
+                    agents = CustomUser.objects.filter(created_by=request.user)
 
+                    # Step 2: Lines created by those agents
+                    lines = Line.objects.filter(created_by__in=agents)
 
+                    # Step 3: Loans for those lines filtered by date
+                    loans = Loan.objects.filter(
+                        line__in=lines,
+                        created_at__date__range=[from_date_parsed, to_date_parsed]
+                    ).select_related('line')
 
+                    if not loans.exists():
+                        messages.warning(request, "No loans found for the selected date range.")
+                    else:
+                        # Step 4: Build report entries: one per loan per customer
+                        for loan in loans:
+                            customers = Customer.objects.filter(line=loan.line)
+                            for customer in customers:
+                                report_entries.append({
+                                    "loan": loan,
+                                    "customer": customer
+                                })
 
+                        # Step 5: Totals
+                        total_principal = loans.aggregate(total=Sum("principal_amount"))["total"] or 0
+                        total_loans = loans.count()
+                        messages.success(request, "Report generated successfully.")
+
+            except (ValueError, TypeError) as e:
+                messages.error(request, f"Invalid date format. Please select valid dates. Error: {str(e)}")
+            except Exception as e:
+                messages.error(request, f"An unexpected error occurred: {str(e)}")
+
+    context = {
+        "report_entries": report_entries,
+        "from_date": from_date_str,
+        "to_date": to_date_str,
+        "total_principal": total_principal,
+        "total_loans": total_loans,
+    }
+
+    return render(request, "core/staff_LineReport.html", context)
+
+@login_required
+def line_report_download(request):
+    from_date = request.GET.get("from_date")
+    to_date = request.GET.get("to_date")
+
+    # Check if dates are provided
+    if not from_date or not to_date:
+        messages.error(request, "Please select both From and To dates to download the report.")
+        return redirect('line_report')  # redirect to your report page
+
+    from_date_parsed = parse_date(from_date)
+    to_date_parsed = parse_date(to_date)
+
+    # Validate date parsing
+    if not from_date_parsed or not to_date_parsed:
+        messages.error(request, "Invalid date format. Please select valid dates.")
+        return redirect('line_report')
+
+    # Fetch loans and related customers
+    agents = CustomUser.objects.filter(created_by=request.user)
+    lines = Line.objects.filter(created_by__in=agents)
+    loans = Loan.objects.filter(
+        line__in=lines,
+        created_at__date__range=[from_date_parsed, to_date_parsed]
+    ).select_related('line')
+
+    if not loans.exists():
+        messages.warning(request, "No loans found for the selected date range.")
+        return redirect('line_report')
+
+    # Calculate totals
+    total_loans = loans.count()
+    total_principal = loans.aggregate(total=Sum('principal_amount'))['total'] or 0
+
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="line_report_{from_date}_to_{to_date}.csv"'
+
+    writer = csv.writer(response)
+    # CSV headers
+    writer.writerow(['Customer Name', 'Line Name', 'Issued Date', 'Loan Amount'])
+
+    for loan in loans:
+        customers = Customer.objects.filter(line=loan.line)
+        for customer in customers:
+            writer.writerow([
+                customer.customer_name,
+                loan.line.line_name,
+                loan.created_at.strftime("%Y-%m-%d"),
+                loan.principal_amount,
+            ])
+
+    # Add totals at the bottom
+    writer.writerow([])
+    writer.writerow(['', '', 'Total Loans', total_loans])
+    writer.writerow(['', '', 'Total Loan Amount', total_principal])
+
+    return response
 
 
 
@@ -1763,13 +1882,6 @@ def superadmin_dashboard(request):
     }
 
     return render(request, 'core/superadmin_dashboard.html', context)
-    
-
-
-
-
-
-
 
 
 
