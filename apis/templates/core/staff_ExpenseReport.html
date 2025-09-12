@@ -1,10 +1,10 @@
 {% extends "core/base.html" %}
 
-{% block title %}Line Report{% endblock %}
+{% block title %}Expense Report{% endblock %}
 
 {% block extra_head %}
 <style>
-    /* header styles */
+    /* Header styles */
     .header {
         position: fixed;
         top: 0;
@@ -19,13 +19,11 @@
         color: white;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-
     .header-action {
         color: white;
         text-decoration: none;
         font-size: 20px;
     }
-
     .header-title {
         position: absolute;
         left: 50%;
@@ -39,14 +37,15 @@
         padding: 80px 20px 100px;
     }
 
-    .form-card {
+    .form-card, .report-card {
         background: white;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         padding: 20px;
-        max-width: 500px;
-        margin: auto;
         margin-bottom: 20px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .form-group {
@@ -57,7 +56,6 @@
         display: block;
         font-weight: 500;
         margin-bottom: 6px;
-        font-size: 14px;
         color: #333;
     }
 
@@ -66,7 +64,6 @@
         padding: 10px;
         border-radius: 8px;
         border: 1px solid #ccc;
-        font-size: 14px;
     }
 
     .submit-btn {
@@ -76,23 +73,12 @@
         border-radius: 8px;
         background-color: var(--primary);
         color: white;
-        font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.2s ease;
+        font-size: 16px;
     }
-
     .submit-btn:hover {
         background-color: var(--primary-light);
-    }
-
-    .report-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 15px;
-        background: #fafafa;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .report-card p {
@@ -107,7 +93,6 @@
         font-weight: 600;
     }
 
-    /* Floating download button */
     .download-btn {
         position: fixed;
         bottom: 30px;
@@ -121,15 +106,10 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 200;
         cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
     }
 
     .download-btn:hover {
         background-color: var(--primary-light);
-    }
-
-    .download-btn i {
-        pointer-events: none;
     }
 
     .message-container {
@@ -144,39 +124,19 @@
         border-radius: 8px;
         color: white;
         text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-
-    .message-container.show {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .message-container.success {
-        background-color: #10b981;
-        /* green-500 */
-    }
-
-    .message-container.error {
-        background-color: #ef4444;
-        /* red-500 */
-    }
-
-    .message-container.warning {
-        background-color: #f59e0b;
-        /* amber-500 */
-    }
-
-    .message-container i {
-        margin-right: 8px;
-        font-size: 1rem;
-    }
+    .message-container.show { opacity: 1; visibility: visible; }
+    .message-container.success { background-color: #10b981; }
+    .message-container.error { background-color: #ef4444; }
+    .message-container.warning { background-color: #f59e0b; }
+    .message-container i { margin-right: 8px; font-size: 1rem; }
 </style>
 {% endblock %}
 
@@ -185,8 +145,7 @@
     <a href="{% url 'staff_reports' %}" class="header-action">
         <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Line Report</div>
-    <div class="header-actions"></div>
+    <div class="header-title">Expense Report</div>
 </header>
 
 <div id="successMessage" class="message-container success"></div>
@@ -194,6 +153,7 @@
 <div id="warningMessage" class="message-container warning"></div>
 
 <main class="main-content">
+    <!-- Date filter form -->
     <div class="form-card">
         <form method="get" action="">
             <div class="form-group">
@@ -211,32 +171,34 @@
     </div>
 
     {% if report_entries %}
+    <!-- Report entries -->
     <div class="form-card">
-        <h3 style="margin-bottom: 15px;">Loan Report</h3>
+        <h3 style="margin-bottom: 15px;">Expense Report</h3>
         {% for entry in report_entries %}
         <div class="report-card">
-            <p><strong>Customer:</strong> {{ entry.customer.customer_name }}</p>
-            <p><strong>Line:</strong> {{ entry.loan.line.line_name }}</p>
-            <p><strong>Issued Date:</strong> {{ entry.loan.created_at|date:"Y-m-d" }}</p>
-            <p><strong>Loan Amount:</strong> ₹ {{ entry.loan.principal_amount }}</p>
+            <p><strong>Date:</strong> {{ entry.date|date:"Y-m-d" }}</p>
+            <p><strong>Agent Name:</strong> {{ entry.agent_name }}</p>
+            <p><strong>Expense Name:</strong> {{ entry.name }}</p>
+            <p><strong>Amount:</strong> ₹ {{ entry.amount }}</p>
+            <p><strong>Comments:</strong> {{ entry.comments }}</p>
         </div>
         {% endfor %}
 
         <div class="report-summary">
-            Total Loans: {{ total_loans }} <br>
-            Total Loan Amount: ₹ {{ total_principal }}
+            Total Expenses: {{ total_expenses }} <br>
+            Total Amount: ₹ {{ total_amount }}
         </div>
     </div>
-    {% endif %}
-    {% if report_entries %}
-    <a href="{% url 'line_report_download' %}?from_date={{ from_date }}&to_date={{ to_date }}" class="download-btn"
-        title="Download Report">
+
+    <!-- Download button -->
+    <a href="{% url 'expense_report_download' %}?from_date={{ from_date }}&to_date={{ to_date }}" class="download-btn"
+        title="Download CSV">
         <i class="fas fa-download"></i>
     </a>
     {% endif %}
 </main>
 
-<!-- Hidden element to store Django messages as JSON -->
+<!-- Hidden element for Django messages -->
 <div id="django-messages" data-messages='[
     {% for message in messages %}
         {"tags": "{{ message.tags|escapejs }}", "message": "{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}
@@ -251,39 +213,23 @@
     function showMessage(type, message) {
         let msgElement;
         let iconClass;
-
-        if (type === 'success') {
-            msgElement = successMessage;
-            iconClass = 'fas fa-check-circle';
-        } else if (type === 'error') {
-            msgElement = errorMessage;
-            iconClass = 'fas fa-exclamation-circle';
-        } else if (type === 'warning') {
-            msgElement = warningMessage;
-            iconClass = 'fas fa-exclamation-triangle';
-        } else {
-            return; // Exit if type is not recognized
-        }
+        if(type==='success'){ msgElement=successMessage; iconClass='fas fa-check-circle'; }
+        else if(type==='error'){ msgElement=errorMessage; iconClass='fas fa-exclamation-circle'; }
+        else if(type==='warning'){ msgElement=warningMessage; iconClass='fas fa-exclamation-triangle'; }
+        else return;
 
         msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
         msgElement.classList.add('show');
-        setTimeout(() => {
-            msgElement.classList.remove('show');
-        }, 3000); // Message will disappear after 3 seconds
+        setTimeout(()=>{ msgElement.classList.remove('show'); },3000);
     }
 
-    // Check for Django messages and display them
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const messagesElement = document.getElementById('django-messages');
-        if (messagesElement && messagesElement.dataset.messages) {
-            try {
+        if(messagesElement && messagesElement.dataset.messages){
+            try{
                 const messages = JSON.parse(messagesElement.dataset.messages);
-                messages.forEach(msg => {
-                    showMessage(msg.tags, msg.message);
-                });
-            } catch (e) {
-                console.error('Error parsing messages:', e);
-            }
+                messages.forEach(msg => { showMessage(msg.tags,msg.message); });
+            }catch(e){ console.error('Error parsing messages:', e); }
         }
     });
 </script>

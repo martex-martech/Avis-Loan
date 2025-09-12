@@ -1774,6 +1774,322 @@ def line_report_download(request):
 
     return response
 
+@login_required
+def area_report(request):
+    from_date_str = request.GET.get("from_date")
+    to_date_str = request.GET.get("to_date")
+
+    report_entries = []
+    total_principal = 0
+    total_loans = 0
+
+    if request.GET:
+        if not from_date_str or not to_date_str:
+            messages.error(request, "Please select both From and To dates.")
+        else:
+            try:
+                from_date_parsed = date.fromisoformat(from_date_str)
+                to_date_parsed = date.fromisoformat(to_date_str)
+
+                if from_date_parsed > to_date_parsed:
+                    messages.error(request, "From Date cannot be after To Date.")
+                else:
+                    # Step 1: Agents created by logged-in user
+                    agents = CustomUser.objects.filter(created_by=request.user)
+
+                    # Step 2: Areas created by those agents
+                    areas = Area.objects.filter(created_by__in=agents)
+
+                    # Step 3: Loans for those areas filtered by date
+                    loans = Loan.objects.filter(
+                        area__in=areas,
+                        created_at__date__range=[from_date_parsed, to_date_parsed]
+                    ).select_related('line', 'area')
+
+                    if not loans.exists():
+                        messages.warning(request, "No loans found for the selected date range.")
+                    else:
+                        # Step 4: Build report entries: one per loan per customer in that area
+                        for loan in loans:
+                            customers = Customer.objects.filter(area=loan.area)
+                            for customer in customers:
+                                report_entries.append({
+                                    "area": loan.area,
+                                    "loan": loan,
+                                    "customer": customer
+                                })
+
+                        # Step 5: Calculate totals
+                        total_principal = sum(entry['loan'].principal_amount for entry in report_entries)
+                        total_loans = len(report_entries)
+                        messages.success(request, "Report generated successfully.")
+
+            except (ValueError, TypeError) as e:
+                messages.error(request, f"Invalid date format. Please select valid dates. Error: {str(e)}")
+            except Exception as e:
+                messages.error(request, f"An unexpected error occurred: {str(e)}")
+
+    context = {
+        "report_entries": report_entries,
+        "from_date": from_date_str,
+        "to_date": to_date_str,
+        "total_principal": total_principal,
+        "total_loans": total_loans,
+    }
+    return render(request, "core/staff_AreaReport.html", context)
+
+
+@login_required
+def area_report_download(request):
+    from_date = request.GET.get("from_date")
+    to_date = request.GET.get("to_date")
+
+    if not from_date or not to_date:
+        return HttpResponse("Please provide From and To dates.", status=400)
+
+    from_date_parsed = parse_date(from_date)
+    to_date_parsed = parse_date(to_date)
+
+    # Step 1: Get agents created by logged-in user
+    agents = CustomUser.objects.filter(created_by=request.user)
+
+    # Step 2: Get areas created by those agents
+    areas = Area.objects.filter(created_by__in=agents)
+
+    # Step 3: Get loans for those areas filtered by date
+    loans = Loan.objects.filter(
+        area__in=areas,
+        created_at__date__range=[from_date_parsed, to_date_parsed]
+    ).select_related('line', 'area')
+
+    # Totals
+    total_loans = loans.count()
+    total_principal = loans.aggregate(total=Sum('principal_amount'))['total'] or 0
+
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="area_report_{from_date}_to_{to_date}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Customer Name', 'Area Name', 'Line Name', 'Issued Date', 'Loan Amount'])
+
+    for loan in loans:
+        customers = Customer.objects.filter(area=loan.area)
+        for customer in customers:
+            writer.writerow([
+                customer.customer_name,
+                loan.area.name,
+                loan.line.line_name,
+                loan.created_at.strftime("%Y-%m-%d"),
+                loan.principal_amount,
+            ])
+
+    # Add totals
+    writer.writerow([])
+    writer.writerow(['', '', '', 'Total Loans', total_loans])
+    writer.writerow(['', '', '', 'Total Loan Amount', total_principal])
+
+    return response
+
+@login_required
+def expense_report(request):
+    from_date_str = request.GET.get("from_date")
+    to_date_str = request.GET.get("to_date")
+
+    report_entries = []
+    total_amount = 0
+    total_expenses = 0
+
+    if request.GET:
+        if not from_date_str or not to_date_str:
+            messages.error(request, "Please select both From and To dates.")
+        else:
+            try:
+                from_date_parsed = date.fromisoformat(from_date_str)
+                to_date_parsed = date.fromisoformat(to_date_str)
+
+                if from_date_parsed > to_date_parsed:
+                    messages.error(request, "From Date cannot be after To Date.")
+                else:
+                    # Step 1: Get agents created by logged-in user
+                    agents = CustomUser.objects.filter(created_by=request.user)
+
+                    # Step 2: Get expenses created by those agents
+                    expenses = Expense.objects.filter(
+                        created_by__in=agents,
+                        date__range=[from_date_parsed, to_date_parsed]
+                    )
+
+                    if not expenses.exists():
+                        messages.warning(request, "No expenses found for the selected date range.")
+                    else:
+                        # Step 3: Build report entries
+                        for exp in expenses:
+                            report_entries.append({
+                                "agent_name": exp.created_by.get_full_name() or exp.created_by.username,
+                                "name": exp.name,
+                                "date": exp.date,
+                                "amount": exp.amount,
+                                "comments": exp.comments  # or description if your model has it
+                            })
+
+                        # Step 4: Totals
+                        total_amount = sum(exp.amount for exp in expenses)
+                        total_expenses = expenses.count()
+                        messages.success(request, "Expense report generated successfully.")
+
+            except ValueError as e:
+                messages.error(request, f"Invalid date format. Please select valid dates. Error: {str(e)}")
+            except Exception as e:
+                messages.error(request, f"An unexpected error occurred: {str(e)}")
+
+    context = {
+        "report_entries": report_entries,
+        "from_date": from_date_str,
+        "to_date": to_date_str,
+        "total_amount": total_amount,
+        "total_expenses": total_expenses
+    }
+
+    return render(request, "core/staff_ExpenseReport.html", context)
+
+
+@login_required
+def expense_report_download(request):
+    from_date_str = request.GET.get("from_date")
+    to_date_str = request.GET.get("to_date")
+
+    if not from_date_str or not to_date_str:
+        messages.error(request, "Please select both From and To dates.")
+        return HttpResponse("Error: From and To dates are required.", status=400)
+
+    try:
+        from_date_parsed = date.fromisoformat(from_date_str)
+        to_date_parsed = date.fromisoformat(to_date_str)
+
+        if from_date_parsed > to_date_parsed:
+            messages.error(request, "From Date cannot be after To Date.")
+            return HttpResponse("Error: From Date cannot be after To Date.", status=400)
+
+        # Step 1: Get agents created by logged-in user
+        agents = CustomUser.objects.filter(created_by=request.user)
+
+        # Step 2: Get expenses created by those agents in the date range
+        expenses = Expense.objects.filter(
+            created_by__in=agents,
+            date__range=[from_date_parsed, to_date_parsed]
+        )
+
+        if not expenses.exists():
+            messages.warning(request, "No expenses found for the selected date range.")
+            return HttpResponse("No expenses found for the selected date range.", status=404)
+
+        # Step 3: Calculate totals
+        total_amount = sum(exp.amount for exp in expenses)
+        total_expenses = expenses.count()
+
+        # Step 4: Create CSV response
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="expense_report_{from_date_str}_to_{to_date_str}.csv"'
+
+        writer = csv.writer(response)
+        # Header row
+        writer.writerow(["Date", "Agent Name", "Expense Name", "Amount", "Comments"])
+
+        # Data rows
+        for exp in expenses:
+            writer.writerow([
+                exp.date.strftime("%Y-%m-%d"),
+                exp.created_by.get_full_name() or exp.created_by.username,
+                exp.name,
+                exp.amount,
+                getattr(exp, "comments", "")
+            ])
+
+        # Totals row
+        writer.writerow([])
+        writer.writerow(["","","", "Total_Expenses", total_expenses, ""])
+        writer.writerow(["","","", "Total_Amount", total_amount, ""])
+
+        return response
+
+    except ValueError as e:
+        messages.error(request, f"Invalid date format. Please select valid dates. Error: {str(e)}")
+        return HttpResponse(f"Error: Invalid date format. {str(e)}", status=400)
+
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+        return HttpResponse(f"Error: An unexpected error occurred. {str(e)}", status=500)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

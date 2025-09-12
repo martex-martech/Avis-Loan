@@ -1,6 +1,6 @@
 {% extends "core/base.html" %}
 
-{% block title %}Line Report{% endblock %}
+{% block title %}Area Report{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -39,13 +39,12 @@
         padding: 80px 20px 100px;
     }
 
-    .form-card {
+    .form-card,
+    .report-card {
         background: white;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         padding: 20px;
-        max-width: 500px;
-        margin: auto;
         margin-bottom: 20px;
     }
 
@@ -57,7 +56,6 @@
         display: block;
         font-weight: 500;
         margin-bottom: 6px;
-        font-size: 14px;
         color: #333;
     }
 
@@ -66,38 +64,25 @@
         padding: 10px;
         border-radius: 8px;
         border: 1px solid #ccc;
-        font-size: 14px;
     }
 
     .submit-btn {
         width: 100%;
         padding: 12px;
-        border: none;
         border-radius: 8px;
+        border: none;
         background-color: var(--primary);
         color: white;
-        font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.2s ease;
     }
 
     .submit-btn:hover {
         background-color: var(--primary-light);
     }
 
-    .report-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 15px;
-        background: #fafafa;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-
     .report-card p {
         margin: 4px 0;
-        font-size: 14px;
     }
 
     .report-summary {
@@ -107,7 +92,7 @@
         font-weight: 600;
     }
 
-    /* Floating download button */
+    /* Floating Download Button */
     .download-btn {
         position: fixed;
         bottom: 30px;
@@ -128,10 +113,7 @@
         background-color: var(--primary-light);
     }
 
-    .download-btn i {
-        pointer-events: none;
-    }
-
+    /* Message container */
     .message-container {
         position: fixed;
         top: 80px;
@@ -185,7 +167,7 @@
     <a href="{% url 'staff_reports' %}" class="header-action">
         <i class="fas fa-chevron-left"></i>
     </a>
-    <div class="header-title">Line Report</div>
+    <div class="header-title">Area Report</div>
     <div class="header-actions"></div>
 </header>
 
@@ -194,6 +176,7 @@
 <div id="warningMessage" class="message-container warning"></div>
 
 <main class="main-content">
+    <!-- Date Form -->
     <div class="form-card">
         <form method="get" action="">
             <div class="form-group">
@@ -211,11 +194,13 @@
     </div>
 
     {% if report_entries %}
+    <!-- Report -->
     <div class="form-card">
-        <h3 style="margin-bottom: 15px;">Loan Report</h3>
+        <h3 style="margin-bottom: 15px;">Area Loan Report</h3>
         {% for entry in report_entries %}
         <div class="report-card">
             <p><strong>Customer:</strong> {{ entry.customer.customer_name }}</p>
+            <p><strong>Area:</strong> {{ entry.area.name }}</p>
             <p><strong>Line:</strong> {{ entry.loan.line.line_name }}</p>
             <p><strong>Issued Date:</strong> {{ entry.loan.created_at|date:"Y-m-d" }}</p>
             <p><strong>Loan Amount:</strong> ₹ {{ entry.loan.principal_amount }}</p>
@@ -227,16 +212,16 @@
             Total Loan Amount: ₹ {{ total_principal }}
         </div>
     </div>
-    {% endif %}
-    {% if report_entries %}
-    <a href="{% url 'line_report_download' %}?from_date={{ from_date }}&to_date={{ to_date }}" class="download-btn"
-        title="Download Report">
+
+    <!-- Download Button -->
+    <a href="{% url 'area_report_download' %}?from_date={{ from_date }}&to_date={{ to_date }}" class="download-btn"
+        title="Download CSV">
         <i class="fas fa-download"></i>
     </a>
     {% endif %}
 </main>
 
-<!-- Hidden element to store Django messages as JSON -->
+<!-- Hidden element for Django messages as JSON -->
 <div id="django-messages" data-messages='[
     {% for message in messages %}
         {"tags": "{{ message.tags|escapejs }}", "message": "{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}
@@ -262,14 +247,14 @@
             msgElement = warningMessage;
             iconClass = 'fas fa-exclamation-triangle';
         } else {
-            return; // Exit if type is not recognized
+            return;
         }
 
         msgElement.innerHTML = `<i class="${iconClass}"></i> ${message}`;
         msgElement.classList.add('show');
         setTimeout(() => {
             msgElement.classList.remove('show');
-        }, 3000); // Message will disappear after 3 seconds
+        }, 3000);
     }
 
     // Check for Django messages and display them
@@ -278,12 +263,19 @@
         if (messagesElement && messagesElement.dataset.messages) {
             try {
                 const messages = JSON.parse(messagesElement.dataset.messages);
-                messages.forEach(msg => {
-                    showMessage(msg.tags, msg.message);
-                });
+                messages.forEach(msg => showMessage(msg.tags, msg.message));
             } catch (e) {
                 console.error('Error parsing messages:', e);
             }
+        }
+    });
+
+    // Show error if date not selected
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (e) {
+        if (!document.getElementById('from_date').value || !document.getElementById('to_date').value) {
+            e.preventDefault();
+            showMessage('error', 'Please select both From and To dates.');
         }
     });
 </script>
