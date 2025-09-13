@@ -78,7 +78,9 @@
     }
 
     .table-actions {
+        position: relative;
         display: flex;
+        z-index: 60;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 16px;
@@ -515,12 +517,12 @@
         z-index: 40;
         box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    
+
     .nav-items {
         display: flex;
         justify-content: space-around;
     }
-    
+
     .nav-item {
         display: flex;
         flex-direction: column;
@@ -530,12 +532,12 @@
         padding: 0.25rem 0.75rem;
         text-decoration: none;
     }
-    
+
     .nav-item i {
         font-size: 1.25rem;
         margin-bottom: 0.25rem;
     }
-    
+
     .nav-item.active {
         color: var(--primary);
     }
@@ -546,9 +548,10 @@
 <header class="header">
     <div class="text-lg font-semibold">Agent Management</div>
 </header>
-<div class="main-content">
+<div class="main-content" style="padding-top: 80px;">
     <div id="messageContainer" class="message-container"></div>
 
+    <!-- Table Actions -->
     <div class="table-actions">
         <div class="search-box">
             <i class="fas fa-search"></i>
@@ -563,8 +566,8 @@
             <button class="add-user-btn" onclick="openModal('add')"><i class="fas fa-plus"></i> Add</button>
         </div>
     </div>
-    <div class="user-list" id="userListContainer">
-    </div>
+
+    <div class="user-list" id="userListContainer"></div>
 </div>
 
 <div class="modal" id="userModal">
@@ -744,41 +747,51 @@
             const listContainer = document.getElementById("userListContainer");
             listContainer.innerHTML = "";
 
-            data.forEach(u => {
-                if (u.role === "staff" || u.role === "superadmin") return;
+            // Filter out staff/superadmin
+            const agents = data.filter(u => u.role !== "staff" && u.role !== "superadmin");
 
+            if (agents.length === 0) {
+                listContainer.innerHTML = `
+                <p style="text-align: center; color: var(--text-light); margin-top: 2rem;">
+                    No agents found.
+                </p>
+            `;
+                return;
+            }
+
+            agents.forEach(u => {
                 const userCard = document.createElement("div");
                 userCard.className = "user-card";
                 const initial = u.full_name ? u.full_name.charAt(0).toUpperCase() : u.username.charAt(0).toUpperCase();
 
                 userCard.innerHTML = `
-                    <div class="user-card-header" onclick="toggleUserCardDetails(event)">
-                        <div class="user-avatar-small">${initial}</div>
-                        <div class="user-info-main">
-                            <h4>${u.full_name || 'N/A'}</h4>
-                            <p class="username-unique">@${u.username}</p>
-                        </div>
-                        <span class="status-badge ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span>
-                        <i class="fas fa-chevron-down toggle-icon"></i>
+                <div class="user-card-header" onclick="toggleUserCardDetails(event)">
+                    <div class="user-avatar-small">${initial}</div>
+                    <div class="user-info-main">
+                        <h4>${u.full_name || 'N/A'}</h4>
+                        <p class="username-unique">@${u.username}</p>
                     </div>
-                    <div class="user-card-details">
-                        <div class="details-inner">
-                            <div class="detail-item">
-                                <i class="fas fa-phone"></i>
-                                <span>${u.mobile_number || 'N/A'}</span>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-envelope"></i>
-                                <span>${u.email || 'N/A'}</span>
-                            </div>
-                            <div class="card-actions">
-                                <button class="action-btn edit-btn" onclick="openModal('edit', ${u.id})"><i class="fas fa-edit"></i> Edit</button>
-                                <button class="action-btn password-btn" onclick="openModal('password', ${u.id})"><i class="fas fa-key"></i> Password</button>
-                                <button class="action-btn delete-btn" onclick="openDeleteModal(${u.id})"><i class="fas fa-trash"></i> Delete</button>
-                            </div>
+                    <span class="status-badge ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="user-card-details">
+                    <div class="details-inner">
+                        <div class="detail-item">
+                            <i class="fas fa-phone"></i>
+                            <span>${u.mobile_number || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>${u.email || 'N/A'}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn edit-btn" onclick="openModal('edit', ${u.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="action-btn password-btn" onclick="openModal('password', ${u.id})"><i class="fas fa-key"></i> Password</button>
+                            <button class="action-btn delete-btn" onclick="openDeleteModal(${u.id})"><i class="fas fa-trash"></i> Delete</button>
                         </div>
                     </div>
-                `;
+                </div>
+            `;
                 listContainer.appendChild(userCard);
             });
         } catch (error) {
@@ -786,6 +799,7 @@
             showMessage('Failed to load users.', 'error');
         }
     }
+
 
     // ------------------------------
     // Load user details
@@ -850,9 +864,9 @@
         const url = "{% url 'agent_detail' 0 %}".replace('/0/', `/${id}/`);
         const res = await fetch(url, {
             method: "PATCH",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken() 
+                "X-CSRFToken": getCSRFToken()
             },
             body: JSON.stringify(data)
         });
@@ -877,7 +891,7 @@
         try {
             const res = await fetch(url, {
                 method: "PATCH",
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCSRFToken()
                 },
