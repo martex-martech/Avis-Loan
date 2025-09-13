@@ -664,17 +664,23 @@
 
 
 <script>
-    const API_USERS = "http://127.0.0.1:8000/api/my-agents/";
+    // ------------------------------
+    // API URLs
+    // ------------------------------
+    const API_USERS = "{% url 'my_agents' %}"; // /api/my-agents/
+    const API_DELETE_USER = "{% url 'delete_user' 0 %}".slice(0, -2); // remove 0/ at end
 
     const userModal = document.getElementById('userModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalActionButton = document.getElementById('modalActionButton');
     let expandedCard = null;
 
+    // ------------------------------
+    // Open / Close Modals
+    // ------------------------------
     function openModal(action, userId = null) {
         const modal = document.getElementById('userModal');
         modal.style.display = 'flex';
-
         document.querySelectorAll('.form-group').forEach(el => el.style.display = 'none');
 
         if (action === 'add') {
@@ -717,40 +723,23 @@
     }
 
     function toggleUserCardDetails(event) {
-        // Prevent event from propagating to parent elements
         event.stopPropagation();
-
-        // If clicking on action buttons, don't toggle the card
-        if (event.target.closest('.card-actions')) {
-            return;
-        }
+        if (event.target.closest('.card-actions')) return;
 
         const card = event.currentTarget.closest('.user-card');
+        if (expandedCard && expandedCard !== card) expandedCard.classList.remove('expanded');
 
-        // If a different card is already expanded, collapse it
-        if (expandedCard && expandedCard !== card) {
-            expandedCard.classList.remove('expanded');
-        }
-
-        // Toggle the 'expanded' class on the clicked card
         card.classList.toggle('expanded');
-
-        // Update the reference to the currently expanded card
-        if (card.classList.contains('expanded')) {
-            expandedCard = card;
-        } else {
-            expandedCard = null;
-        }
+        expandedCard = card.classList.contains('expanded') ? card : null;
     }
 
+    // ------------------------------
+    // Load Users
+    // ------------------------------
     async function loadUsers() {
         try {
-            const res = await fetch(API_USERS, {
-                credentials: 'include'
-            });
-
+            const res = await fetch(API_USERS, { credentials: 'include' });
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
             const data = await res.json();
             const listContainer = document.getElementById("userListContainer");
             listContainer.innerHTML = "";
@@ -760,95 +749,66 @@
 
                 const userCard = document.createElement("div");
                 userCard.className = "user-card";
-
                 const initial = u.full_name ? u.full_name.charAt(0).toUpperCase() : u.username.charAt(0).toUpperCase();
 
                 userCard.innerHTML = `
-                <div class="user-card-header" onclick="toggleUserCardDetails(event)">
-                    <div class="user-avatar-small">${initial}</div>
-                    <div class="user-info-main">
-                        <h4>${u.full_name || 'N/A'}</h4>
-                        <p class="username-unique">@${u.username}</p>
+                    <div class="user-card-header" onclick="toggleUserCardDetails(event)">
+                        <div class="user-avatar-small">${initial}</div>
+                        <div class="user-info-main">
+                            <h4>${u.full_name || 'N/A'}</h4>
+                            <p class="username-unique">@${u.username}</p>
+                        </div>
+                        <span class="status-badge ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span>
+                        <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
-                    <span class="status-badge ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
-                </div>
-                <div class="user-card-details">
-                    <div class="details-inner">
-                        <div class="detail-item">
-                            <i class="fas fa-phone"></i>
-                            <span>${u.mobile_number || 'N/A'}</span>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>${u.email || 'N/A'}</span>
-                        </div>
-                        <div class="card-actions">
-                            <button class="action-btn edit-btn" onclick="openModal('edit', ${u.id})"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn password-btn" onclick="openModal('password', ${u.id})"><i class="fas fa-key"></i> Password</button>
-                            <button class="action-btn delete-btn" onclick="openDeleteModal(${u.id})"><i class="fas fa-trash"></i> Delete</button>
+                    <div class="user-card-details">
+                        <div class="details-inner">
+                            <div class="detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${u.mobile_number || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>${u.email || 'N/A'}</span>
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-btn edit-btn" onclick="openModal('edit', ${u.id})"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="action-btn password-btn" onclick="openModal('password', ${u.id})"><i class="fas fa-key"></i> Password</button>
+                                <button class="action-btn delete-btn" onclick="openDeleteModal(${u.id})"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
                 listContainer.appendChild(userCard);
             });
         } catch (error) {
-            console.error(error); // log the exact error
+            console.error(error);
             showMessage('Failed to load users.', 'error');
         }
     }
 
+    // ------------------------------
+    // Load user details
+    // ------------------------------
+    async function loadUserDetails(id) {
+        try {
+            const url = "{% url 'agent_detail' 0 %}".replace('/0/', `/${id}/`);
+            const res = await fetch(url);
+            const u = await res.json();
+            document.getElementById("userId").value = u.id;
+            document.getElementById("fullName").value = u.full_name;
+            document.getElementById("username").value = u.username;
+            document.getElementById("email").value = u.email;
+            document.getElementById("mobile").value = u.mobile_number;
+            document.getElementById("status").value = u.is_active ? "true" : "false";
+        } catch (error) {
+            showMessage("Failed to load user details.", "error");
+        }
+    }
 
-
-    document.getElementById("searchInput").addEventListener("input", function () {
-        const filter = this.value.toLowerCase();
-        document.querySelectorAll(".user-card").forEach(card => {
-            const name = card.querySelector("h4").textContent.toLowerCase();
-            const username = card.querySelector("p").textContent.toLowerCase();
-            const mobile = card.querySelector(".detail-item:nth-of-type(1) span").textContent.toLowerCase();
-            const email = card.querySelector(".detail-item:nth-of-type(2) span").textContent.toLowerCase();
-            card.style.display = (name.includes(filter) || username.includes(filter) || mobile.includes(filter) || email.includes(filter)) ? "flex" : "none";
-        });
-    });
-
-    document.getElementById("filterSelect").addEventListener("change", function () {
-        const val = this.value;
-        document.querySelectorAll(".user-card").forEach(card => {
-            const status = card.querySelector(".status-badge").textContent.toLowerCase();
-            if (val === "all") {
-                card.style.opacity = "1";
-                card.style.height = "auto";
-                card.style.marginBottom = "12px";
-                card.style.pointerEvents = "auto";
-            } else if (val === "active") {
-                if (status === "active") {
-                    card.style.opacity = "1";
-                    card.style.height = "auto";
-                    card.style.marginBottom = "12px";
-                    card.style.pointerEvents = "auto";
-                } else {
-                    card.style.opacity = "0.5";
-                    card.style.height = "0";
-                    card.style.marginBottom = "0";
-                    card.style.pointerEvents = "none";
-                }
-            } else if (val === "inactive") {
-                if (status === "inactive") {
-                    card.style.opacity = "1";
-                    card.style.height = "auto";
-                    card.style.marginBottom = "12px";
-                    card.style.pointerEvents = "auto";
-                } else {
-                    card.style.opacity = "0.5";
-                    card.style.height = "0";
-                    card.style.marginBottom = "0";
-                    card.style.pointerEvents = "none";
-                }
-            }
-        });
-    });
-
+    // ------------------------------
+    // Add user
+    // ------------------------------
     async function addUser() {
         const formData = new FormData();
         formData.append('username', document.getElementById("username").value);
@@ -863,40 +823,22 @@
                 headers: { "X-CSRFToken": getCSRFToken() },
                 body: formData
             });
-
             const responseData = await res.json();
-
             if (res.ok) {
                 closeModal();
                 loadUsers();
                 showMessage("Agent added successfully!", "success");
             } else {
-                let errorMsg = "Failed to add user";
-                if (responseData.error) {
-                    errorMsg = responseData.error;
-                }
-                showMessage(errorMsg, "error");
+                showMessage(responseData.error || "Failed to add user", "error");
             }
         } catch (error) {
             showMessage("Network error: " + error.message, "error");
         }
     }
 
-    async function loadUserDetails(id) {
-        try {
-            const res = await fetch(API_USERS + id + "/");
-            const u = await res.json();
-            document.getElementById("userId").value = u.id;
-            document.getElementById("fullName").value = u.full_name;
-            document.getElementById("username").value = u.username;
-            document.getElementById("email").value = u.email;
-            document.getElementById("mobile").value = u.mobile_number;
-            document.getElementById("status").value = u.is_active ? "true" : "false";
-        } catch (error) {
-            showMessage("Failed to load user details.", "error");
-        }
-    }
-
+    // ------------------------------
+    // Update user
+    // ------------------------------
     async function updateUser(id) {
         const data = {
             full_name: document.getElementById("fullName").value,
@@ -905,70 +847,57 @@
             mobile_number: document.getElementById("mobile").value,
             is_active: document.getElementById("status").value === "true"
         };
-        const res = await fetch(`http://127.0.0.1:8000/api/my-agents/${id}/`, {
+        const url = "{% url 'agent_detail' 0 %}".replace('/0/', `/${id}/`);
+        const res = await fetch(url, {
             method: "PATCH",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            headers: { 
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken() 
+            },
             body: JSON.stringify(data)
         });
-
         if (res.ok) {
             closeModal();
             loadUsers();
             showMessage("Agent updated successfully!", "success");
         } else {
             const errorData = await res.json();
-            const errorMsg = "Failed to update user: " + (errorData.detail || JSON.stringify(errorData));
-            showMessage(errorMsg, "error");
+            showMessage("Failed to update user: " + (errorData.detail || JSON.stringify(errorData)), "error");
         }
     }
 
+    // ------------------------------
+    // Change password
+    // ------------------------------
     async function changePassword(id) {
         const password = document.getElementById("newPassword").value.trim();
+        if (!password) { showMessage("Enter new password.", "error"); return; }
 
-        if (!password) {
-            showMessage("Please enter a new password.", "error");
-            return;
-        }
-
-        if (password.length < 6) {
-            showMessage("Password must be at least 6 characters long.", "error");
-            return;
-        }
-
+        const url = "{% url 'change_password' 0 %}".replace('/0/', `/${id}/`);
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/my-agents/${id}/`, {
-                method: "PATCH", // PATCH works for updating just password
-                headers: {
+            const res = await fetch(url, {
+                method: "PATCH",
+                headers: { 
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCSRFToken()
                 },
-                body: JSON.stringify({ password: password })
+                body: JSON.stringify({ password })
             });
-
-            // Check if response is JSON
-            const contentType = res.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                showMessage("Unexpected server response. Please try again.", "error");
-                return;
-            }
-
             const data = await res.json();
-
             if (res.ok) {
                 closeModal();
                 showMessage("Password changed successfully!", "success");
             } else {
-                // Use backend-provided error if available
-                const errorMsg = data.error || "Failed to change password.";
-                showMessage(errorMsg, "error");
+                showMessage(data.error || "Failed to change password", "error");
             }
-
         } catch (err) {
             showMessage("Network error: " + err.message, "error");
         }
     }
 
-
+    // ------------------------------
+    // Delete user
+    // ------------------------------
     function openDeleteModal(id) {
         document.getElementById('deleteUserId').value = id;
         document.getElementById('deleteModal').style.display = 'flex';
@@ -980,7 +909,8 @@
 
     async function confirmDelete() {
         const id = document.getElementById('deleteUserId').value;
-        const res = await fetch(`http://127.0.0.1:8000/api/users/${id}/delete/`, {
+        const url = `${API_DELETE_USER}${id}/delete/`;
+        const res = await fetch(url, {
             method: "DELETE",
             headers: { "X-CSRFToken": getCSRFToken() }
         });
@@ -994,33 +924,22 @@
         }
     }
 
+    // ------------------------------
+    // Utilities
+    // ------------------------------
     function getCSRFToken() {
         const cookieValue = document.cookie.match('(^|;)\\s*csrftoken\\s*=\\s*([^;]+)');
         return cookieValue ? cookieValue.pop() : '';
     }
 
-    function showMessage(message, type) {
-        const msgContainer = document.getElementById("messageContainer");
-        msgContainer.textContent = message;
-        msgContainer.className = 'message-container';
-        if (type === 'success') {
-            msgContainer.classList.add('message-success');
-        } else {
-            msgContainer.classList.add('message-error');
-        }
-        msgContainer.classList.add('show');
-        setTimeout(() => {
-            msgContainer.classList.remove('show');
-        }, 3000);
+    function showMessage(msg, type = 'info') {
+        alert(`${type.toUpperCase()}: ${msg}`);
     }
 
-    document.getElementById('togglePassword').addEventListener('click', function () {
-        const passwordInput = document.getElementById('newPassword');
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.classList.toggle('fa-eye-slash');
-    });
-
-    loadUsers();
+    // ------------------------------
+    // Initial Load
+    // ------------------------------
+    document.addEventListener('DOMContentLoaded', loadUsers);
 </script>
+
 {% endblock %}
