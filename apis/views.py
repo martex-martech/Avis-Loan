@@ -2201,7 +2201,6 @@ def superadmin_dashboard(request):
 
 
 
-
 def enter_username(request):
     return render(request, 'core/forget_password.html')
 
