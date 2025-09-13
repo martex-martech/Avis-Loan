@@ -921,13 +921,16 @@
         document.getElementById('deleteModal').style.display = 'none';
     }
 
-    async function confirmDelete() {
-        const id = document.getElementById('deleteUserId').value;
-        const url = `${API_DELETE_USER}${id}/delete/`;
-        const res = await fetch(url, {
-            method: "DELETE",
-            headers: { "X-CSRFToken": getCSRFToken() }
-        });
+function confirmDelete() {
+    const id = document.getElementById('deleteUserId').value;
+    // Build URL dynamically
+    const url = "{% url 'delete_user' 0 %}".replace('/0/', `/${id}/`);
+    
+    fetch(url, {
+        method: "DELETE",
+        headers: { "X-CSRFToken": getCSRFToken() }
+    })
+    .then(res => {
         if (res.ok) {
             closeDeleteModal();
             loadUsers();
@@ -936,7 +939,9 @@
             closeDeleteModal();
             showMessage("Failed to delete user.", "error");
         }
-    }
+    });
+}
+
 
     // ------------------------------
     // Utilities
@@ -947,8 +952,16 @@
     }
 
     function showMessage(msg, type = 'info') {
-        alert(`${type.toUpperCase()}: ${msg}`);
+        const container = document.getElementById('messageContainer');
+        container.textContent = msg;
+        container.className = `message-container show message-${type}`;
+
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+            container.classList.remove('show');
+        }, 3000);
     }
+
 
     // ------------------------------
     // Initial Load
