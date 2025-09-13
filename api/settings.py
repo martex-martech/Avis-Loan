@@ -1,5 +1,5 @@
 """
-Django settings for api project (PostgreSQL for both Dev & Prod using Render DB)
+Django settings for api project (Dev = SQLite, Prod = PostgreSQL)
 """
 
 from pathlib import Path
@@ -13,11 +13,20 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ------------------------------
+# Environment
+# ------------------------------
+ENV = os.environ.get("DJANGO_ENV", "development")  # "production" or "development"
+
+# ------------------------------
 # Security
 # ------------------------------
 SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-default-key')
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+DEBUG = ENV == "development"
+
+if ENV == "production":
+    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+else:
+    ALLOWED_HOSTS = ["*"]
 
 # ------------------------------
 # Applications
@@ -82,19 +91,21 @@ TEMPLATES = [
 ]
 
 # ------------------------------
-# Database (Always Render Postgres)
+# Database
 # ------------------------------
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get(
-            'DATABASE_URL',
-            # fallback to your Render connection string (use your own)
-            'postgresql://avisloan_db_user:BItOZLhCHrW8FFTzVVTOorVdIa21ICmP@dpg-d2mjn21r0fns73b92kn0-a.oregon-postgres.render.com/avisloan_db'
-        ),
-        conn_max_age=600,  # persistent connections
-        ssl_require=True   # enforce SSL on Render
-    )
-}
+if ENV == "production":
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL')
+        )
+    }
+else:  # development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ------------------------------
 # Password validation
@@ -159,12 +170,25 @@ SIMPLE_JWT = {
 # ------------------------------
 # CORS
 # ------------------------------
-CORS_ALLOW_ALL_ORIGINS = True  # allow all origins for dev + prod
+if ENV == "production":
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+else:
+    CORS_ALLOW_ALL_ORIGINS = True
 
 # ------------------------------
 # Email
 # ------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if ENV == "production":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # ------------------------------
 # Default auto field
