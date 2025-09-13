@@ -1,11 +1,13 @@
 """
-Django settings for api project (Dev = SQLite, Prod = PostgreSQL)
+Django settings for api project (PostgreSQL on Render for dev & prod)
 """
 
 from pathlib import Path
 from datetime import timedelta
 import os
 import dj_database_url
+import environ
+import sys
 
 # ------------------------------
 # Paths
@@ -13,18 +15,25 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ------------------------------
-# Environment
+# Environment variables
 # ------------------------------
-ENV = os.environ.get("DJANGO_ENV", "development")  # "production" or "development"
+env = environ.Env(
+    DJANGO_ENV=(str, "development"),
+    SECRET_KEY=(str, "unsafe-default-key"),
+    DATABASE_URL=(str, None),
+    ALLOWED_HOSTS=(str, "*"),
+    CORS_ALLOWED_ORIGINS=(str, "")
+)
 
-# ------------------------------
-# Security
-# ------------------------------
-SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-default-key')
+# Read .env file if present (local development)
+environ.Env.read_env(BASE_DIR / ".env")
+
+ENV = env("DJANGO_ENV")
+SECRET_KEY = env("SECRET_KEY")
 DEBUG = ENV == "development"
 
 if ENV == "production":
-    ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+    ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
 else:
     ALLOWED_HOSTS = ["*"]
 
@@ -91,30 +100,29 @@ TEMPLATES = [
 ]
 
 # ------------------------------
-# Database
+# Database (PostgreSQL for dev & prod)
 # ------------------------------
-if ENV == "production":
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL')
-        )
-    }
-else:  # development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASE_URL = env("DATABASE_URL")
+
+if ENV == "production" and not DATABASE_URL:
+    raise Exception("DATABASE_URL is required in production but not set!")
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=(ENV == "production"),
+    )
+}
 
 # ------------------------------
 # Password validation
 # ------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # ------------------------------
@@ -172,7 +180,7 @@ SIMPLE_JWT = {
 # ------------------------------
 if ENV == "production":
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(",") if env("CORS_ALLOWED_ORIGINS") else []
 else:
     CORS_ALLOW_ALL_ORIGINS = True
 
