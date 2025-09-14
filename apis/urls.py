@@ -91,6 +91,13 @@ urlpatterns = [
 
     # Superadmin Panel
     path('superadmin-dashboard/', views.superadmin_dashboard, name='superadmin_dashboard'),
+    path("superadmin-usermanagement/", views.user_management, name="user_management"),
+    path('edit-user/', views.edit_user, name='edit_user'),
+    path("users/toggle-status/<int:user_id>/", views.toggle_status, name="toggle_status"),
+    path("users/<int:user_id>/change-password/", views.SA_change_password, name="change_password"),
+    path("users/<int:user_id>/delete/", views.delete_user, name="delete_user"),
+
+
 
     # API endpoints
     path('send-code/', views.send_code, name='send_code'),

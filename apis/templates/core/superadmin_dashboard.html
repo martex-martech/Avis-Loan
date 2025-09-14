@@ -9,47 +9,20 @@
 
 {% block extra_head %}
 <style>
-  :root {
-    --primary: #4f46e5;
-    --primary-light: #eef2ff;
-    --text: #1f2937;
-    --text-light: #6b7280;
-    --border: #e5e7eb;
-    --border-radius: 8px;
-  }
-
-  /* Ensure no default margin or padding on body and html */
-  html,
-  body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f3f4f6;
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* Main container for the whole page */
   .main-container {
     display: flex;
     width: 100%;
     position: relative;
   }
 
-  /* Sidebar Styles */
+  /* Sidebar */
   .sidebar {
     width: 280px;
     background: white;
     padding: 24px 0;
     height: 100vh;
     position: fixed;
-    /* Anchors the sidebar to the viewport */
     left: 0;
-    /* Aligns it to the far left */
     top: 0;
     border-right: 1px solid var(--border);
     z-index: 1000;
@@ -71,10 +44,6 @@
     font-weight: 600;
     color: var(--primary);
     margin: 0;
-  }
-
-  .sidebar-header h3 i {
-    font-size: 1.5rem;
   }
 
   .sidebar-menu {
@@ -108,13 +77,13 @@
   }
 
   .menu-item:hover {
-    background-color: var(--primary-light);
-    color: var(--primary);
+    background-color: var(--primary);
+    color: white;
   }
 
   .menu-item.active {
-    background-color: var(--primary-light);
-    color: var(--primary);
+    background-color: var(--primary);
+    color: white;
     position: relative;
   }
 
@@ -125,7 +94,7 @@
     top: 0;
     height: 100%;
     width: 4px;
-    background-color: var(--primary);
+    background-color: var(--primary-light);
     border-radius: 0 4px 4px 0;
   }
 
@@ -143,11 +112,10 @@
     font-size: 1rem;
   }
 
-  /* Main Content Styles */
+  /* Main Content */
   .main-content {
     flex-grow: 1;
     margin-left: 280px;
-    /* Pushes content away from the fixed sidebar */
     padding: 32px;
     display: flex;
     flex-direction: column;
@@ -177,7 +145,6 @@
 
   .menu-toggle {
     display: none;
-    /* Hidden on desktop by default */
     background: none;
     border: none;
     font-size: 1.5rem;
@@ -204,6 +171,11 @@
     gap: 12px;
   }
 
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
   .user-avatar {
     width: 40px;
     height: 40px;
@@ -216,21 +188,6 @@
     font-weight: 600;
     cursor: pointer;
     flex-shrink: 0;
-  }
-
-  .user-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .user-name {
-    font-weight: 600;
-    font-size: 0.875rem;
-  }
-
-  .user-role {
-    font-size: 0.75rem;
-    color: var(--text-light);
   }
 
   .dashboard-cards {
@@ -279,17 +236,17 @@
 
   .card-icon.loans {
     background-color: var(--primary-light);
-    color: var(--primary);
+    color: white;
   }
 
   .card-icon.users {
-    background-color: #d1fae5;
-    color: #10b981;
+    background-color: var(--success);
+    color: white;
   }
 
   .card-icon.areas {
-    background-color: #dbeafe;
-    color: #3b82f6;
+    background-color: var(--secondary);
+    color: white;
   }
 
   .activity-card {
@@ -304,11 +261,6 @@
     margin-top: 0;
     margin-bottom: 16px;
     font-size: 1.25rem;
-  }
-
-  .activity-card ul {
-    padding: 0;
-    margin: 0;
   }
 
   .activity-item {
@@ -335,32 +287,22 @@
 
   .activity-icon.loans {
     background-color: var(--primary-light);
-    color: var(--primary);
+    color: white;
   }
 
   .activity-icon.customers {
-    background-color: #d1fae5;
-    color: #10b981;
-  }
-
-  .activity-icon.areas {
-    background-color: #dbeafe;
-    color: #3b82f6;
+    background-color: var(--success);
+    color: white;
   }
 
   .activity-icon.agents {
-    background-color: #fef3c7;
-    color: #f59e0b;
+    background-color: var(--secondary);
+    color: white;
   }
 
-  .activity-details {
-    flex: 1;
-  }
-
-  .activity-title {
-    font-weight: 500;
-    margin-bottom: 4px;
-    margin-top: 0;
+  .activity-icon.staff {
+    background-color: var(--primary);
+    color: white;
   }
 
   .activity-time {
@@ -380,34 +322,28 @@
     min-width: 280px;
   }
 
-  /* Responsive adjustments */
   @media (max-width: 768px) {
     .main-container {
       flex-direction: column;
     }
 
-    /* Hide the sidebar initially off-screen */
     .sidebar {
       transform: translateX(-100%);
     }
 
-    /* Remove fixed margin from main content */
     .main-content {
       margin-left: 0;
       padding: 24px;
     }
 
-    /* Display the menu toggle button */
     .menu-toggle {
       display: block;
     }
 
-    /* When 'sidebar-open' class is on, slide in the sidebar */
     .main-container.sidebar-open .sidebar {
       transform: translateX(0);
     }
 
-    /* Create a semi-transparent overlay when the menu is open */
     .main-container.sidebar-open::before {
       content: '';
       position: fixed;
@@ -427,18 +363,24 @@
 
   <div class="sidebar">
     <div class="sidebar-header">
-      <h3><i class="fas fa-hand-holding-usd"></i> LoanApp</h3>
+      <h3>
+        <img src="{% static 'icons/icon.png' %}" alt="LoanApp Logo"
+          style="height: 70px; width: auto; margin-left: 35px;">
+      </h3>
     </div>
     <div class="sidebar-menu">
       <div class="menu-title">Main</div>
       <ul class="menu-items">
-        <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item active">
-            <i class="fas fa-chart-line"></i><span>Dashboard</span>
-          </a>
-        </li>
+        <li><a href="{% url 'superadmin_dashboard' %}" class="menu-item active"><i
+              class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+        <li><a href="{% url 'user_management' %}" class="menu-item"><i class="fas fa-user-cog"></i><span>User
+              Management</span></a></li>
+        <li><a href="{% url 'signout' %}" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Sign
+              Out</span></a></li>
       </ul>
     </div>
   </div>
+
 
   <div class="main-content">
     <div class="header">
@@ -537,8 +479,8 @@
         datasets: [{
           label: 'Total Loan Amount (₹)',
           data: loanData,
-          backgroundColor: 'rgba(79, 70, 229, 0.6)',
-          borderColor: 'rgba(79, 70, 229, 1)',
+          backgroundColor: 'var(--primary-light)',
+          borderColor: 'var(--primary)',
           borderWidth: 1
         }]
       },
@@ -546,7 +488,7 @@
         responsive: true,
         plugins: {
           legend: { display: false },
-          title: { display: true, text: 'Loans per Area' }
+          title: { display: true, text: 'Loans per Line' }
         },
         scales: {
           y: {
@@ -554,7 +496,7 @@
             title: { display: true, text: 'Amount (₹)' }
           },
           x: {
-            title: { display: true, text: 'Area' }
+            title: { display: true, text: 'Line' }
           }
         }
       }
@@ -569,7 +511,7 @@
           label: 'New Users',
           data: userData,
           backgroundColor: 'rgba(16, 185, 129, 0.2)',
-          borderColor: 'rgba(16, 185, 129, 1)',
+          borderColor: 'var(--success)',
           borderWidth: 2,
           fill: true,
           tension: 0.4
@@ -579,7 +521,7 @@
         responsive: true,
         plugins: {
           legend: { display: false },
-          title: { display: true, text: 'New Users per Month' }
+          title: { display: true, text: 'New Users per Day' }
         },
         scales: {
           y: {
@@ -587,22 +529,20 @@
             title: { display: true, text: 'Number of Users' }
           },
           x: {
-            title: { display: true, text: 'Month' }
+            title: { display: true, text: 'Date' }
           }
         }
       }
     });
 
-    // Sidebar toggle functionality
+    // Sidebar toggle
     const menuToggle = document.getElementById('menuToggle');
     const mainContainer = document.querySelector('.main-container');
 
-    // Toggle the sidebar
     menuToggle.addEventListener('click', () => {
       mainContainer.classList.toggle('sidebar-open');
     });
 
-    // Close sidebar by clicking outside
     mainContainer.addEventListener('click', (e) => {
       if (mainContainer.classList.contains('sidebar-open') && !e.target.closest('.sidebar') && !e.target.closest('#menuToggle')) {
         mainContainer.classList.remove('sidebar-open');

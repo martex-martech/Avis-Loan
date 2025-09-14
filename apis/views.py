@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
+import logging
 import re
 from django.db.models import Sum, IntegerField
 from django.db.models.functions import Cast
@@ -422,13 +423,21 @@ def register_view_api(request):
         'user_id': user.id
     }, status=status.HTTP_201_CREATED)
 
+logger = logging.getLogger(__name__)
 
 def login_view(request):
+    """
+    AJAX login view. Expects X-Requested-With: XMLHttpRequest.
+    Returns JSON responses with a 'field' key for front-end handling:
+      - 'username' -> username errors
+      - 'password' -> password errors
+      - 'account'  -> subscription / inactive account errors (popup)
+    """
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '').strip()
 
-        # ✅ 1. Username validation
+        # 1) Basic validation
         if not username:
             return JsonResponse({
                 'success': False,
@@ -436,7 +445,6 @@ def login_view(request):
                 'error': "Username is required. Please enter your username."
             })
 
-        # ✅ 2. Password validation
         if not password:
             return JsonResponse({
                 'success': False,
@@ -451,41 +459,58 @@ def login_view(request):
                 'error': "Your password is too short. It must be at least 6 characters long."
             })
 
-        # ✅ 3. Authenticate user
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            if not user.is_active:
-                return JsonResponse({
-                    'success': False,
-                    'field': 'account',
-                    'error': "Your account has been deactivated. Please contact support."
-                })
-
-            # Successful login
-            login(request, user)
+        # 2) Ensure user exists
+        try:
+            user_obj = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
             return JsonResponse({
-                'success': True,
-                'role': user.role,
-                'message': f"Welcome back, {user.full_name if hasattr(user, 'full_name') else user.username}!"
+                'success': False,
+                'field': 'username',
+                'error': f"No account found with the username '{username}'. Please check or register a new account."
             })
 
-        else:
-            # Check if username exists to give specific error
-            from .models import CustomUser
-            if CustomUser.objects.filter(username=username).exists():
-                return JsonResponse({
-                    'success': False,
-                    'field': 'password',
-                    'error': "The password you entered is incorrect. Please try again."
-                })
+        # 3) Robust inactive/subscription check
+        # Accepts boolean False or string representations like 'f', 'false', '0', etc.
+        inactive = False
+        try:
+            val = user_obj.is_active
+            if isinstance(val, bool):
+                inactive = (val is False)
             else:
-                return JsonResponse({
-                    'success': False,
-                    'field': 'username',
-                    'error': f"No account found with the username '{username}'. Please check or register a new account."
-                })
+                # normalize to string and check common 'false' tokens
+                if str(val).strip().lower() in ('f', 'false', '0', 'no', ''):
+                    inactive = True
+        except Exception as exc:
+            logger.exception("Unexpected error checking is_active for user %s: %s", username, exc)
+            # be conservative: if we can't determine, treat as active (or you can flip to True to be safer)
+            inactive = False
 
+        if inactive:
+            # This will be handled specially on the frontend (popup)
+            return JsonResponse({
+                'success': False,
+                'field': 'account',
+                'error': "Subscription completed. Contact avis4u.in@gmail.com | +91 97876 78785"
+            }, status=403)
+
+        # 4) Authenticate (only when account is active)
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            return JsonResponse({
+                'success': False,
+                'field': 'password',
+                'error': "The password you entered is incorrect. Please try again."
+            }, status=401)
+
+        # 5) Successful login
+        login(request, user)
+        return JsonResponse({
+            'success': True,
+            'role': getattr(user, 'role', None),
+            'message': f"Welcome back, {getattr(user, 'full_name', user.username)}!"
+        })
+
+    # Non-AJAX fallthrough -> render login page
     return render(request, 'core/login.html')
 
 @login_required
@@ -2021,86 +2046,6 @@ def expense_report_download(request):
         messages.error(request, f"An unexpected error occurred: {str(e)}")
         return HttpResponse(f"Error: An unexpected error occurred. {str(e)}", status=500)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #----------------
 #  SUPERUSER
 #---------------
@@ -2119,9 +2064,10 @@ def superadmin_dashboard(request):
         total=Sum('maximum_loan_amount')
     )['total'] or 0
 
+    # Count all active users except superadmin
     total_active_users = CustomUser.objects.filter(
         is_active=True
-    ).exclude(role__in=['superadmin', 'staff']).count()
+    ).exclude(role='superadmin').count()
 
     total_areas = Area.objects.count()
 
@@ -2139,6 +2085,17 @@ def superadmin_dashboard(request):
             'timestamp': agent.date_joined
         })
 
+    # Recent staff
+    recent_staff = CustomUser.objects.filter(
+        role='staff'
+    ).order_by('-date_joined')[:5]
+    for staff in recent_staff:
+        activities.append({
+            'type': 'primary',
+            'message': f"New staff joined: {staff.full_name}",
+            'timestamp': staff.date_joined
+        })
+
     # Recent customers
     recent_customers = Customer.objects.order_by('-created_at')[:5]
     for customer in recent_customers:
@@ -2148,10 +2105,9 @@ def superadmin_dashboard(request):
             'timestamp': customer.created_at
         })
 
-    # Recent loans → fetch related customer via OneToOne
+    # Recent loans
     recent_loans = Loan.objects.order_by('-created_at')[:5]
     for loan in recent_loans:
-        # Customer linked to this loan (via OneToOne)
         customer = getattr(loan, "customer", None)
         customer_name = customer.customer_name if customer else "Unknown"
         activities.append({
@@ -2182,7 +2138,7 @@ def superadmin_dashboard(request):
     for day in last_7_days:
         count = CustomUser.objects.filter(
             date_joined__date=day
-        ).exclude(role__in=['superadmin', 'staff']).count()
+        ).exclude(role='superadmin').count()
         user_data.append(count)
 
     context = {
@@ -2200,6 +2156,117 @@ def superadmin_dashboard(request):
     return render(request, 'core/superadmin_dashboard.html', context)
 
 
+@login_required
+def user_management(request):
+    print("Logged in user:", request.user, request.user.is_authenticated, request.user.role)
+    
+    if request.user.role != 'superadmin':
+        return redirect('/')
+    
+    staff_users = CustomUser.objects.filter(role='staff').order_by('-date_joined')
+    return render(request, 'core/SA_user_management.html', {
+        'staff_users': staff_users
+    })
+
+@csrf_exempt  # required if you handle CSRF manually in JS
+def edit_user(request):
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+        user_id = data.get("user_id")
+        if not user_id:
+            return JsonResponse({"error": "User ID is required"}, status=400)
+
+        user = get_object_or_404(CustomUser, id=user_id)
+
+        username = data.get("username", "").strip()
+        full_name = data.get("full_name", "").strip()
+        email = data.get("email", "").strip()
+        mobile_number = data.get("mobile_number", "").strip()
+
+        # Validate inputs
+        errors = {}
+        if not username:
+            errors["username"] = "Username cannot be empty"
+        if not full_name:
+            errors["full_name"] = "Full Name cannot be empty"
+        if not email:
+            errors["email"] = "Email cannot be empty"
+        else:
+            try:
+                validate_email(email)
+            except ValidationError:
+                errors["email"] = "Invalid email format"
+        if not mobile_number:
+            errors["mobile_number"] = "Mobile number cannot be empty"
+
+        if errors:
+            return JsonResponse({"success": False, "errors": errors}, status=400)
+
+        # Update user
+        user.username = username
+        user.full_name = full_name
+        user.email = email
+        user.mobile_number = mobile_number
+        user.save()
+
+        return JsonResponse({"success": True, "message": "User updated successfully"})
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+@csrf_exempt
+def toggle_status(request, user_id):
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+            user = get_object_or_404(CustomUser, id=user_id)
+
+            # Store "t" or "f" instead of boolean
+            is_active_flag = "t" if data.get("is_active") else "f"
+            user.is_active = is_active_flag
+            user.save()
+
+            return JsonResponse({"success": True, "status": user.is_active})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+@csrf_exempt
+def SA_change_password(request, user_id):
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            new_password = data.get("password")
+
+            if not new_password:
+                return JsonResponse({"success": False, "error": "Password is required"}, status=400)
+
+            user = get_object_or_404(CustomUser, id=user_id)
+            user.set_password(new_password)  # better than make_password
+            user.save()
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def delete_user(request, user_id):
+    if request.method == "DELETE":
+        try:
+            user = get_object_or_404(CustomUser, id=user_id)
+            user.delete()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 def enter_username(request):
     return render(request, 'core/forget_password.html')
@@ -2384,11 +2451,3 @@ def reset_password(request):
             return JsonResponse({'success': False, 'error': 'User not found'})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-
-
-
-
-
-
-
