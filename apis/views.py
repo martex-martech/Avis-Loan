@@ -284,7 +284,7 @@ def register_view(request):
                 else:
                     role = "agent"
             else:
-                role = "agent"
+                role = "staff"
 
             # ✅ 8. User creation with safe transaction
             try:
